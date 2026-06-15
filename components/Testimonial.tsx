@@ -1,5 +1,3 @@
-"use client";
-
 import { Star } from "lucide-react";
 import SectionShell from "./SectionShell";
 
@@ -16,17 +14,17 @@ const Testimonial = () => (
                     Student Story
                 </span>
                 <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-snug">
-                    &quot;Stwedy transformed my career trajectory. The depth of knowledge and personalized mentorship exceeded every expectation.&quot;
+                    &quot;Sturdee&apos;s Full-Stack Web Development track landed me a senior role within four months. The curriculum mirrors what we ship in production.&quot;
                 </p>
             </div>
             <div className="lg:col-span-7">
                 <div className="bg-white rounded-2xl p-8 shadow-xl border border-gray-100/50">
                     <p className="text-gray-500 font-medium leading-relaxed text-sm sm:text-base">
-                        This is education at its finest — practical, inspiring, and built for ambitious learners who want to lead.
+                        This is what modern technical education should feel like — rigorous, practical, and aligned with how teams actually build software.
                     </p>
                     <div className="mt-8 pt-6 border-t border-gray-100">
                         <p className="font-bold text-gray-900 text-sm">Alexandra Williams</p>
-                        <p className="text-gray-500 text-xs font-medium mt-1">Chief Innovation Officer, Fortune 500</p>
+                        <p className="text-gray-500 text-xs font-medium mt-1">Senior Software Engineer, Vercel · WEB-401 Graduate</p>
                     </div>
                 </div>
             </div>

@@ -37,4 +37,4 @@ export const TIME_SLOTS = [
 ];
 
 /** Default admin email — gets admin role on first sign-up. Override in Supabase or SQL. */
-export const DEFAULT_ADMIN_EMAIL = "admin@stwedy.com";
+export const DEFAULT_ADMIN_EMAIL = "admin@sturdee.online";

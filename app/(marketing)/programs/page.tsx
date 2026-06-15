@@ -1,9 +1,11 @@
+import Image from "next/image";
 import PageHero from "@/components/PageHero";
 import SectionShell from "@/components/SectionShell";
+import { IMAGES } from "@/lib/images";
 
 export default function ProgramsPage() {
     return (
-        <div className="font-jakarta bg-white min-h-screen">
+        <div className="font-jakarta bg-page min-h-screen">
             <PageHero
                 highlight="Academic Programs"
                 title="Structured Learning Paths"
@@ -55,9 +57,13 @@ export default function ProgramsPage() {
                         </button>
                     </div>
                     <div className="relative rounded-2xl overflow-hidden shadow-xl border border-gray-100/50 aspect-[4/5]">
-                        <img
-                            src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80"
+                        <Image
+                            src={IMAGES.programsStudents}
                             alt="Students"
+                            width={640}
+                            height={800}
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                            loading="lazy"
                             className="w-full h-full object-cover"
                         />
                     </div>

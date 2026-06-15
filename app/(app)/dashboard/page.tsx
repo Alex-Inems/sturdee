@@ -39,16 +39,31 @@ export default function DashboardPage() {
         };
     }, [loading, isAuthenticated, router]);
 
-    if (loading || !isAuthenticated) {
+    if (loading) {
         return (
-            <div className="flex min-h-screen items-center justify-center font-jakarta">
-                <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+            <div className="font-jakarta bg-page min-h-screen">
+                <PageHero
+                    highlight="My Dashboard"
+                    title="Your Bookings"
+                    subtitle="Track and manage all your scheduled sessions in one place."
+                />
+                <SectionShell compact>
+                    <div className="space-y-4 animate-pulse">
+                        <div className="h-10 w-48 rounded-lg bg-gray-100" />
+                        <div className="h-24 rounded-2xl bg-gray-50" />
+                        <div className="h-24 rounded-2xl bg-gray-50" />
+                    </div>
+                </SectionShell>
             </div>
         );
     }
 
+    if (!isAuthenticated) {
+        return null;
+    }
+
     return (
-        <div className="font-jakarta bg-white min-h-screen">
+        <div className="font-jakarta bg-page min-h-screen">
             <PageHero
                 highlight="My Dashboard"
                 title="Your Bookings"
@@ -68,7 +83,10 @@ export default function DashboardPage() {
                 </div>
 
                 {fetching ? (
-                    <div className="py-20 text-center text-gray-400">Loading bookings...</div>
+                    <div className="space-y-4 animate-pulse">
+                        <div className="h-24 rounded-2xl bg-gray-50" />
+                        <div className="h-24 rounded-2xl bg-gray-50" />
+                    </div>
                 ) : bookings.length === 0 ? (
                     <div className="rounded-2xl border border-gray-100 bg-white p-12 text-center shadow-xl">
                         <CalendarCheck className="mx-auto h-12 w-12 text-gray-300 mb-4" />

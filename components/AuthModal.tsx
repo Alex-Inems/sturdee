@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { X, BookOpen, Mail, Lock, ArrowRight, User, AlertCircle, CheckCircle2 } from "lucide-react";
+import { SITE_NAME } from "@/lib/site";
 import { useAuth } from "./AuthContext";
 
 interface AuthModalProps {
@@ -33,15 +34,20 @@ function GoogleIcon() {
     );
 }
 
+type AuthView = "login" | "register" | "forgot";
+
 export default function AuthModal({ isOpen, onClose, initialError }: AuthModalProps) {
-    const [isLogin, setIsLogin] = useState(true);
+    const [view, setView] = useState<AuthView>("login");
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(initialError ?? "");
     const [success, setSuccess] = useState("");
     const [submitting, setSubmitting] = useState(false);
-    const { login, register, signInWithGoogle } = useAuth();
+    const { login, register, signInWithGoogle, resetPassword } = useAuth();
+
+    const isLogin = view === "login";
+    const isForgot = view === "forgot";
 
     if (!isOpen) return null;
 
@@ -61,9 +67,11 @@ export default function AuthModal({ isOpen, onClose, initialError }: AuthModalPr
         setSuccess("");
         setSubmitting(true);
 
-        const result = isLogin
-            ? await login(email, password)
-            : await register(email, name, password);
+        const result = isForgot
+            ? await resetPassword(email)
+            : isLogin
+              ? await login(email, password)
+              : await register(email, name, password);
 
         setSubmitting(false);
 
@@ -81,6 +89,13 @@ export default function AuthModal({ isOpen, onClose, initialError }: AuthModalPr
         setEmail("");
         setName("");
         setPassword("");
+        setView("login");
+    };
+
+    const switchView = (next: AuthView) => {
+        setView(next);
+        setError("");
+        setSuccess("");
     };
 
     return (
@@ -93,16 +108,18 @@ export default function AuthModal({ isOpen, onClose, initialError }: AuthModalPr
                     <div className="relative z-10">
                         <div className="flex items-center gap-2 font-bold text-[#FFE55E] mb-8">
                             <BookOpen className="w-5 h-5" />
-                            Stwedy
+                            {SITE_NAME}
                         </div>
                         <h2 className="text-3xl font-bold leading-tight mb-4">
-                            {isLogin ? "Welcome Back" : "Begin Your Journey"}
+                            {isForgot ? "Reset Password" : isLogin ? "Welcome Back" : "Begin Your Journey"}
                         </h2>
                         <p className="text-white/70 font-medium leading-relaxed">
-                            Sign in with Google or email to book sessions and access your dashboard.
+                            {isForgot
+                                ? "We'll email you a link to choose a new password."
+                                : "Sign in with Google or email to book sessions and access your dashboard."}
                         </p>
                     </div>
-                    <p className="relative z-10 text-xs text-white/40">© 2025 Stwedy</p>
+                    <p className="relative z-10 text-xs text-white/40">© 2026 {SITE_NAME}</p>
                 </div>
 
                 <div className="flex-1 p-8 md:p-12 relative bg-white">
@@ -115,13 +132,19 @@ export default function AuthModal({ isOpen, onClose, initialError }: AuthModalPr
 
                     <div className="mb-6">
                         <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                            {isLogin ? "Sign in" : "Create account"}
+                            {isForgot ? "Forgot password?" : isLogin ? "Sign in" : "Create account"}
                         </h3>
                         <p className="text-gray-500 text-sm">
-                            {isLogin ? "Continue to your account." : "Get started in seconds."}
+                            {isForgot
+                                ? "Enter your email and we'll send a reset link."
+                                : isLogin
+                                  ? "Continue to your account."
+                                  : "Get started in seconds."}
                         </p>
                     </div>
 
+                    {!isForgot && (
+                        <>
                     <button
                         type="button"
                         onClick={handleGoogleSignIn}
@@ -140,6 +163,8 @@ export default function AuthModal({ isOpen, onClose, initialError }: AuthModalPr
                             <span className="bg-white px-3 text-gray-400 font-medium">or continue with email</span>
                         </div>
                     </div>
+                        </>
+                    )}
 
                     {displayError && (
                         <div className="mb-5 flex items-center gap-2 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
@@ -156,7 +181,7 @@ export default function AuthModal({ isOpen, onClose, initialError }: AuthModalPr
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-5">
-                        {!isLogin && (
+                        {view === "register" && (
                             <div>
                                 <label className="block text-xs font-semibold text-gray-500 mb-2">Full Name</label>
                                 <div className="relative">
@@ -188,8 +213,20 @@ export default function AuthModal({ isOpen, onClose, initialError }: AuthModalPr
                             </div>
                         </div>
 
+                        {!isForgot && (
                         <div>
-                            <label className="block text-xs font-semibold text-gray-500 mb-2">Password</label>
+                            <div className="flex items-center justify-between mb-2">
+                                <label className="block text-xs font-semibold text-gray-500">Password</label>
+                                {isLogin && (
+                                    <button
+                                        type="button"
+                                        onClick={() => switchView("forgot")}
+                                        className="text-xs font-semibold text-emerald-600 hover:text-emerald-700"
+                                    >
+                                        Forgot password?
+                                    </button>
+                                )}
+                            </div>
                             <div className="relative">
                                 <input
                                     type="password"
@@ -203,32 +240,47 @@ export default function AuthModal({ isOpen, onClose, initialError }: AuthModalPr
                                 <Lock className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
                             </div>
                         </div>
+                        )}
 
                         <button
                             type="submit"
                             disabled={submitting}
                             className="w-full bg-[#10B981] hover:bg-[#0F9F72] disabled:opacity-60 text-white py-4 rounded-full font-semibold flex items-center justify-center gap-2 transition-all"
                         >
-                            {submitting ? "Please wait..." : isLogin ? "Sign In" : "Create Account"}
+                            {submitting
+                                ? "Please wait..."
+                                : isForgot
+                                  ? "Send Reset Link"
+                                  : isLogin
+                                    ? "Sign In"
+                                    : "Create Account"}
                             <ArrowRight className="w-4 h-4" />
                         </button>
                     </form>
 
                     <div className="mt-8 pt-8 border-t border-gray-100 flex justify-center text-sm">
+                        {isForgot ? (
+                            <button
+                                type="button"
+                                onClick={() => switchView("login")}
+                                className="text-emerald-600 hover:text-emerald-700 font-semibold"
+                            >
+                                Back to sign in
+                            </button>
+                        ) : (
+                            <>
                         <span className="text-gray-500 mr-2">
                             {isLogin ? "No account?" : "Already have one?"}
                         </span>
                         <button
                             type="button"
-                            onClick={() => {
-                                setIsLogin(!isLogin);
-                                setError("");
-                                setSuccess("");
-                            }}
+                            onClick={() => switchView(isLogin ? "register" : "login")}
                             className="text-emerald-600 hover:text-emerald-700 font-semibold"
                         >
                             {isLogin ? "Sign up" : "Sign in"}
                         </button>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

@@ -1,10 +1,15 @@
+import dynamic from "next/dynamic";
 import PageHero from "@/components/PageHero";
 import SectionShell from "@/components/SectionShell";
-import BookingForm from "@/components/booking/BookingForm";
+import SectionPlaceholder from "@/components/SectionPlaceholder";
+
+const BookingForm = dynamic(() => import("@/components/booking/BookingForm"), {
+    loading: () => <SectionPlaceholder />,
+});
 
 export default function BookPage() {
     return (
-        <div className="font-jakarta bg-white min-h-screen">
+        <div className="font-jakarta bg-page min-h-screen">
             <PageHero
                 highlight="Book a Session"
                 title="Schedule Your Consultation"

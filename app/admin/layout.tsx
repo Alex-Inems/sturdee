@@ -2,10 +2,10 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/components/AuthContext";
+import { AuthProvider, useAuth } from "@/components/AuthContext";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     const { user, loading, isAuthenticated, refreshUser } = useAuth();
     const router = useRouter();
 
@@ -34,5 +34,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <AdminSidebar />
             <div className="pl-[240px]">{children}</div>
         </div>
+    );
+}
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+    return (
+        <AuthProvider>
+            <AdminLayoutInner>{children}</AdminLayoutInner>
+        </AuthProvider>
     );
 }

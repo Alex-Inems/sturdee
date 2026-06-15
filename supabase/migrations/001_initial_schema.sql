@@ -1,4 +1,4 @@
--- Stwedy: profiles + bookings with Row Level Security
+-- Sturdee: profiles + bookings with Row Level Security
 -- Run in Supabase SQL Editor or via `supabase db push`
 
 -- ─── Profiles ───────────────────────────────────────────────────────────────
@@ -97,7 +97,7 @@ begin
             split_part(new.email, '@', 1)
         ),
         case
-            when new.email in ('admin@stwedy.com') then 'admin'
+            when new.email in ('admin@sturdee.online') then 'admin'
             else 'user'
         end
     );

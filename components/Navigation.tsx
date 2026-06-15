@@ -1,16 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useState, useEffect, Suspense } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import AuthModal from "./AuthModal";
 import { useAuth } from "./AuthContext";
+
+const AuthModal = dynamic(() => import("./AuthModal"), { ssr: false });
 
 function NavigationInner() {
     const [scrolled, setScrolled] = useState(false);
     const [mobileMenu, setMobileMenu] = useState(false);
     const [authOpen, setAuthOpen] = useState(false);
-    const { user, logout } = useAuth();
+    const { user, logout, ensureAuth } = useAuth();
     const pathname = usePathname();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -31,8 +33,21 @@ function NavigationInner() {
         }
     };
 
+    const openAuth = () => {
+        ensureAuth();
+        setAuthOpen(true);
+    };
+
+    useEffect(() => {
+        if (authFromUrl) {
+            ensureAuth();
+            setAuthOpen(true);
+        }
+    }, [authFromUrl, ensureAuth]);
+
     const navLinks = [
         { label: "Home", href: "/" },
+        { label: "Tutorials", href: "/tutorials" },
         { label: "Courses", href: "/courses" },
         { label: "Programs", href: "/programs" },
         { label: "Instructors", href: "/instructors" },
@@ -42,13 +57,13 @@ function NavigationInner() {
     return (
         <>
             <nav
-                className={`fixed w-full z-50 transition-all duration-300 font-jakarta bg-white/80 backdrop-blur-md ${
-                    scrolled ? "py-4 border-b border-gray-100/80 shadow-xs" : "py-6 border-b border-transparent"
+                className={`fixed w-full z-50 transition-all duration-300 font-jakarta bg-page/85 backdrop-blur-md ${
+                    scrolled ? "py-4 border-b border-gray-200/70 shadow-xs" : "py-6 border-b border-transparent"
                 }`}
             >
                 <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
                     <Link href="/" className="text-2xl font-bold tracking-tight text-gray-900 hover:opacity-85 transition-opacity">
-                        Stwedy
+                        Sturdee
                     </Link>
 
                     <div className="hidden lg:flex items-center gap-7">
@@ -104,13 +119,13 @@ function NavigationInner() {
                         ) : (
                             <>
                                 <button
-                                    onClick={() => setAuthOpen(true)}
+                                    onClick={openAuth}
                                     className="text-[14px] font-semibold text-gray-600 hover:text-black transition-colors"
                                 >
                                     Sign Up
                                 </button>
                                 <button
-                                    onClick={() => setAuthOpen(true)}
+                                    onClick={openAuth}
                                     className="px-6 py-2 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold text-[14px] rounded-full shadow-xs hover:shadow-sm transition-all duration-200"
                                 >
                                     Login
@@ -135,7 +150,7 @@ function NavigationInner() {
                 </div>
 
                 {mobileMenu && (
-                    <div className="md:hidden absolute top-[100%] left-0 w-full bg-white/95 backdrop-blur-md border-b border-gray-100 px-6 py-6 space-y-3">
+                    <div className="md:hidden absolute top-[100%] left-0 w-full bg-page/95 backdrop-blur-md border-b border-gray-200/70 px-6 py-6 space-y-3">
                         {navLinks.map((link) => (
                             <Link
                                 key={link.label}
@@ -166,10 +181,10 @@ function NavigationInner() {
                             </>
                         ) : (
                             <>
-                                <button onClick={() => { setAuthOpen(true); setMobileMenu(false); }} className="w-full py-2.5 border border-gray-200 rounded-xl font-semibold">
+                                <button onClick={() => { openAuth(); setMobileMenu(false); }} className="w-full py-2.5 border border-gray-200 rounded-xl font-semibold">
                                     Sign Up
                                 </button>
-                                <button onClick={() => { setAuthOpen(true); setMobileMenu(false); }} className="w-full py-2.5 bg-[#10B981] text-white rounded-xl font-semibold">
+                                <button onClick={() => { openAuth(); setMobileMenu(false); }} className="w-full py-2.5 bg-[#10B981] text-white rounded-xl font-semibold">
                                     Login
                                 </button>
                             </>

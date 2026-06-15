@@ -40,7 +40,7 @@ export default function AdminSidebar() {
                     S
                 </div>
                 <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-gray-900">Stwedy</p>
+                    <p className="truncate text-sm font-semibold text-gray-900">Sturdee</p>
                     <p className="truncate text-[11px] text-gray-500">Admin Dashboard</p>
                 </div>
             </div>

@@ -46,7 +46,7 @@ export default function AdminOverviewPage() {
         <>
             <AdminHeader
                 title="Project Overview"
-                description="Stwedy education platform metrics"
+                description="Sturdee education platform metrics"
                 onRefresh={fetchStats}
                 refreshing={refreshing}
             />

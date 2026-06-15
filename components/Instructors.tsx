@@ -1,29 +1,8 @@
-"use client";
-
+import Image from "next/image";
 import SectionShell from "./SectionShell";
+import { INSTRUCTORS } from "@/lib/courses";
 
 const Instructors = () => {
-    const instructors = [
-        {
-            name: "Dr. James Morrison",
-            title: "Leadership & Strategy",
-            image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80",
-            credentials: "Harvard Business School",
-        },
-        {
-            name: "Prof. Sarah Chen",
-            title: "Innovation & Design",
-            image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
-            credentials: "MIT Sloan",
-        },
-        {
-            name: "Michael Zhang",
-            title: "Digital Transformation",
-            image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=400&q=80",
-            credentials: "Stanford GSB",
-        },
-    ];
-
     return (
         <SectionShell id="instructors">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start mb-12">
@@ -35,27 +14,34 @@ const Instructors = () => {
                         World-Class Faculty
                     </h2>
                     <p className="text-base sm:text-lg text-gray-500 font-medium leading-relaxed max-w-sm mt-6">
-                        Learn from industry pioneers and academic leaders who shape tomorrow.
+                        Learn from engineers and researchers who build production systems at leading technology firms.
                     </p>
                 </div>
             </div>
 
             <div className="grid md:grid-cols-3 gap-6">
-                {instructors.map((instructor, i) => (
+                {INSTRUCTORS.map((instructor) => (
                     <div
-                        key={i}
+                        key={instructor.name}
                         className="group bg-white rounded-2xl p-6 shadow-xl border border-gray-100/50 text-center hover:translate-y-[-2px] transition-all duration-300 cursor-pointer"
                     >
                         <div className="relative w-28 h-28 mx-auto mb-5 rounded-full overflow-hidden ring-4 ring-amber-100/60">
-                            <img
+                            <Image
                                 src={instructor.image}
                                 alt={instructor.name}
+                                width={112}
+                                height={112}
+                                sizes="112px"
+                                loading="lazy"
                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                             />
                         </div>
                         <h3 className="text-lg font-bold text-gray-900 mb-1">{instructor.name}</h3>
                         <p className="text-xs font-semibold text-emerald-600 mb-2">{instructor.title}</p>
-                        <p className="text-xs text-gray-500 font-medium">{instructor.credentials}</p>
+                        <p className="text-xs text-gray-500 font-medium mb-3">{instructor.credentials}</p>
+                        <p className="text-[11px] text-gray-400 font-medium">
+                            {instructor.courses.join(" · ")}
+                        </p>
                     </div>
                 ))}
             </div>

@@ -9,7 +9,7 @@ import {
     useCallback,
     useMemo,
 } from "react";
-import type { User } from "@supabase/supabase-js";
+import type { User, SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import type { SessionUser } from "@/lib/types";
 
@@ -19,14 +19,17 @@ interface AuthContextType {
     login: (email: string, password: string) => Promise<{ error?: string }>;
     register: (email: string, name: string, password: string) => Promise<{ error?: string; message?: string }>;
     signInWithGoogle: () => Promise<{ error?: string }>;
+    resetPassword: (email: string) => Promise<{ error?: string; message?: string }>;
+    updatePassword: (password: string) => Promise<{ error?: string }>;
     logout: () => Promise<void>;
     refreshUser: () => Promise<void>;
     isAuthenticated: boolean;
+    ensureAuth: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-async function fetchProfile(supabase: ReturnType<typeof createClient>, userId: string): Promise<SessionUser | null> {
+async function fetchProfile(supabase: SupabaseClient, userId: string): Promise<SessionUser | null> {
     const { data, error } = await supabase
         .from("profiles")
         .select("id, email, name, role")
@@ -52,9 +55,16 @@ function sessionUserFromAuth(authUser: User, profile: SessionUser | null): Sessi
     };
 }
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({
+    children,
+    deferAuth = false,
+}: {
+    children: ReactNode;
+    deferAuth?: boolean;
+}) {
     const [user, setUser] = useState<SessionUser | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(!deferAuth);
+    const [authEnabled, setAuthEnabled] = useState(!deferAuth);
     const supabase = useMemo(() => createClient(), []);
 
     const applySession = useCallback(
@@ -72,7 +82,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         [supabase]
     );
 
+    const ensureAuth = useCallback(() => {
+        setAuthEnabled(true);
+    }, []);
+
     const refreshUser = useCallback(async () => {
+        setAuthEnabled(true);
         const {
             data: { user: authUser },
         } = await supabase.auth.getUser();
@@ -80,6 +95,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, [supabase, applySession]);
 
     useEffect(() => {
+        if (!authEnabled) {
+            setLoading(false);
+            return;
+        }
+
+        setLoading(true);
         const {
             data: { subscription },
         } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -87,9 +108,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
 
         return () => subscription.unsubscribe();
-    }, [supabase, applySession]);
+    }, [supabase, applySession, authEnabled]);
+
+    useEffect(() => {
+        if (!deferAuth || authEnabled) return;
+
+        const enable = () => setAuthEnabled(true);
+        const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 100));
+        const id = idle(enable);
+        return () => {
+            if (window.cancelIdleCallback) window.cancelIdleCallback(id as number);
+        };
+    }, [deferAuth, authEnabled]);
 
     const login = async (email: string, password: string) => {
+        ensureAuth();
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) return { error: error.message };
         await refreshUser();
@@ -97,6 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     const register = async (email: string, name: string, password: string) => {
+        ensureAuth();
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
 
         const { data, error } = await supabase.auth.signUp({
@@ -121,6 +155,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     const signInWithGoogle = async () => {
+        ensureAuth();
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
 
         const { error } = await supabase.auth.signInWithOAuth({
@@ -138,7 +173,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return {};
     };
 
+    const resetPassword = async (email: string) => {
+        ensureAuth();
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: `${siteUrl}/auth/callback?next=/auth/reset-password`,
+        });
+
+        if (error) return { error: error.message };
+        return { message: "Check your email for a password reset link." };
+    };
+
+    const updatePassword = async (password: string) => {
+        ensureAuth();
+        const { error } = await supabase.auth.updateUser({ password });
+        if (error) return { error: error.message };
+        await refreshUser();
+        return {};
+    };
+
     const logout = async () => {
+        ensureAuth();
         await supabase.auth.signOut();
         setUser(null);
     };
@@ -151,9 +207,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 login,
                 register,
                 signInWithGoogle,
+                resetPassword,
+                updatePassword,
                 logout,
                 refreshUser,
                 isAuthenticated: !!user,
+                ensureAuth,
             }}
         >
             {children}

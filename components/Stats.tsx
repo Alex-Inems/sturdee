@@ -1,4 +1,3 @@
-"use client";
 
 import { Users, Award, TrendingUp, BookOpen } from "lucide-react";
 import SectionShell from "./SectionShell";

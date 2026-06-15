@@ -1,33 +1,9 @@
-"use client";
-
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import SectionShell from "./SectionShell";
+import { LEARNING_PATHS } from "@/lib/courses";
 
 const LearningPaths = () => {
-    const paths = [
-        {
-            title: "Business Mastery",
-            courses: "24 Courses",
-            duration: "6 Months",
-            image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80",
-            tag: "Popular",
-        },
-        {
-            title: "Leadership Excellence",
-            courses: "18 Courses",
-            duration: "4 Months",
-            image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=80",
-            tag: "New",
-        },
-        {
-            title: "Innovation & Strategy",
-            courses: "20 Courses",
-            duration: "5 Months",
-            image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80",
-            tag: "Featured",
-        },
-    ];
-
     return (
         <SectionShell id="programs">
             <div className="mb-12 lg:mb-16">
@@ -43,15 +19,19 @@ const LearningPaths = () => {
             </div>
 
             <div className="grid md:grid-cols-3 gap-6">
-                {paths.map((path, i) => (
+                {LEARNING_PATHS.map((path) => (
                     <div
-                        key={i}
+                        key={path.id}
                         className="group relative rounded-2xl overflow-hidden shadow-xl border border-gray-100/50 hover:translate-y-[-2px] transition-all duration-300 cursor-pointer"
                     >
-                        <div className="aspect-[3/4] overflow-hidden">
-                            <img
+                        <div className="aspect-[3/4] overflow-hidden relative">
+                            <Image
                                 src={path.image}
                                 alt={path.title}
+                                width={640}
+                                height={853}
+                                sizes="(max-width: 768px) 100vw, 33vw"
+                                loading="lazy"
                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/30 to-transparent" />
@@ -60,13 +40,18 @@ const LearningPaths = () => {
                             {path.tag}
                         </span>
                         <div className="absolute bottom-0 left-0 right-0 p-6 text-white z-10">
-                            <h3 className="text-2xl font-bold mb-3">{path.title}</h3>
+                            <p className="text-xs font-semibold text-white/70 mb-2">{path.category}</p>
+                            <h3 className="text-2xl font-bold mb-2">{path.title}</h3>
+                            <p className="text-sm text-white/75 font-medium mb-4 line-clamp-2">{path.description}</p>
                             <div className="flex gap-4 text-sm font-medium text-white/80 mb-4">
-                                <span>{path.courses}</span>
+                                <span>{path.courses} Courses</span>
                                 <span>•</span>
                                 <span>{path.duration}</span>
                             </div>
-                            <button className="flex items-center gap-2 text-sm font-semibold text-white hover:gap-3 transition-all">
+                            <button
+                                type="button"
+                                className="flex items-center gap-2 text-sm font-semibold text-white hover:gap-3 transition-all"
+                            >
                                 View Path <ArrowRight className="w-4 h-4" />
                             </button>
                         </div>

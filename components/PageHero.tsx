@@ -1,5 +1,3 @@
-"use client";
-
 interface PageHeroProps {
     title: string;
     subtitle: string;
@@ -7,7 +5,7 @@ interface PageHeroProps {
 }
 
 const PageHero = ({ title, subtitle, highlight }: PageHeroProps) => (
-    <section className="relative bg-white font-jakarta overflow-hidden pt-28 pb-16 md:pt-36 md:pb-20">
+    <section className="relative bg-page-gradient font-jakarta overflow-hidden pt-28 pb-16 md:pt-36 md:pb-20">
         <div className="absolute inset-0 opacity-[0.015] pointer-events-none dot-pattern" aria-hidden />
         <div className="max-w-7xl mx-auto px-6 md:px-12 w-full relative z-10">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-4 items-center">
