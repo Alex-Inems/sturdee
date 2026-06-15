@@ -25,7 +25,7 @@ export default function InstructorsPage() {
                         </span>
                         <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Dr. Eleanor Sterling</h2>
                         <p className="text-gray-500 font-medium leading-relaxed mb-4">
-                            Dr. Sterling joins Sturdee after a distinguished 20-year career at the World Bank. Her research on micro-finance in developing nations has shaped global policy.
+                            Dr. Sterling joins Stwedy after a distinguished 20-year career at the World Bank. Her research on micro-finance in developing nations has shaped global policy.
                         </p>
                         <p className="text-gray-600 font-medium italic leading-relaxed mb-8">
                             &quot;Education is the most powerful weapon which you can use to change the world.&quot;

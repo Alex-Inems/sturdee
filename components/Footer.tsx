@@ -9,7 +9,7 @@ const Footer = () => (
             <div className="grid md:grid-cols-4 gap-12 mb-16">
                 <div>
                     <Link href="/" className="text-2xl font-bold tracking-tight text-gray-900">
-                        Sturdee
+                        Stwedy
                     </Link>
                     <p className="text-gray-500 text-sm leading-relaxed font-medium mt-4">
                         Elevating minds through exceptional education
@@ -33,6 +33,7 @@ const Footer = () => (
                     <h3 className="text-xs font-bold uppercase tracking-wide text-gray-900 mb-5">Resources</h3>
                     <ul className="space-y-3 text-sm">
                         {[
+                            { label: "Book a Session", href: "/book" },
                             { label: "Course Catalog", href: "/courses" },
                             { label: "Learning Paths", href: "/programs" },
                             { label: "Certifications", href: "#" },
@@ -67,7 +68,7 @@ const Footer = () => (
             </div>
 
             <div className="border-t border-gray-100 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p className="text-gray-400 text-sm font-medium">© 2025 Sturdee. All rights reserved.</p>
+                <p className="text-gray-400 text-sm font-medium">© 2025 Stwedy. All rights reserved.</p>
                 <div className="flex gap-6 text-sm">
                     {["Privacy", "Terms", "Legal"].map((item) => (
                         <a key={item} href="#" className="text-gray-400 hover:text-gray-900 font-medium transition-colors">

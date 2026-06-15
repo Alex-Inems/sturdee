@@ -1,17 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import AuthModal from "./AuthModal";
 import { useAuth } from "./AuthContext";
 
-const Navigation = () => {
+function NavigationInner() {
     const [scrolled, setScrolled] = useState(false);
     const [mobileMenu, setMobileMenu] = useState(false);
     const [authOpen, setAuthOpen] = useState(false);
     const { user, logout } = useAuth();
     const pathname = usePathname();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const authParam = searchParams.get("auth");
+    const authFromUrl = authParam === "login" || authParam === "error";
+    const authError = authParam === "error" ? "Sign in failed. Please try again." : undefined;
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -19,48 +24,75 @@ const Navigation = () => {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+    const closeAuth = () => {
+        setAuthOpen(false);
+        if (authFromUrl) {
+            router.replace(pathname);
+        }
+    };
+
     const navLinks = [
         { label: "Home", href: "/" },
         { label: "Courses", href: "/courses" },
         { label: "Programs", href: "/programs" },
-        { label: "Instructors", href: "/instructors" }
+        { label: "Instructors", href: "/instructors" },
+        { label: "Book", href: "/book" },
     ];
 
     return (
         <>
-            <nav className={`fixed w-full z-50 transition-all duration-300 font-jakarta bg-white/80 backdrop-blur-md ${scrolled ? "py-4 border-b border-gray-100/80 shadow-xs" : "py-6 border-b border-transparent"
-                }`}>
+            <nav
+                className={`fixed w-full z-50 transition-all duration-300 font-jakarta bg-white/80 backdrop-blur-md ${
+                    scrolled ? "py-4 border-b border-gray-100/80 shadow-xs" : "py-6 border-b border-transparent"
+                }`}
+            >
                 <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
-                    {/* Refined Brand Logo */}
                     <Link href="/" className="text-2xl font-bold tracking-tight text-gray-900 hover:opacity-85 transition-opacity">
-                        Sturdee
+                        Stwedy
                     </Link>
 
-                    {/* Desktop Navigation Links */}
-                    <div className="hidden md:flex items-center gap-9">
+                    <div className="hidden lg:flex items-center gap-7">
                         {navLinks.map((link) => {
                             const isActive = pathname === link.href;
                             return (
                                 <Link
                                     key={link.label}
                                     href={link.href}
-                                    className={`text-[14px] font-medium tracking-wide transition-colors ${isActive
+                                    className={`text-[14px] font-medium tracking-wide transition-colors ${
+                                        isActive
                                             ? "text-black font-semibold border-b border-black pb-0.5"
                                             : "text-gray-500 hover:text-black"
-                                        }`}
+                                    }`}
                                 >
                                     {link.label}
                                 </Link>
                             );
                         })}
+                        {user?.role === "admin" && (
+                            <Link
+                                href="/admin"
+                                className={`text-[14px] font-medium tracking-wide transition-colors ${
+                                    pathname.startsWith("/admin")
+                                        ? "text-emerald-600 font-semibold"
+                                        : "text-gray-500 hover:text-emerald-600"
+                                }`}
+                            >
+                                Admin
+                            </Link>
+                        )}
                     </div>
 
-                    {/* Auth Status & Refined CTA Button */}
-                    <div className="hidden md:flex items-center gap-6">
+                    <div className="hidden md:flex items-center gap-4">
                         {user ? (
-                            <div className="flex items-center gap-4">
+                            <>
+                                <Link
+                                    href="/dashboard"
+                                    className="text-[13px] font-semibold text-gray-600 hover:text-gray-900 transition-colors"
+                                >
+                                    Dashboard
+                                </Link>
                                 <span className="text-[13px] font-semibold bg-gray-50 text-gray-800 px-3 py-1.5 rounded-full border border-gray-200">
-                                    🎓 {user.name}
+                                    {user.name}
                                 </span>
                                 <button
                                     onClick={logout}
@@ -68,7 +100,7 @@ const Navigation = () => {
                                 >
                                     Log Out
                                 </button>
-                            </div>
+                            </>
                         ) : (
                             <>
                                 <button
@@ -87,7 +119,6 @@ const Navigation = () => {
                         )}
                     </div>
 
-                    {/* Mobile Menu Button */}
                     <button
                         onClick={() => setMobileMenu(!mobileMenu)}
                         className="md:hidden p-2 rounded-full hover:bg-gray-50 transition-colors"
@@ -103,56 +134,62 @@ const Navigation = () => {
                     </button>
                 </div>
 
-                {/* Mobile Menu Overlay */}
                 {mobileMenu && (
-                    <div className="md:hidden absolute top-[100%] left-0 w-full bg-white/95 backdrop-blur-md border-b border-gray-100 px-6 py-6 space-y-3 animate-in fade-in-50 duration-200">
+                    <div className="md:hidden absolute top-[100%] left-0 w-full bg-white/95 backdrop-blur-md border-b border-gray-100 px-6 py-6 space-y-3">
                         {navLinks.map((link) => (
                             <Link
                                 key={link.label}
                                 href={link.href}
                                 onClick={() => setMobileMenu(false)}
-                                className="block text-base font-semibold text-gray-800 p-2.5 rounded-xl hover:bg-gray-50 transition-colors"
+                                className="block text-base font-semibold text-gray-800 p-2.5 rounded-xl hover:bg-gray-50"
                             >
                                 {link.label}
                             </Link>
                         ))}
+                        {user?.role === "admin" && (
+                            <Link href="/admin" onClick={() => setMobileMenu(false)} className="block text-base font-semibold text-emerald-600 p-2.5">
+                                Admin
+                            </Link>
+                        )}
                         <hr className="border-gray-100 my-2" />
-                        <div className="flex flex-col gap-2 pt-2">
-                            {user ? (
-                                <>
-                                    <div className="text-center font-semibold bg-gray-50 p-2.5 rounded-xl border border-gray-100">
-                                        🎓 {user.name}
-                                    </div>
-                                    <button
-                                        onClick={() => { logout(); setMobileMenu(false); }}
-                                        className="w-full text-center py-2.5 bg-red-50 text-red-600 rounded-xl font-semibold hover:bg-red-100 transition-colors"
-                                    >
-                                        Log Out
-                                    </button>
-                                </>
-                            ) : (
-                                <>
-                                    <button
-                                        onClick={() => { setAuthOpen(true); setMobileMenu(false); }}
-                                        className="w-full text-center py-2.5 border border-gray-200 rounded-xl font-semibold text-gray-800 hover:bg-gray-50 transition-colors"
-                                    >
-                                        Sign Up
-                                    </button>
-                                    <button
-                                        onClick={() => { setAuthOpen(true); setMobileMenu(false); }}
-                                        className="w-full text-center py-2.5 bg-[#10B981] text-white rounded-xl font-semibold hover:bg-[#0F9F72] transition-colors"
-                                    >
-                                        Login
-                                    </button>
-                                </>
-                            )}
-                        </div>
+                        {user ? (
+                            <>
+                                <Link href="/dashboard" onClick={() => setMobileMenu(false)} className="block text-center py-2.5 bg-gray-50 rounded-xl font-semibold">
+                                    Dashboard
+                                </Link>
+                                <button
+                                    onClick={() => { logout(); setMobileMenu(false); }}
+                                    className="w-full text-center py-2.5 bg-red-50 text-red-600 rounded-xl font-semibold"
+                                >
+                                    Log Out
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <button onClick={() => { setAuthOpen(true); setMobileMenu(false); }} className="w-full py-2.5 border border-gray-200 rounded-xl font-semibold">
+                                    Sign Up
+                                </button>
+                                <button onClick={() => { setAuthOpen(true); setMobileMenu(false); }} className="w-full py-2.5 bg-[#10B981] text-white rounded-xl font-semibold">
+                                    Login
+                                </button>
+                            </>
+                        )}
                     </div>
                 )}
             </nav>
-            <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} />
+            <AuthModal
+                isOpen={authOpen || authFromUrl}
+                onClose={closeAuth}
+                initialError={authError}
+            />
         </>
     );
-};
+}
 
-export default Navigation;
+export default function Navigation() {
+    return (
+        <Suspense fallback={null}>
+            <NavigationInner />
+        </Suspense>
+    );
+}

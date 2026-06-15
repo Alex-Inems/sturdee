@@ -34,6 +34,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# local database
+/data/db.json
+
 # User Rules ignores
 CLAUDE.md
 AGENTS.md

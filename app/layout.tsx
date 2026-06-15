@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthContext";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
+import SiteShell from "@/components/SiteShell";
 
 export const metadata: Metadata = {
-    title: "Sturdee | Education",
+    title: "Stwedy | Education",
     description: "Inspiring education exploration",
 };
 
@@ -18,9 +17,7 @@ export default function RootLayout({
         <html lang="en">
             <body className="font-jakarta antialiased text-gray-900 bg-white">
                 <AuthProvider>
-                    <Navigation />
-                    {children}
-                    <Footer />
+                    <SiteShell>{children}</SiteShell>
                 </AuthProvider>
             </body>
         </html>

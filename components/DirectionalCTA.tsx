@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import SectionShell from "./SectionShell";
 
 const DirectionalCTA = () => (
@@ -14,9 +15,12 @@ const DirectionalCTA = () => (
                 </p>
             </div>
             <div className="lg:col-span-5 flex lg:justify-end">
-                <button className="px-8 py-4 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold text-base rounded-full shadow-md hover:shadow-lg transition-all duration-200">
-                    Request Prospectus
-                </button>
+                <Link
+                    href="/book"
+                    className="px-8 py-4 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold text-base rounded-full shadow-md hover:shadow-lg transition-all duration-200"
+                >
+                    Book a Session
+                </Link>
             </div>
         </div>
     </SectionShell>

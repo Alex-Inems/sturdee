@@ -3,7 +3,7 @@ import PageHero from "@/components/PageHero";
 import SectionShell from "@/components/SectionShell";
 
 export const metadata: Metadata = {
-    title: "Available Courses | Sturdee",
+    title: "Available Courses | Stwedy",
     description:
         "Browse our comprehensive catalog of courses in economics, arts, and sciences. Enroll today to start your journey.",
 };

@@ -16,7 +16,7 @@ const Testimonial = () => (
                     Student Story
                 </span>
                 <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-snug">
-                    &quot;Sturdee transformed my career trajectory. The depth of knowledge and personalized mentorship exceeded every expectation.&quot;
+                    &quot;Stwedy transformed my career trajectory. The depth of knowledge and personalized mentorship exceeded every expectation.&quot;
                 </p>
             </div>
             <div className="lg:col-span-7">

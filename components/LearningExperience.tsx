@@ -8,7 +8,7 @@ const LearningExperience = () => (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
             <div className="lg:col-span-5">
                 <span className="inline-flex mb-6 px-5 py-2.5 bg-white border border-gray-100 rounded-full font-semibold text-gray-700 text-xs shadow-md">
-                    The Sturdee Experience
+                    The Stwedy Experience
                 </span>
                 <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 leading-[1.08] tracking-tight">
                     Learn With Purpose
