@@ -28,6 +28,7 @@ export function generateStaticParams() {
         { lang: "json" },
         { lang: "xml" },
         { lang: "nodejs" },
+        { lang: "liquid" },
     ];
 }
 

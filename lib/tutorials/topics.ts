@@ -133,6 +133,7 @@ function getHelloExample(id: string, ext: string): string {
         json: `{\n  "message": "Hello from Sturdee"\n}`,
         xml: `<?xml version="1.0"?>\n<greeting>Hello from Sturdee</greeting>`,
         nodejs: `console.log("Hello from Sturdee");`,
+        liquid: `{% comment %}Hello from Sturdee{% endcomment %}\n<h1>{{ shop.name }}</h1>`,
     };
     return map[id] ?? `// Hello from Sturdee`;
 }

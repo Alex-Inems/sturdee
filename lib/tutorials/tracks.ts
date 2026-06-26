@@ -11,6 +11,7 @@ import {
     variablesPage,
 } from "./topics";
 import type { TutorialLanguage, TutorialTrack } from "./types";
+import { liquidTrack } from "./liquid-track";
 
 const LANG = (
     id: string,
@@ -42,6 +43,7 @@ export const TUTORIAL_LANGUAGES: TutorialLanguage[] = [
     LANG("json", "JSON", "Lightweight data interchange format", "bg-amber-100 text-amber-800", "{ }"),
     LANG("xml", "XML", "Extensible markup for structured data", "bg-teal-100 text-teal-700", "📄"),
     LANG("nodejs", "Node.js", "JavaScript runtime for server-side development", "bg-lime-100 text-lime-800", "🟢"),
+    LANG("liquid", "Liquid", "Shopify's templating language for custom theme development", "bg-[#95BF47]/20 text-[#5E8E3E]", "🛍️"),
 ];
 
 function htmlTrack(): TutorialTrack {
@@ -508,6 +510,7 @@ export const TUTORIAL_TRACKS: TutorialTrack[] = [
         `for (const port of [3000, 3001]) console.log(port);`,
         `function createServer() {\n  return http.createServer((req, res) => {\n    res.end('OK');\n  });\n}`
     ),
+    liquidTrack,
 ];
 
 export function getTutorialTrack(langId: string): TutorialTrack | undefined {

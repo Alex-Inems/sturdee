@@ -25,11 +25,15 @@ console.error = log;
 try { ${code} } catch (e) { log('Error:', e.message); }
 </script></body></html>`;
     }
+    if (lang === "liquid") {
+        const html = code.includes("<") ? code : `<p>${code}</p>`;
+        return `<!DOCTYPE html><html><body style="font-family:sans-serif;padding:1rem;background:#e8ebf0;">${html}<p style="margin-top:1rem;font-size:12px;color:#6b7280;">Simulated output — Liquid renders on Shopify servers.</p></body></html>`;
+    }
     return "";
 }
 
 const runnable = (language: string) =>
-    ["html", "css", "javascript", "typescript", "nodejs", "xml"].includes(language.toLowerCase());
+    ["html", "css", "javascript", "typescript", "nodejs", "xml", "liquid"].includes(language.toLowerCase());
 
 export default function TryItPanel({ language, code, title = "Try it Yourself" }: TryItPanelProps) {
     const [editorCode, setEditorCode] = useState(code);

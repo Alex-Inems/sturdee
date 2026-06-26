@@ -5,11 +5,11 @@ import { TUTORIAL_LANGUAGES, TUTORIAL_TRACKS } from "@/lib/tutorials";
 
 export const metadata: Metadata = {
     title: `Tutorials | ${SITE_NAME}`,
-    description: "Free tutorials for HTML, CSS, JavaScript, Python, Java, C++, Go, Rust, and more.",
+    description: "Free tutorials for HTML, CSS, JavaScript, Liquid, Shopify themes, Python, and more.",
 };
 
 export default function TutorialsPage() {
-    const popular = ["html", "css", "javascript", "python", "sql", "java", "typescript", "nodejs"];
+    const popular = ["html", "css", "javascript", "liquid", "python", "sql", "java", "typescript"];
 
     return (
         <div className="font-jakarta bg-page min-h-screen pt-28 pb-20">
