@@ -12,6 +12,7 @@ import {
 } from "./topics";
 import type { TutorialLanguage, TutorialTrack } from "./types";
 import { liquidTrack } from "./liquid";
+import { attachVideoToPage } from "./videos";
 
 const LANG = (
     id: string,
@@ -524,7 +525,9 @@ export function getAllTutorialPages(langId: string) {
 }
 
 export function getTutorialPage(langId: string, slug: string) {
-    return getAllTutorialPages(langId).find((p) => p.slug === slug);
+    const page = getAllTutorialPages(langId).find((p) => p.slug === slug);
+    if (!page) return undefined;
+    return attachVideoToPage(langId, page);
 }
 
 export function getAdjacentPages(langId: string, slug: string) {

@@ -17,10 +17,17 @@ export type TutorialBlock =
     | { type: "list"; items: string[] }
     | { type: "steps"; items: string[] };
 
+export interface TutorialVideo {
+    id: string;
+    start?: number;
+    channel?: string;
+}
+
 export interface TutorialPage {
     slug: string;
     title: string;
     sections: TutorialBlock[];
+    video?: TutorialVideo;
 }
 
 export interface TutorialSection {

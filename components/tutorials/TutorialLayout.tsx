@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import TutorialSidebar from "./TutorialSidebar";
 import TutorialPageContent from "./TutorialPageContent";
+import TutorialVideo from "./TutorialVideo";
 import type { TutorialPage, TutorialTrack } from "@/lib/tutorials";
 
 interface TutorialLayoutProps {
@@ -26,6 +27,7 @@ export default function TutorialLayout({ track, page, prev, next }: TutorialLayo
                                 {track.language.name} Tutorial
                             </p>
                             <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-8">{page.title}</h1>
+                            {page.video && <TutorialVideo video={page.video} title={page.title} />}
                             <TutorialPageContent sections={page.sections} />
 
                             <div className="flex flex-col sm:flex-row justify-between gap-4 mt-12 pt-8 border-t border-gray-100">
