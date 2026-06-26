@@ -1,18 +1,6 @@
 import type { TutorialBlock } from "@/lib/tutorials";
+import CodeBlock from "./CodeBlock";
 import TryItPanel from "./TryItPanel";
-
-function CodeBlock({ language, code, title }: { language: string; code: string; title?: string }) {
-    return (
-        <div className="my-6 rounded-xl overflow-hidden border border-gray-200 shadow-sm">
-            {title && (
-                <div className="px-4 py-2 bg-gray-900 text-white text-xs font-bold">{title}</div>
-            )}
-            <pre className="p-5 overflow-x-auto bg-[#1e293b] text-gray-100 text-sm font-mono leading-relaxed">
-                <code>{code}</code>
-            </pre>
-        </div>
-    );
-}
 
 export default function TutorialPageContent({ sections }: { sections: TutorialBlock[] }) {
     return (

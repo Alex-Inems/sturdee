@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Play, RotateCcw } from "lucide-react";
+import CopyCodeButton from "./CopyCodeButton";
 
 interface TryItPanelProps {
     language: string;
@@ -50,8 +51,10 @@ export default function TryItPanel({ language, code, title = "Try it Yourself" }
         <div className="my-8 rounded-2xl border border-gray-200 overflow-hidden shadow-lg bg-white">
             <div className="flex items-center justify-between px-5 py-3 bg-gray-900 text-white">
                 <span className="text-sm font-bold">{title}</span>
-                {canRun && (
-                    <div className="flex gap-2">
+                <div className="flex gap-2">
+                    <CopyCodeButton code={editorCode} />
+                    {canRun && (
+                        <>
                         <button
                             type="button"
                             onClick={reset}
@@ -66,8 +69,9 @@ export default function TryItPanel({ language, code, title = "Try it Yourself" }
                         >
                             <Play className="w-3.5 h-3.5" /> Run
                         </button>
-                    </div>
-                )}
+                        </>
+                    )}
+                </div>
             </div>
             <textarea
                 value={editorCode}
