@@ -13,7 +13,9 @@ export type TutorialBlock =
     | { type: "code"; language: string; code: string; title?: string }
     | { type: "tryit"; language: string; code: string; title?: string }
     | { type: "note"; text: string }
-    | { type: "list"; items: string[] };
+    | { type: "tip"; text: string }
+    | { type: "list"; items: string[] }
+    | { type: "steps"; items: string[] };
 
 export interface TutorialPage {
     slug: string;

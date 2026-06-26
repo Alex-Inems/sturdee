@@ -45,6 +45,24 @@ export default function TutorialPageContent({ sections }: { sections: TutorialBl
                                 ))}
                             </ul>
                         );
+                    case "steps":
+                        return (
+                            <ol key={i} className="list-decimal pl-6 mb-6 space-y-3 text-gray-600 font-medium">
+                                {block.items.map((item) => (
+                                    <li key={item} className="leading-relaxed">{item}</li>
+                                ))}
+                            </ol>
+                        );
+                    case "tip":
+                        return (
+                            <div
+                                key={i}
+                                className="my-6 px-5 py-4 rounded-xl bg-emerald-50 border border-emerald-200/80 text-emerald-900 text-sm font-medium leading-relaxed"
+                            >
+                                <strong className="font-bold">Tip: </strong>
+                                {block.text}
+                            </div>
+                        );
                     case "note":
                         return (
                             <div

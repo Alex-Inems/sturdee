@@ -28,6 +28,14 @@ export function list(items: string[]): TutorialBlock {
     return { type: "list", items };
 }
 
+export function steps(items: string[]): TutorialBlock {
+    return { type: "steps", items };
+}
+
+export function tip(text: string): TutorialBlock {
+    return { type: "tip", text };
+}
+
 export function code(language: string, code: string, title?: string): TutorialBlock {
     return { type: "code", language, code, title };
 }

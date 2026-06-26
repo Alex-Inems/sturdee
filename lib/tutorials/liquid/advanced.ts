@@ -1,0 +1,102 @@
+import { section, h2, h3, list, page, code, tryit, p, note, tip, steps } from "../builder";
+
+const ext = "liquid";
+
+export const liquidAdvancedSection = section("Advanced Theme Development", [
+    page("liquid_product_template", "Product Page Template", [
+        h2("Building a Complete Product Section"),
+        p("A production product page coordinates media gallery, variant selection, price updates, inventory messaging, and add-to-cart — all in one Online Store 2.0 section. This example shows the Liquid foundation before JavaScript enhancement."),
+        code(ext, `{%- liquid\n  assign current_variant = product.selected_or_first_available_variant\n  assign featured_media = current_variant.featured_media | default: product.featured_media\n-%}\n\n<div\n  class="product"\n  id="Product-{{ section.id }}"\n  data-section-id="{{ section.id }}"\n  data-product-id="{{ product.id }}"\n>\n  <div class="product__media">\n    {% if featured_media %}\n      {{ featured_media\n        | image_url: width: 1200\n        | image_tag: loading: 'eager', alt: product.title, id: 'ProductImage'\n      }}\n    {% endif %}\n\n    <div class="product__thumbnails">\n      {% for media in product.media %}\n        <button type="button" data-media-id="{{ media.id }}">\n          {{ media | image_url: width: 120 | image_tag: alt: media.alt }}\n        </button>\n      {% endfor %}\n    </div>\n  </div>\n\n  <div class="product__info">\n    <h1>{{ product.title }}</h1>\n    <p class="product__vendor">{{ product.vendor }}</p>\n\n    <div class="product__price" id="Price-{{ section.id }}">\n      {% if current_variant.compare_at_price > current_variant.price %}\n        <s>{{ current_variant.compare_at_price | money }}</s>\n      {% endif %}\n      <span>{{ current_variant.price | money }}</span>\n    </div>\n\n    {% form 'product', product, id: 'product-form' %}\n      {% unless product.has_only_default_variant %}\n        {% for option in product.options_with_values %}\n          <fieldset>\n            <legend>{{ option.name }}</legend>\n            {% for value in option.values %}\n              <input\n                type="radio"\n                name="options[{{ option.name | escape }}]"\n                value="{{ value | escape }}"\n                {% if option.selected_value == value %}checked{% endif %}\n              >\n              {{ value }}\n            {% endfor %}\n          </fieldset>\n        {% endfor %}\n      {% endunless %}\n\n      <input type="hidden" name="id" value="{{ current_variant.id }}">\n\n      <button\n        type="submit"\n        name="add"\n        class="btn"\n        {% unless current_variant.available %}disabled{% endunless %}\n      >\n        {% if current_variant.available %}\n          {{ 'products.add_to_cart' | t }}\n        {% else %}\n          {{ 'products.sold_out' | t }}\n        {% endif %}\n      </button>\n    {% endform %}\n\n    <div class="rte product__description">{{ product.description }}</div>\n  </div>\n</div>\n\n<script type="application/json" id="ProductJson-{{ product.id }}">\n  {{ product | json }}\n</script>`, "Full product section with media and variants"),
+        steps([
+            "options_with_values — OS 2.0 API for variant pickers with selected state",
+            "Hidden input name=\"id\" must update when variant changes (JavaScript)",
+            "Embed product JSON for client-side variant resolution",
+            "loading: 'eager' on hero image — LCP optimization",
+            "section.id in element IDs — supports multiple product sections",
+        ]),
+        note("For 100+ variant products, use a JavaScript variant picker library or Shopify's reference Dawn implementation."),
+    ]),
+    page("liquid_js_integration", "Liquid + JavaScript", [
+        h2("Bridging Server and Client"),
+        p("Liquid renders the initial HTML state. JavaScript handles interactivity: variant changes, cart drawers, predictive search. Pass data from Liquid to JS via JSON script tags — never embed unescaped user content in inline scripts."),
+        code(ext, `<script type="application/json" id="CartJson">\n  {{ cart | json }}\n</script>\n\n<script type="application/json" id="ProductJson-{{ product.id }}">\n  {{ product | json }}\n</script>\n\n<script src="{{ 'product-form.js' | asset_url }}" defer></script>`, "Safe JSON embedding pattern"),
+        code("javascript", `// assets/product-form.js\nconst product = JSON.parse(\n  document.getElementById('ProductJson-{{ product.id }}')?.textContent || '{}'\n);\n\nconst form = document.querySelector('#product-form');\nconst priceEl = document.querySelector('.product__price span:last-child');\n\nform?.addEventListener('change', (event) => {\n  const variantId = Number(form.querySelector('[name="id"]').value);\n  const variant = product.variants.find((v) => v.id === variantId);\n  if (variant && priceEl) {\n    priceEl.textContent = formatMoney(variant.price, window.Shopify?.currency?.active);\n  }\n});\n\nfunction formatMoney(cents, currency) {\n  return new Intl.NumberFormat(undefined, {\n    style: 'currency',\n    currency: currency || 'USD',\n  }).format(cents / 100);\n}`),
+        h3("Section Rendering API"),
+        p("Fetch updated HTML for a section without full page reload — powers AJAX cart drawers and dynamic filters."),
+        code("javascript", `const response = await fetch(\n  \`/?section_id=\${sectionId}&variant=\${variantId}\`\n);\nconst html = await response.text();\ndocument.getElementById(\`shopify-section-\${sectionId}\`).innerHTML = html;`),
+        list([
+            "Cart AJAX API: POST /cart/add.js, /cart/change.js, /cart/update.js",
+            "Predictive search: GET /search/suggest.json?q=query",
+            "Never trust client-side prices at checkout — server validates on order creation",
+        ]),
+        tip("Use @shopify/theme-cart or reference Dawn's cart-notification.js for battle-tested cart patterns."),
+    ]),
+    page("liquid_performance", "Theme Performance", [
+        h2("Core Web Vitals for Shopify Themes"),
+        p("Theme performance directly affects conversion rate and SEO. Google measures LCP (largest contentful paint), INP (interaction to next paint), and CLS (cumulative layout shift). Liquid choices impact all three."),
+        h3("Image Optimization"),
+        code(ext, `{%- liquid\n  assign card_width = 400\n  assign image_height = card_width | divided_by: product.featured_image.aspect_ratio | round\n-%}\n\n{{ product.featured_image\n  | image_url: width: card_width\n  | image_tag:\n    loading: 'lazy',\n    width: card_width,\n    height: image_height,\n    alt: product.title,\n    sizes: '(max-width: 749px) 50vw, 25vw',\n    widths: '200, 400, 600, 800'\n}}`, "Responsive images with CLS prevention"),
+        h3("Liquid Performance Rules"),
+        list([
+            "Never loop collection.products without limit or paginate on homepage sections",
+            "Avoid nested loops: products × variants × images — O(n³) render cost",
+            "Use {%- liquid -%} blocks to reduce whitespace bytes in HTML output",
+            "Defer all non-critical JS: script_tag: defer or type=\"module\"",
+            "Preload only the LCP hero image — lazy-load everything else",
+            "Minimize | json payload size — pass variants array, not full product graph",
+        ]),
+        code(ext, `{%- liquid\n  assign featured = section.settings.collection.products | first\n  if featured\n    echo featured.featured_image | image_url: width: 1200 | image_tag: preload: true, loading: 'eager'\n  endif\n-%}`, "Preload LCP image only"),
+        note("Run Lighthouse on the preview URL from shopify theme dev. Target 90+ performance score before launch."),
+    ]),
+    page("liquid_app_blocks", "App Blocks & Embeds", [
+        h2("Integrating Shopify Apps in Your Theme"),
+        p("Apps extend themes via app blocks (in sections), app embed blocks (global in theme.liquid), and theme app extensions. Theme developers must add @app block support so merchants can place app widgets in the editor."),
+        code(ext, `{% for block in section.blocks %}\n  {% case block.type %}\n    {% when '@app' %}\n      {% render block %}\n    {% when 'heading' %}\n      <h2 {{ block.shopify_attributes }}>{{ block.settings.heading }}</h2>\n    {% when 'text' %}\n      <div class="rte" {{ block.shopify_attributes }}>{{ block.settings.body }}</div>\n  {% endcase %}\n{% endfor %}\n\n{% schema %}\n{\n  "name": "Flexible content",\n  "blocks": [\n    { "type": "@app" },\n    {\n      "type": "heading",\n      "name": "Heading",\n      "settings": [{ "type": "text", "id": "heading", "label": "Heading" }]\n    },\n    {\n      "type": "text",\n      "name": "Text",\n      "settings": [{ "type": "richtext", "id": "body", "label": "Body" }]\n    }\n  ],\n  "presets": [{ "name": "Flexible content" }]\n}\n{% endschema %}`, "Section with app block support"),
+        steps([
+            "Add { \"type\": \"@app\" } to section schema blocks array",
+            "Render with {% render block %} inside the block loop",
+            "App embed blocks go in settings_data.json under theme app embeds — no section needed",
+            "Test with a popular app (reviews, upsell) in your dev store",
+        ]),
+        tip("Theme Store themes MUST support app blocks in main sections. Theme Check validates AppBlockMissing schema in some configurations."),
+    ]),
+    page("liquid_best_practices", "Theme Development Best Practices", [
+        h2("Production Readiness Checklist"),
+        p("Before handing off a theme to a merchant or submitting to the Theme Store, verify every item below. These practices prevent support tickets, security issues, and performance regressions."),
+        h3("Architecture"),
+        list([
+            "Online Store 2.0 JSON templates for all page types",
+            "Section-based architecture — no monolithic template files",
+            "Snippets for every repeated UI pattern (cards, icons, badges)",
+            "Global design tokens in settings_schema.json exposed as CSS variables",
+            "Section groups for header and footer in theme.liquid",
+        ]),
+        h3("Liquid & Security"),
+        list([
+            "Use {% render %} exclusively — zero {% include %} tags",
+            "Use routes object for every internal link",
+            "| escape on all user/merchant content in HTML attributes",
+            "Check != blank before rendering optional metafields and settings",
+            "Never expose API secrets in Liquid, JavaScript, or theme files",
+        ]),
+        h3("Accessibility & i18n"),
+        list([
+            "Skip-to-content link as first focusable element",
+            "All images have descriptive alt text (empty alt for decorative)",
+            "Form inputs have associated <label> elements",
+            "Color contrast meets WCAG AA — do not rely on color alone for state",
+            "All merchant-facing strings use locales/ and the | t filter",
+        ]),
+        h3("Tooling & Process"),
+        list([
+            "shopify theme check passes with zero errors",
+            "Git history with meaningful commits and tagged releases",
+            "Develop on dev store, stage on unpublished theme, then publish",
+            "Document section settings with clear schema labels and info text",
+            "Lighthouse performance 90+ on homepage, collection, and product templates",
+        ]),
+        code("bash", `# Pre-deploy command sequence\nshopify theme check\nshopify theme package\ngit status  # ensure clean working tree\ngit tag v$(date +%Y.%m.%d)\nshopify theme push --unpublished --theme "Pre-release QA"`),
+        note("Review Shopify's Theme Store requirements at shopify.dev/docs/storefronts/themes/store/requirements before public distribution."),
+        tip("Maintain a THEME_CHANGELOG.md for merchants documenting section additions and breaking settings changes between versions."),
+    ]),
+]);

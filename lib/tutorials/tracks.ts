@@ -11,7 +11,7 @@ import {
     variablesPage,
 } from "./topics";
 import type { TutorialLanguage, TutorialTrack } from "./types";
-import { liquidTrack } from "./liquid-track";
+import { liquidTrack } from "./liquid";
 
 const LANG = (
     id: string,
