@@ -48,6 +48,9 @@ function NavigationInner() {
     const navLinks = [
         { label: "Home", href: "/" },
         { label: "Tutorials", href: "/tutorials" },
+        { label: "Guides", href: "/guides" },
+        { label: "Cheat Sheets", href: "/cheatsheets" },
+        { label: "Media", href: "/media" },
         { label: "Courses", href: "/courses" },
         { label: "Programs", href: "/programs" },
         { label: "Instructors", href: "/instructors" },

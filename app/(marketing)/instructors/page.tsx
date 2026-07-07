@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import PageHero from "@/components/PageHero";
 import SectionShell from "@/components/SectionShell";
 import { pageMetadata } from "@/lib/seo";
 import { IMAGES } from "@/lib/images";
-import { COURSES, INSTRUCTORS } from "@/lib/courses";
+import { COURSES, EXTENDED_INSTRUCTORS } from "@/lib/courses";
 import { SITE_NAME } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
@@ -15,49 +16,9 @@ export const metadata: Metadata = pageMetadata({
     keywords: ["coding instructors", "programming teachers", "web development faculty", "tech educators"],
 });
 
-const facultyImages = [IMAGES.facultyA, IMAGES.facultyB, IMAGES.facultyC] as const;
-
-const extendedFaculty = [
-    ...INSTRUCTORS,
-    {
-        name: "Jordan Blake",
-        title: "Frontend Architecture",
-        credentials: "Principal Engineer, Stripe",
-        image: IMAGES.facultyA,
-        courses: ["WEB-302"],
-    },
-    {
-        name: "Dr. Yuki Nakamura",
-        title: "Systems Programming",
-        credentials: "Systems Engineer, Cloudflare",
-        image: IMAGES.facultyB,
-        courses: ["PROG-350"],
-    },
-    {
-        name: "Alexandre Dubois",
-        title: "Digital Asset Markets",
-        credentials: "Former Head of Digital Assets, Citadel",
-        image: IMAGES.facultyC,
-        courses: ["CRY-220"],
-    },
-    {
-        name: "Mia Torres",
-        title: "Web Foundations",
-        credentials: "Curriculum Lead, freeCodeCamp",
-        image: facultyImages[0],
-        courses: ["WEB-210"],
-    },
-    {
-        name: "James Whitfield",
-        title: "Enterprise Java",
-        credentials: "Principal Engineer, JPMorgan Chase",
-        image: facultyImages[1],
-        courses: ["PROG-205"],
-    },
-];
-
 export default function InstructorsPage() {
-    const deanCourses = COURSES.filter((c) => c.instructor === "Dr. Priya Sharma").slice(0, 2);
+    const dean = EXTENDED_INSTRUCTORS.find((i) => i.slug === "priya-sharma")!;
+    const deanCourses = COURSES.filter((c) => dean.courses.includes(c.code)).slice(0, 2);
 
     return (
         <div className="font-jakarta bg-page min-h-screen">
@@ -69,7 +30,7 @@ export default function InstructorsPage() {
 
             <SectionShell>
                 <div className="grid md:grid-cols-2 gap-12 items-center">
-                    <div className="relative rounded-2xl overflow-hidden shadow-xl border border-gray-100/50 aspect-[4/5]">
+                    <Link href={`/instructors/${dean.slug}`} className="relative rounded-2xl overflow-hidden shadow-xl border border-gray-100/50 aspect-[4/5] block">
                         <Image
                             src={IMAGES.instructorsDean}
                             alt="Dr. Priya Sharma"
@@ -79,27 +40,29 @@ export default function InstructorsPage() {
                             loading="lazy"
                             className="w-full h-full object-cover"
                         />
-                    </div>
+                    </Link>
                     <div>
                         <span className="inline-flex mb-4 px-5 py-2.5 bg-amber-100/60 text-amber-700 rounded-full text-xs font-bold">
                             Dean of Technology
                         </span>
-                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Dr. Priya Sharma</h2>
-                        <p className="text-gray-500 font-medium leading-relaxed mb-4">
-                            Dr. Sharma leads {SITE_NAME}&apos;s technology programs after a decade at the Stanford Blockchain
-                            Lab. Her work on smart contract security has been cited in over 2,400 peer-reviewed papers.
-                        </p>
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
+                            <Link href={`/instructors/${dean.slug}`} className="hover:text-emerald-700 transition-colors">
+                                {dean.name}
+                            </Link>
+                        </h2>
+                        <p className="text-gray-500 font-medium leading-relaxed mb-4">{dean.bio}</p>
                         <p className="text-gray-600 font-medium italic leading-relaxed mb-8">
                             &quot;The best engineers learn by building systems that real users depend on.&quot;
                         </p>
                         <div className="flex flex-wrap gap-2">
                             {deanCourses.map((course) => (
-                                <span
+                                <Link
                                     key={course.code}
-                                    className="px-4 py-2 bg-white border border-gray-100 rounded-full text-xs font-semibold text-gray-700 shadow-sm"
+                                    href={`/courses/${course.slug}`}
+                                    className="px-4 py-2 bg-white border border-gray-100 rounded-full text-xs font-semibold text-gray-700 shadow-sm hover:border-emerald-200 transition-colors"
                                 >
                                     {course.code}: {course.title.split(" ").slice(0, 3).join(" ")}…
-                                </span>
+                                </Link>
                             ))}
                         </div>
                     </div>
@@ -108,9 +71,10 @@ export default function InstructorsPage() {
 
             <SectionShell>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {extendedFaculty.map((instructor) => (
-                        <div
-                            key={instructor.name}
+                    {EXTENDED_INSTRUCTORS.map((instructor) => (
+                        <Link
+                            key={instructor.slug}
+                            href={`/instructors/${instructor.slug}`}
                             className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100/50 text-center hover:translate-y-[-2px] transition-all duration-300"
                         >
                             <div className="w-24 h-24 mx-auto rounded-full overflow-hidden ring-4 ring-amber-100/60 mb-4 relative">
@@ -128,7 +92,7 @@ export default function InstructorsPage() {
                             <p className="text-xs font-semibold text-emerald-600 mb-2">{instructor.title}</p>
                             <p className="text-gray-500 text-xs font-medium mb-2">{instructor.credentials}</p>
                             <p className="text-[10px] text-gray-400 font-medium">{instructor.courses.join(" · ")}</p>
-                        </div>
+                        </Link>
                     ))}
                 </div>
             </SectionShell>
@@ -138,34 +102,8 @@ export default function InstructorsPage() {
                     <h2 className="text-3xl font-bold text-gray-900 mb-6">Research & Impact</h2>
                     <p className="text-gray-500 font-medium leading-relaxed text-lg">
                         Our faculty publish on smart contract security, distributed systems, and developer tooling.
-                        78% maintain active open-source contributions alongside their teaching.
+                        78% maintain active open-source contributions alongside their teaching at {SITE_NAME}.
                     </p>
-                </div>
-            </SectionShell>
-
-            <SectionShell>
-                <div className="bg-white rounded-2xl p-8 md:p-10 shadow-xl border border-gray-100/50">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-8">Recent Publications</h2>
-                    <div className="space-y-4">
-                        {[
-                            { title: "Formal Verification Patterns for Solidity Smart Contracts", journal: "IEEE Security & Privacy, 2025" },
-                            { title: "Latency Budgets in Edge-Deployed Next.js Applications", journal: "ACM Web Conference, 2025" },
-                            { title: "Rust Memory Safety in High-Throughput Network Services", journal: "USENIX ATC, 2024" },
-                        ].map((pub) => (
-                            <div
-                                key={pub.title}
-                                className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center p-4 rounded-xl hover:bg-gray-50 transition-colors"
-                            >
-                                <div>
-                                    <h4 className="font-bold text-gray-900">{pub.title}</h4>
-                                    <p className="text-gray-500 text-sm font-medium">{pub.journal}</p>
-                                </div>
-                                <button className="px-5 py-2.5 border border-gray-200 rounded-full text-xs font-semibold text-gray-700 hover:border-gray-300 transition-colors shrink-0">
-                                    Read Abstract
-                                </button>
-                            </div>
-                        ))}
-                    </div>
                 </div>
             </SectionShell>
 
@@ -175,9 +113,12 @@ export default function InstructorsPage() {
                     <p className="text-gray-500 font-medium mb-6">
                         We are hiring instructors in web development, systems programming, and blockchain engineering.
                     </p>
-                    <button className="px-10 py-4 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold rounded-full transition-all">
+                    <Link
+                        href="/resources"
+                        className="inline-block px-10 py-4 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold rounded-full transition-all"
+                    >
                         View Openings
-                    </button>
+                    </Link>
                 </div>
             </SectionShell>
         </div>

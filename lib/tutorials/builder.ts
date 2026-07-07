@@ -36,6 +36,10 @@ export function tip(text: string): TutorialBlock {
     return { type: "tip", text };
 }
 
+export function faq(items: { question: string; answer: string }[]): TutorialBlock {
+    return { type: "faq", items };
+}
+
 export function code(language: string, code: string, title?: string): TutorialBlock {
     return { type: "code", language, code, title };
 }

@@ -15,7 +15,8 @@ export type TutorialBlock =
     | { type: "note"; text: string }
     | { type: "tip"; text: string }
     | { type: "list"; items: string[] }
-    | { type: "steps"; items: string[] };
+    | { type: "steps"; items: string[] }
+    | { type: "faq"; items: { question: string; answer: string }[] };
 
 export interface TutorialVideo {
     id: string;

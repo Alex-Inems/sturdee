@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import JsonLd from "@/components/seo/JsonLd";
 import PageHero from "@/components/PageHero";
 import SectionShell from "@/components/SectionShell";
@@ -51,9 +52,10 @@ export default function CoursesPage() {
             <SectionShell>
                 <div className="grid md:grid-cols-3 gap-6">
                     {COURSES.map((course) => (
-                        <div
+                        <Link
                             key={course.id}
-                            className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100/50 hover:translate-y-[-2px] transition-all duration-300"
+                            href={`/courses/${course.slug}`}
+                            className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100/50 hover:translate-y-[-2px] transition-all duration-300 block"
                         >
                             <div className="flex items-center justify-between gap-2 mb-4">
                                 <span className={`inline-flex px-3 py-1 rounded-full text-xs font-bold ${levelColors[course.level]}`}>
@@ -78,9 +80,9 @@ export default function CoursesPage() {
                                         {course.rating} ★ · {formatStudents(course.students)} enrolled
                                     </p>
                                 </div>
-                                <span className="text-emerald-600 font-semibold text-sm">Enroll →</span>
+                                <span className="text-emerald-600 font-semibold text-sm">View course →</span>
                             </div>
-                        </div>
+                        </Link>
                     ))}
                 </div>
             </SectionShell>
@@ -110,9 +112,12 @@ export default function CoursesPage() {
                         <p className="text-sm text-gray-400 font-medium mb-6">
                             {featured.instructor} · {featured.duration} · {featured.reviews} reviews
                         </p>
-                        <button className="px-6 py-3 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold rounded-full text-sm transition-all">
-                            Download Syllabus
-                        </button>
+                        <Link
+                            href={`/courses/${featured.slug}`}
+                            className="px-6 py-3 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold rounded-full text-sm transition-all inline-block"
+                        >
+                            View Course Details
+                        </Link>
                     </div>
                 </div>
             </SectionShell>

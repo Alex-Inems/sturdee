@@ -5,14 +5,18 @@ import JsonLd from "@/components/seo/JsonLd";
 import TutorialSidebar from "./TutorialSidebar";
 import TutorialPageContent from "./TutorialPageContent";
 import TutorialVideo from "./TutorialVideo";
-import { breadcrumbJsonLd, tutorialLessonJsonLd } from "@/lib/seo";
-import type { TutorialPage, TutorialTrack } from "@/lib/tutorials";
+import { breadcrumbJsonLd, faqJsonLd, tutorialLessonJsonLd } from "@/lib/seo";
+import type { TutorialBlock, TutorialPage, TutorialTrack } from "@/lib/tutorials";
 
 interface TutorialLayoutProps {
     track: TutorialTrack;
     page: TutorialPage;
     prev: TutorialPage | null;
     next: TutorialPage | null;
+}
+
+function extractFaqItems(sections: TutorialBlock[]) {
+    return sections.flatMap((block) => (block.type === "faq" ? block.items : []));
 }
 
 export default function TutorialLayout({ track, page, prev, next }: TutorialLayoutProps) {
@@ -28,12 +32,15 @@ export default function TutorialLayout({ track, page, prev, next }: TutorialLayo
         { name: page.title, path: `${base}/${page.slug}` },
     ];
 
+    const faqItems = extractFaqItems(page.sections);
+
     return (
         <div className="font-jakarta bg-page min-h-screen pt-24 pb-16">
             <JsonLd
                 data={[
                     breadcrumbJsonLd(breadcrumbSchema),
                     tutorialLessonJsonLd(track, page, track.language.id, page.slug),
+                    ...(faqItems.length > 0 ? [faqJsonLd(faqItems)] : []),
                 ]}
             />
             <div className="max-w-7xl mx-auto px-6 md:px-12">

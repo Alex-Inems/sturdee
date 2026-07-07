@@ -1,36 +1,94 @@
 import type { MetadataRoute } from "next";
+import { CHEATSHEETS } from "@/lib/cheatsheets";
+import { getCourseCurriculum } from "@/lib/course-content";
+import { COURSE_CATEGORIES, COURSES, EXTENDED_INSTRUCTORS, LEARNING_PATHS } from "@/lib/courses";
+import { GUIDES } from "@/lib/guides";
+import { MEDIA_ASSETS } from "@/lib/media";
+import { categorySlug } from "@/lib/slug";
 import { SITE_URL } from "@/lib/site";
 import { TUTORIAL_TRACKS } from "@/lib/tutorials";
 
+function entry(
+    path: string,
+    priority: number,
+    changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] = "weekly",
+    images?: string[]
+): MetadataRoute.Sitemap[number] {
+    return {
+        url: `${SITE_URL}${path}`,
+        lastModified: new Date(),
+        changeFrequency,
+        priority,
+        ...(images && images.length > 0 && { images: images.map((img) => `${SITE_URL}${img}`) }),
+    };
+}
+
 export default function sitemap(): MetadataRoute.Sitemap {
-    const now = new Date();
     const staticRoutes: MetadataRoute.Sitemap = [
-        { url: SITE_URL, lastModified: now, changeFrequency: "weekly", priority: 1 },
-        { url: `${SITE_URL}/tutorials`, lastModified: now, changeFrequency: "daily", priority: 0.95 },
-        { url: `${SITE_URL}/courses`, lastModified: now, changeFrequency: "weekly", priority: 0.85 },
-        { url: `${SITE_URL}/programs`, lastModified: now, changeFrequency: "monthly", priority: 0.75 },
-        { url: `${SITE_URL}/instructors`, lastModified: now, changeFrequency: "monthly", priority: 0.75 },
+        entry("/", 1, "weekly"),
+        entry("/tutorials", 0.95, "daily"),
+        entry("/guides", 0.9, "weekly"),
+        entry("/cheatsheets", 0.9, "weekly"),
+        entry("/resources", 0.85, "monthly"),
+        entry("/courses", 0.9, "weekly"),
+        entry("/programs", 0.85, "weekly"),
+        entry("/instructors", 0.85, "weekly"),
+        entry("/media", 0.8, "monthly"),
+        entry("/privacy", 0.3, "yearly"),
+        entry("/terms", 0.3, "yearly"),
+        entry("/legal", 0.3, "yearly"),
     ];
 
-    const tutorialRoutes: MetadataRoute.Sitemap = TUTORIAL_TRACKS.flatMap((track) => {
-        const langHub = {
-            url: `${SITE_URL}/tutorials/${track.language.id}`,
-            lastModified: now,
-            changeFrequency: "weekly" as const,
-            priority: 0.9,
-        };
+    const guideRoutes = GUIDES.map((guide) => entry(`/guides/${guide.slug}`, 0.88, "monthly"));
+    const cheatsheetRoutes = CHEATSHEETS.map((sheet) =>
+        entry(`/cheatsheets/${sheet.slug}`, 0.88, "monthly")
+    );
 
-        const lessons = track.sections.flatMap((section) =>
-            section.pages.map((page) => ({
-                url: `${SITE_URL}/tutorials/${track.language.id}/${page.slug}`,
-                lastModified: now,
-                changeFrequency: "monthly" as const,
-                priority: 0.8,
-            }))
+    const categoryRoutes = COURSE_CATEGORIES.map((cat) =>
+        entry(`/courses/category/${categorySlug(cat)}`, 0.87, "weekly")
+    );
+
+    const courseRoutes = COURSES.flatMap((course) => {
+        const courseEntry = entry(`/courses/${course.slug}`, 0.86, "weekly", [course.image]);
+        const lessonEntries = getCourseCurriculum(course).flatMap((mod) =>
+            mod.lessons.map((lesson) =>
+                entry(`/courses/${course.slug}/lessons/${lesson.slug}`, 0.82, "monthly", [course.image])
+            )
         );
+        return [courseEntry, ...lessonEntries];
+    });
 
+    const programRoutes = LEARNING_PATHS.map((path) =>
+        entry(`/programs/${path.slug}`, 0.85, "monthly", [path.image])
+    );
+
+    const instructorRoutes = EXTENDED_INSTRUCTORS.map((instructor) =>
+        entry(`/instructors/${instructor.slug}`, 0.84, "monthly", [instructor.image])
+    );
+
+    const mediaRoutes = MEDIA_ASSETS.map((asset) =>
+        entry(`/media/${asset.slug}`, 0.75, "yearly", [asset.path])
+    );
+
+    const tutorialRoutes: MetadataRoute.Sitemap = TUTORIAL_TRACKS.flatMap((track) => {
+        const langHub = entry(`/tutorials/${track.language.id}`, 0.9, "weekly");
+        const lessons = track.sections.flatMap((section) =>
+            section.pages.map((page) =>
+                entry(`/tutorials/${track.language.id}/${page.slug}`, 0.8, "monthly")
+            )
+        );
         return [langHub, ...lessons];
     });
 
-    return [...staticRoutes, ...tutorialRoutes];
+    return [
+        ...staticRoutes,
+        ...guideRoutes,
+        ...cheatsheetRoutes,
+        ...categoryRoutes,
+        ...courseRoutes,
+        ...programRoutes,
+        ...instructorRoutes,
+        ...mediaRoutes,
+        ...tutorialRoutes,
+    ];
 }

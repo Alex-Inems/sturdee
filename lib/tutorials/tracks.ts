@@ -1,4 +1,4 @@
-import { section, h2, h3, list, page, code, tryit, p } from "./builder";
+import { section, h2, h3, list, page, code, tryit, p, faq, steps, tip } from "./builder";
 import {
     classesPage,
     conditionalsPage,
@@ -10,6 +10,7 @@ import {
     syntaxPage,
     variablesPage,
 } from "./topics";
+import { referenceSection } from "./extra-pages";
 import type { TutorialLanguage, TutorialTrack } from "./types";
 import { liquidTrack } from "./liquid";
 import { attachVideoToPage } from "./videos";
@@ -112,6 +113,31 @@ function htmlTrack(): TutorialTrack {
                     list(["<div> — block container", "<span> — inline container", "<ul>/<ol>/<li> — lists", "<button> — clickable button", "<input> — form control"]),
                 ]),
             ]),
+            section("HTML Advanced", [
+                page(`${id}_semantics`, "HTML Semantics & SEO", [
+                    h2("Semantic HTML for SEO"),
+                    p("Search engines reward semantic markup. Use <main>, <article>, <nav>, and proper heading hierarchy (one <h1> per page) to help Google understand your content structure."),
+                    code(ext, `<main>\n  <article>\n    <h1>Learn HTML Free</h1>\n    <p>Semantic tags improve accessibility and search rankings.</p>\n  </article>\n</main>`),
+                    faq([
+                        { question: "Does semantic HTML help SEO?", answer: "Yes. Semantic tags clarify page structure for crawlers and improve accessibility scores, which correlate with rankings." },
+                    ]),
+                ]),
+                page(`${id}_lists`, "HTML Lists", [
+                    h2("Ordered, Unordered & Definition Lists"),
+                    code(ext, `<ul>\n  <li>Unordered</li>\n</ul>\n<ol>\n  <li>First</li>\n  <li>Second</li>\n</ol>`),
+                    tryit(ext, `<!DOCTYPE html><html><body><ul><li>HTML</li><li>CSS</li></ul></body></html>`),
+                ]),
+                page(`${id}_accessibility`, "HTML Accessibility", [
+                    h2("Building Accessible Pages"),
+                    p("Accessibility (a11y) ensures everyone can use your site, including screen reader users. It is also a legal requirement in many countries and improves SEO."),
+                    list(["Always set alt on images", "Use <label> for every form input", "Ensure color contrast meets WCAG AA", "Add skip-to-content link", "Use aria-label when visual context is missing"]),
+                ]),
+                page(`${id}_seo`, "HTML for SEO", [
+                    h2("On-Page SEO Essentials"),
+                    code(ext, `<head>\n  <title>Learn HTML Free | Sturdee</title>\n  <meta name="description" content="Free HTML tutorial with examples.">\n  <link rel="canonical" href="https://www.sturdee.online/tutorials/html">\n</head>`),
+                    steps(["Unique title per page (50–60 chars)", "Meta description (150–155 chars)", "Canonical URL", "One H1 with primary keyword", "Internal links to related tutorials"]),
+                ]),
+            ]),
         ],
     };
 }
@@ -159,6 +185,25 @@ function cssTrack(): TutorialTrack {
                     code("css", `@media (max-width: 768px) {\n  .sidebar { display: none; }\n}`),
                 ]),
             ]),
+            section("CSS Advanced", [
+                page(`${id}_typography`, "CSS Typography", [
+                    h2("Fonts & Text Styling"),
+                    code("css", `body { font-family: 'Inter', sans-serif; line-height: 1.6; }\nh1 { font-size: clamp(1.75rem, 4vw, 3rem); font-weight: 700; }`),
+                ]),
+                page(`${id}_position`, "CSS Position", [
+                    h2("Positioning Elements"),
+                    list(["static — default flow", "relative — offset from normal position", "absolute — relative to positioned parent", "fixed — viewport-fixed (sticky headers)", "sticky — scroll-based stick"]),
+                    code("css", `.sticky-header { position: sticky; top: 0; z-index: 50; }`),
+                ]),
+                page(`${id}_variables`, "CSS Variables", [
+                    h2("Custom Properties"),
+                    code("css", `:root {\n  --color-primary: #10B981;\n  --spacing: 1rem;\n}\n.btn { background: var(--color-primary); padding: var(--spacing); }`),
+                ]),
+                page(`${id}_transitions`, "CSS Transitions & Animations", [
+                    h2("Motion on the Web"),
+                    code("css", `.card {\n  transition: transform 0.2s ease, box-shadow 0.2s ease;\n}\n.card:hover {\n  transform: translateY(-4px);\n}`),
+                ]),
+            ]),
         ],
     };
 }
@@ -194,6 +239,25 @@ function jsTrack(): TutorialTrack {
                     h2("HTML DOM"),
                     p("JavaScript can select and modify HTML elements at runtime."),
                     code(ext, `document.getElementById("title").textContent = "Updated";\ndocument.querySelector(".btn").addEventListener("click", () => alert("Hi"));`),
+                ]),
+            ]),
+            section("JavaScript Advanced", [
+                page(`${id}_strings`, "JavaScript Strings", [
+                    h2("String Methods"),
+                    code(ext, `const s = "Hello Sturdee";\nconsole.log(s.length, s.toUpperCase(), s.includes("Sturdee"));`),
+                    tryit(ext, `const s = "Hello Sturdee";\nconsole.log(s.split(" "));`),
+                ]),
+                page(`${id}_objects`, "JavaScript Objects", [
+                    h2("Objects & Destructuring"),
+                    code(ext, `const user = { name: "Alex", score: 95 };\nconst { name, score } = user;\nconsole.log(Object.keys(user));`),
+                ]),
+                page(`${id}_fetch`, "JavaScript Fetch API", [
+                    h2("HTTP Requests"),
+                    code(ext, `async function getCourses() {\n  const res = await fetch("/api/courses");\n  return res.json();\n}`),
+                ]),
+                page(`${id}_errors`, "JavaScript Error Handling", [
+                    h2("try / catch"),
+                    code(ext, `try {\n  JSON.parse(badJson);\n} catch (e) {\n  console.error("Parse failed:", e.message);\n}`),
                 ]),
             ]),
         ],
@@ -266,7 +330,10 @@ function genericTrack(
         functionsPage(id, name, ext, fnExample),
     ];
     if (classExample) basics.push(classesPage(id, name, ext, classExample));
-    return { language: lang, sections: [section(`${name} Tutorial`, basics)] };
+    return {
+        language: lang,
+        sections: [section(`${name} Tutorial`, basics), referenceSection(id, name, ext)],
+    };
 }
 
 export const TUTORIAL_TRACKS: TutorialTrack[] = [

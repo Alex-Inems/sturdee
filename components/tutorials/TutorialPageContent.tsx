@@ -61,6 +61,24 @@ export default function TutorialPageContent({ sections }: { sections: TutorialBl
                                 {block.text}
                             </div>
                         );
+                    case "faq":
+                        return (
+                            <div key={i} className="my-8 space-y-4">
+                                <h3 className="text-xl font-bold text-gray-900">Frequently Asked Questions</h3>
+                                {block.items.map((item) => (
+                                    <details
+                                        key={item.question}
+                                        className="group rounded-xl border border-gray-200 bg-gray-50/50 open:bg-white open:shadow-sm"
+                                    >
+                                        <summary className="cursor-pointer px-5 py-4 font-semibold text-gray-900 list-none flex justify-between items-center">
+                                            {item.question}
+                                            <span className="text-gray-400 group-open:rotate-45 transition-transform text-xl leading-none">+</span>
+                                        </summary>
+                                        <p className="px-5 pb-4 text-gray-600 font-medium leading-relaxed">{item.answer}</p>
+                                    </details>
+                                ))}
+                            </div>
+                        );
                     case "code":
                         return <CodeBlock key={i} language={block.language} code={block.code} title={block.title} />;
                     case "tryit":

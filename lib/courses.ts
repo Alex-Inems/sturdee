@@ -26,6 +26,7 @@ export interface Course {
 
 export interface LearningPath {
     id: string;
+    slug: string;
     title: string;
     category: CourseCategory;
     courses: number;
@@ -33,14 +34,18 @@ export interface LearningPath {
     image: string;
     tag: string;
     description: string;
+    outcomes: string[];
 }
 
 export interface Instructor {
+    slug: string;
     name: string;
     title: string;
     credentials: string;
     image: string;
     courses: string[];
+    bio: string;
+    expertise: string[];
 }
 
 export const COURSE_CATEGORIES: CourseCategory[] = [
@@ -310,6 +315,7 @@ export const COURSES: Course[] = [
 export const LEARNING_PATHS: LearningPath[] = [
     {
         id: "path-web",
+        slug: "full-stack-web-development",
         title: "Full-Stack Web Development",
         category: "Web Development",
         courses: 18,
@@ -317,9 +323,16 @@ export const LEARNING_PATHS: LearningPath[] = [
         image: IMAGES.pathBusiness,
         tag: "Popular",
         description: "From HTML fundamentals to deployed Next.js applications with CI/CD.",
+        outcomes: [
+            "Build responsive websites with HTML, CSS, and JavaScript",
+            "Create React and Next.js applications with server-side rendering",
+            "Deploy production apps with authentication and APIs",
+            "Qualify for frontend and full-stack developer roles",
+        ],
     },
     {
         id: "path-prog",
+        slug: "professional-programming",
         title: "Professional Programming",
         category: "Programming",
         courses: 22,
@@ -327,9 +340,16 @@ export const LEARNING_PATHS: LearningPath[] = [
         image: IMAGES.pathLeadership,
         tag: "New",
         description: "Python, TypeScript, systems design, and enterprise patterns for software careers.",
+        outcomes: [
+            "Write tested, maintainable code in Python and TypeScript",
+            "Master data structures and algorithmic problem solving",
+            "Design scalable systems for technical interviews",
+            "Contribute to enterprise and open-source codebases",
+        ],
     },
     {
         id: "path-crypto",
+        slug: "blockchain-cryptocurrency",
         title: "Blockchain & Cryptocurrency",
         category: "Cryptocurrency",
         courses: 16,
@@ -337,30 +357,99 @@ export const LEARNING_PATHS: LearningPath[] = [
         image: IMAGES.pathInnovation,
         tag: "Featured",
         description: "Smart contracts, DeFi protocols, security auditing, and digital asset markets.",
+        outcomes: [
+            "Develop and deploy Solidity smart contracts",
+            "Understand DeFi protocol mechanics and tokenomics",
+            "Audit contracts for common vulnerability patterns",
+            "Analyze cryptocurrency markets with risk frameworks",
+        ],
     },
 ];
 
 export const INSTRUCTORS: Instructor[] = [
     {
+        slug: "elena-vasquez",
         name: "Dr. Elena Vasquez",
         title: "Full-Stack Web Development",
         credentials: "Staff Engineer, ex-Vercel",
         image: IMAGES.instructorJames,
         courses: ["WEB-401", "WEB-510"],
+        bio: "Dr. Vasquez spent six years at Vercel building the App Router and edge middleware stack. She now teaches production Next.js engineering and full-stack architecture to thousands of developers worldwide.",
+        expertise: ["React", "Next.js", "Node.js", "Edge Computing", "Performance"],
     },
     {
+        slug: "marcus-okonkwo",
         name: "Prof. Marcus Okonkwo",
         title: "Programming & Algorithms",
         credentials: "Adjunct Faculty, Carnegie Mellon",
         image: IMAGES.instructorSarah,
         courses: ["PROG-301", "PROG-420"],
+        bio: "Prof. Okonkwo teaches algorithms and software engineering at Carnegie Mellon while consulting for fintech firms. His students consistently place in top-tier engineering roles.",
+        expertise: ["Python", "TypeScript", "Algorithms", "System Design", "Testing"],
     },
     {
+        slug: "priya-sharma",
         name: "Dr. Priya Sharma",
         title: "Blockchain & Cryptocurrency",
         credentials: "Stanford Blockchain Lab",
         image: IMAGES.instructorMichael,
         courses: ["CRY-301", "CRY-410", "CRY-505"],
+        bio: "Dr. Sharma leads Sturdee's technology programs after a decade at the Stanford Blockchain Lab. Her research on smart contract security has been cited in over 2,400 peer-reviewed papers.",
+        expertise: ["Solidity", "DeFi", "Smart Contract Security", "Tokenomics", "Formal Verification"],
+    },
+];
+
+export const EXTENDED_INSTRUCTORS: Instructor[] = [
+    ...INSTRUCTORS,
+    {
+        slug: "jordan-blake",
+        name: "Jordan Blake",
+        title: "Frontend Architecture",
+        credentials: "Principal Engineer, Stripe",
+        image: IMAGES.facultyA,
+        courses: ["WEB-302"],
+        bio: "Jordan architects design systems and payment UI at Stripe. He teaches advanced CSS, layout systems, and component-driven design tokens.",
+        expertise: ["CSS", "Design Systems", "Tailwind", "Accessibility", "Component Architecture"],
+    },
+    {
+        slug: "yuki-nakamura",
+        name: "Dr. Yuki Nakamura",
+        title: "Systems Programming",
+        credentials: "Systems Engineer, Cloudflare",
+        image: IMAGES.facultyB,
+        courses: ["PROG-350"],
+        bio: "Dr. Nakamura builds memory-safe network services at Cloudflare using Rust. Her course covers ownership, concurrency, and WASM deployment.",
+        expertise: ["Rust", "Systems Programming", "WASM", "Networking", "Concurrency"],
+    },
+    {
+        slug: "alexandre-dubois",
+        name: "Alexandre Dubois",
+        title: "Digital Asset Markets",
+        credentials: "Former Head of Digital Assets, Citadel",
+        image: IMAGES.facultyC,
+        courses: ["CRY-220"],
+        bio: "Alexandre managed digital asset trading desks at Citadel before teaching cryptocurrency markets, derivatives, and institutional risk management.",
+        expertise: ["Trading", "Derivatives", "Risk Management", "On-Chain Analytics", "Compliance"],
+    },
+    {
+        slug: "mia-torres",
+        name: "Mia Torres",
+        title: "Web Foundations",
+        credentials: "Curriculum Lead, freeCodeCamp",
+        image: IMAGES.facultyA,
+        courses: ["WEB-210"],
+        bio: "Mia designed freeCodeCamp's responsive web design curriculum. She specializes in teaching HTML, JavaScript, and accessibility to absolute beginners.",
+        expertise: ["HTML", "JavaScript", "Accessibility", "Curriculum Design", "Beginner Education"],
+    },
+    {
+        slug: "james-whitfield",
+        name: "James Whitfield",
+        title: "Enterprise Java",
+        credentials: "Principal Engineer, JPMorgan Chase",
+        image: IMAGES.facultyB,
+        courses: ["PROG-205"],
+        bio: "James builds microservices and event-driven systems at JPMorgan Chase. He teaches Spring Boot, Kafka, and secure API design for regulated industries.",
+        expertise: ["Java", "Spring Boot", "Kafka", "Microservices", "Enterprise Architecture"],
     },
 ];
 
@@ -372,4 +461,28 @@ export function formatStudents(n: number) {
 
 export function formatPrice(n: number) {
     return n.toLocaleString("en-US");
+}
+
+export function getCourse(slug: string): Course | undefined {
+    return COURSES.find((c) => c.slug === slug);
+}
+
+export function getLearningPath(slug: string): LearningPath | undefined {
+    return LEARNING_PATHS.find((p) => p.slug === slug);
+}
+
+export function getInstructor(slug: string): Instructor | undefined {
+    return EXTENDED_INSTRUCTORS.find((i) => i.slug === slug);
+}
+
+export function getCoursesByCategory(category: CourseCategory): Course[] {
+    return COURSES.filter((c) => c.category === category);
+}
+
+export function getCoursesByInstructor(instructorName: string): Course[] {
+    return COURSES.filter((c) => c.instructor === instructorName);
+}
+
+export function getCoursesForPath(path: LearningPath): Course[] {
+    return COURSES.filter((c) => c.category === path.category);
 }

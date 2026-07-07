@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Play, Star, Clock, Users, ArrowRight } from "lucide-react";
 import SectionShell from "./SectionShell";
 import { FEATURED_COURSES, formatPrice, formatStudents } from "@/lib/courses";
@@ -20,9 +21,10 @@ const FeaturedCourses = () => {
 
             <div className="grid md:grid-cols-3 gap-6">
                 {FEATURED_COURSES.map((course) => (
-                    <div
+                    <Link
                         key={course.id}
-                        className="group cursor-pointer bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100/50 hover:translate-y-[-2px] transition-all duration-300"
+                        href={`/courses/${course.slug}`}
+                        className="group cursor-pointer bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100/50 hover:translate-y-[-2px] transition-all duration-300 block"
                     >
                         <div className="relative aspect-4/3 overflow-hidden">
                             <Image
@@ -84,16 +86,12 @@ const FeaturedCourses = () => {
 
                             <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                                 <span className="text-xl font-bold text-gray-900">${formatPrice(course.price)}</span>
-                                <button
-                                    type="button"
-                                    aria-label={`Enroll in ${course.title}`}
-                                    className="text-emerald-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all"
-                                >
-                                    Enroll <ArrowRight className="w-4 h-4" />
-                                </button>
+                                <span className="text-emerald-600 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                                    View course <ArrowRight className="w-4 h-4" />
+                                </span>
                             </div>
                         </div>
-                    </div>
+                    </Link>
                 ))}
             </div>
         </SectionShell>

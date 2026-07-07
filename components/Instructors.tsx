@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import SectionShell from "./SectionShell";
 import { INSTRUCTORS } from "@/lib/courses";
 
@@ -21,9 +22,10 @@ const Instructors = () => {
 
             <div className="grid md:grid-cols-3 gap-6">
                 {INSTRUCTORS.map((instructor) => (
-                    <div
+                    <Link
                         key={instructor.name}
-                        className="group bg-white rounded-2xl p-6 shadow-xl border border-gray-100/50 text-center hover:translate-y-[-2px] transition-all duration-300 cursor-pointer"
+                        href={`/instructors/${instructor.slug}`}
+                        className="group bg-white rounded-2xl p-6 shadow-xl border border-gray-100/50 text-center hover:translate-y-[-2px] transition-all duration-300"
                     >
                         <div className="relative w-28 h-28 mx-auto mb-5 rounded-full overflow-hidden ring-4 ring-amber-100/60">
                             <Image
@@ -42,7 +44,7 @@ const Instructors = () => {
                         <p className="text-[11px] text-gray-400 font-medium">
                             {instructor.courses.join(" · ")}
                         </p>
-                    </div>
+                    </Link>
                 ))}
             </div>
         </SectionShell>

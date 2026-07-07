@@ -18,7 +18,11 @@ export const TUTORIAL_VIDEOS: Record<string, TutorialVideo> = {
 };
 
 export function getTutorialVideo(langId: string, slug: string): TutorialVideo | undefined {
-    return TUTORIAL_VIDEOS[`${langId}/${slug}`];
+    return (
+        TUTORIAL_VIDEOS[`${langId}/${slug}`] ??
+        TUTORIAL_VIDEOS[`${langId}/${langId}_intro`] ??
+        TUTORIAL_VIDEOS[`${langId}/${langId}_syntax`]
+    );
 }
 
 export function attachVideoToPage<T extends { slug: string; video?: TutorialVideo }>(

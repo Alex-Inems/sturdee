@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import SectionShell from "./SectionShell";
 import { LEARNING_PATHS } from "@/lib/courses";
@@ -20,9 +21,10 @@ const LearningPaths = () => {
 
             <div className="grid md:grid-cols-3 gap-6">
                 {LEARNING_PATHS.map((path) => (
-                    <div
+                    <Link
                         key={path.id}
-                        className="group relative rounded-2xl overflow-hidden shadow-xl border border-gray-100/50 hover:translate-y-[-2px] transition-all duration-300 cursor-pointer"
+                        href={`/programs/${path.slug}`}
+                        className="group relative rounded-2xl overflow-hidden shadow-xl border border-gray-100/50 hover:translate-y-[-2px] transition-all duration-300"
                     >
                         <div className="aspect-[3/4] overflow-hidden relative">
                             <Image
@@ -48,14 +50,11 @@ const LearningPaths = () => {
                                 <span>•</span>
                                 <span>{path.duration}</span>
                             </div>
-                            <button
-                                type="button"
-                                className="flex items-center gap-2 text-sm font-semibold text-white hover:gap-3 transition-all"
-                            >
+                            <span className="flex items-center gap-2 text-sm font-semibold text-white hover:gap-3 transition-all">
                                 View Path <ArrowRight className="w-4 h-4" />
-                            </button>
+                            </span>
                         </div>
-                    </div>
+                    </Link>
                 ))}
             </div>
         </SectionShell>

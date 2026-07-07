@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
+import type { Course, Instructor, LearningPath } from "@/lib/courses";
+import { COURSES } from "@/lib/courses";
+import type { MediaAsset } from "@/lib/media";
 import type { TutorialPage, TutorialTrack } from "@/lib/tutorials/types";
 
 const DEFAULT_KEYWORDS = [
@@ -70,6 +73,8 @@ type PageMetaInput = {
     path: string;
     keywords?: string[];
     type?: "website" | "article";
+    image?: string;
+    imageAlt?: string;
 };
 
 export function pageMetadata({
@@ -78,8 +83,11 @@ export function pageMetadata({
     path,
     keywords = [],
     type = "website",
+    image,
+    imageAlt,
 }: PageMetaInput): Metadata {
     const url = `${SITE_URL}${path}`;
+    const ogImage = image ? (image.startsWith("http") ? image : `${SITE_URL}${image}`) : undefined;
     return {
         title,
         description,
@@ -91,11 +99,15 @@ export function pageMetadata({
             url,
             type,
             siteName: SITE_NAME,
+            ...(ogImage && {
+                images: [{ url: ogImage, alt: imageAlt ?? title, width: 1200, height: 630 }],
+            }),
         },
         twitter: {
             card: "summary_large_image",
             title: `${title} | ${SITE_NAME}`,
             description,
+            ...(ogImage && { images: [ogImage] }),
         },
     };
 }
@@ -230,6 +242,33 @@ export function tutorialLessonJsonLd(
     };
 }
 
+export function faqJsonLd(items: { question: string; answer: string }[]) {
+    return {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: items.map((item) => ({
+            "@type": "Question",
+            name: item.question,
+            acceptedAnswer: {
+                "@type": "Answer",
+                text: item.answer,
+            },
+        })),
+    };
+}
+
+export function articleJsonLd(title: string, description: string, path: string) {
+    return {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: title,
+        description,
+        url: `${SITE_URL}${path}`,
+        author: { "@type": "Organization", name: SITE_NAME },
+        publisher: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+    };
+}
+
 export function courseListJsonLd() {
     return {
         "@context": "https://schema.org",
@@ -237,5 +276,175 @@ export function courseListJsonLd() {
         name: `${SITE_NAME} Courses`,
         url: `${SITE_URL}/courses`,
         description: "Web development, programming, and cryptocurrency courses.",
+        numberOfItems: COURSES.length,
+        itemListElement: COURSES.map((course, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            url: `${SITE_URL}/courses/${course.slug}`,
+            name: course.title,
+        })),
     };
+}
+
+export function courseMetadata(course: Course): Metadata {
+    return pageMetadata({
+        title: `${course.title} — ${course.level} Course`,
+        description: `${course.description} ${course.duration}, ${course.format} format. Taught by ${course.instructor}. ${course.rating}★ rating from ${course.reviews} reviews.`,
+        path: `/courses/${course.slug}`,
+        keywords: [
+            course.title.toLowerCase(),
+            course.category.toLowerCase(),
+            `${course.level.toLowerCase()} course`,
+            course.instructor,
+        ],
+        type: "article",
+        image: course.image,
+        imageAlt: course.title,
+    });
+}
+
+export function courseJsonLd(course: Course) {
+    return {
+        "@context": "https://schema.org",
+        "@type": "Course",
+        name: course.title,
+        description: course.description,
+        url: `${SITE_URL}/courses/${course.slug}`,
+        provider: {
+            "@type": "Organization",
+            name: SITE_NAME,
+            url: SITE_URL,
+        },
+        educationalLevel: course.level,
+        timeRequired: `PT${course.hours}H`,
+        courseCode: course.code,
+        image: `${SITE_URL}${course.image}`,
+        offers: {
+            "@type": "Offer",
+            price: course.price,
+            priceCurrency: "USD",
+            availability: "https://schema.org/InStock",
+            url: `${SITE_URL}/courses/${course.slug}`,
+        },
+        aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: course.rating,
+            reviewCount: course.reviews,
+        },
+    };
+}
+
+export function courseLessonMetadata(course: Course, lessonTitle: string, lessonSlug: string): Metadata {
+    const title = `${lessonTitle} — ${course.title}`;
+    const description = `Lesson from ${course.title}: ${lessonTitle}. Part of the ${course.duration} ${course.format.toLowerCase()} course taught by ${course.instructor} on ${SITE_NAME}.`;
+    return pageMetadata({
+        title,
+        description,
+        path: `/courses/${course.slug}/lessons/${lessonSlug}`,
+        keywords: [lessonTitle.toLowerCase(), course.title.toLowerCase(), "course lesson"],
+        type: "article",
+        image: course.image,
+        imageAlt: lessonTitle,
+    });
+}
+
+export function courseLessonJsonLd(course: Course, lessonTitle: string, lessonSlug: string, lessonDescription: string) {
+    return {
+        "@context": "https://schema.org",
+        "@type": "LearningResource",
+        name: lessonTitle,
+        description: lessonDescription,
+        url: `${SITE_URL}/courses/${course.slug}/lessons/${lessonSlug}`,
+        learningResourceType: "lesson",
+        isPartOf: {
+            "@type": "Course",
+            name: course.title,
+            url: `${SITE_URL}/courses/${course.slug}`,
+        },
+        provider: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+    };
+}
+
+export function learningPathMetadata(path: LearningPath): Metadata {
+    return pageMetadata({
+        title: `${path.title} — Learning Path`,
+        description: `${path.description} ${path.courses} courses over ${path.duration}. ${path.category} program at ${SITE_NAME}.`,
+        path: `/programs/${path.slug}`,
+        keywords: [path.title.toLowerCase(), "learning path", path.category.toLowerCase()],
+        image: path.image,
+        imageAlt: path.title,
+    });
+}
+
+export function learningPathJsonLd(path: LearningPath) {
+    return {
+        "@context": "https://schema.org",
+        "@type": "EducationalOccupationalProgram",
+        name: path.title,
+        description: path.description,
+        url: `${SITE_URL}/programs/${path.slug}`,
+        provider: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+        occupationalCategory: path.category,
+        timeToComplete: path.duration,
+        image: `${SITE_URL}${path.image}`,
+    };
+}
+
+export function instructorMetadata(instructor: Instructor): Metadata {
+    return pageMetadata({
+        title: `${instructor.name} — Instructor Profile`,
+        description: `${instructor.bio} Teaches ${instructor.courses.join(", ")} at ${SITE_NAME}. ${instructor.credentials}.`,
+        path: `/instructors/${instructor.slug}`,
+        keywords: [instructor.name, "coding instructor", ...instructor.expertise.map((e) => e.toLowerCase())],
+        image: instructor.image,
+        imageAlt: instructor.name,
+    });
+}
+
+export function instructorJsonLd(instructor: Instructor) {
+    return {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        name: instructor.name,
+        jobTitle: instructor.title,
+        description: instructor.bio,
+        url: `${SITE_URL}/instructors/${instructor.slug}`,
+        image: `${SITE_URL}${instructor.image}`,
+        worksFor: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+        knowsAbout: instructor.expertise,
+    };
+}
+
+export function mediaMetadata(asset: MediaAsset): Metadata {
+    return pageMetadata({
+        title: asset.title,
+        description: asset.description,
+        path: `/media/${asset.slug}`,
+        keywords: [asset.category, asset.title.toLowerCase(), "education image"],
+        image: asset.path,
+        imageAlt: asset.alt,
+    });
+}
+
+export function imageObjectJsonLd(asset: MediaAsset) {
+    return {
+        "@context": "https://schema.org",
+        "@type": "ImageObject",
+        name: asset.title,
+        description: asset.description,
+        contentUrl: `${SITE_URL}${asset.path}`,
+        url: `${SITE_URL}/media/${asset.slug}`,
+        width: asset.width,
+        height: asset.height,
+        caption: asset.alt,
+    };
+}
+
+export function categoryMetadata(category: string, slug: string): Metadata {
+    return pageMetadata({
+        title: `${category} Courses`,
+        description: `Browse all ${category.toLowerCase()} courses at ${SITE_NAME}. Live cohorts, self-paced options, and verified certificates.`,
+        path: `/courses/category/${slug}`,
+        keywords: [`${category.toLowerCase()} courses`, "online classes", "programming bootcamp"],
+    });
 }
