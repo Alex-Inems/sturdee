@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import Hero from "@/components/Hero";
+import JsonLd from "@/components/seo/JsonLd";
+import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 import Stats from "@/components/Stats";
 import AlumniOutcomes from "@/components/AlumniOutcomes";
 import Philosophy from "@/components/Philosophy";
@@ -21,9 +24,24 @@ const Instructors = dynamic(() => import("@/components/Instructors"), {
     loading: () => <SectionPlaceholder />,
 });
 
+export const metadata: Metadata = pageMetadata({
+    title: "Learn to Code — Free Tutorials, Courses & Study Resources",
+    description:
+        "Sturdee is your free study platform for web development, programming, and Shopify Liquid. Interactive tutorials, video lessons, live courses, and expert instructors — learn by doing.",
+    path: "/",
+    keywords: [
+        "learn to code free",
+        "programming study site",
+        "web development education",
+        "coding courses online",
+        "Shopify theme development",
+    ],
+});
+
 export default function HomePage() {
     return (
         <div className="font-jakarta bg-page">
+            <JsonLd data={breadcrumbJsonLd([{ name: "Home", path: "/" }])} />
             <Hero />
             <Stats />
             <AlumniOutcomes />

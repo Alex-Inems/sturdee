@@ -1,7 +1,17 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import PageHero from "@/components/PageHero";
 import SectionShell from "@/components/SectionShell";
+import { pageMetadata } from "@/lib/seo";
 import { IMAGES } from "@/lib/images";
+
+export const metadata: Metadata = pageMetadata({
+    title: "Academic Programs & Learning Paths",
+    description:
+        "Structured learning paths in web development, programming, and technology — from foundations to executive mastery. Explore undergraduate, graduate, and professional programs at Sturdee.",
+    path: "/programs",
+    keywords: ["learning paths", "technology programs", "coding degree paths", "professional development"],
+});
 
 export default function ProgramsPage() {
     return (

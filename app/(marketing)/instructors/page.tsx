@@ -1,9 +1,19 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import PageHero from "@/components/PageHero";
 import SectionShell from "@/components/SectionShell";
+import { pageMetadata } from "@/lib/seo";
 import { IMAGES } from "@/lib/images";
 import { COURSES, INSTRUCTORS } from "@/lib/courses";
 import { SITE_NAME } from "@/lib/site";
+
+export const metadata: Metadata = pageMetadata({
+    title: "Expert Instructors & Faculty",
+    description:
+        "Learn from engineers and researchers at Google, Stripe, Cloudflare, Stanford, and top firms. Sturdee faculty teach what they ship in production.",
+    path: "/instructors",
+    keywords: ["coding instructors", "programming teachers", "web development faculty", "tech educators"],
+});
 
 const facultyImages = [IMAGES.facultyA, IMAGES.facultyB, IMAGES.facultyC] as const;
 

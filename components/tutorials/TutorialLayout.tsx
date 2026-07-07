@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import Breadcrumbs from "@/components/seo/Breadcrumbs";
+import JsonLd from "@/components/seo/JsonLd";
 import TutorialSidebar from "./TutorialSidebar";
 import TutorialPageContent from "./TutorialPageContent";
 import TutorialVideo from "./TutorialVideo";
+import { breadcrumbJsonLd, tutorialLessonJsonLd } from "@/lib/seo";
 import type { TutorialPage, TutorialTrack } from "@/lib/tutorials";
 
 interface TutorialLayoutProps {
@@ -14,15 +17,32 @@ interface TutorialLayoutProps {
 
 export default function TutorialLayout({ track, page, prev, next }: TutorialLayoutProps) {
     const base = `/tutorials/${track.language.id}`;
+    const breadcrumbItems = [
+        { label: "Tutorials", href: "/tutorials" },
+        { label: track.language.name, href: base },
+        { label: page.title },
+    ];
+    const breadcrumbSchema = [
+        { name: "Tutorials", path: "/tutorials" },
+        { name: track.language.name, path: base },
+        { name: page.title, path: `${base}/${page.slug}` },
+    ];
 
     return (
         <div className="font-jakarta bg-page min-h-screen pt-24 pb-16">
+            <JsonLd
+                data={[
+                    breadcrumbJsonLd(breadcrumbSchema),
+                    tutorialLessonJsonLd(track, page, track.language.id, page.slug),
+                ]}
+            />
             <div className="max-w-7xl mx-auto px-6 md:px-12">
                 <div className="flex flex-col lg:flex-row gap-8">
                     <TutorialSidebar track={track} currentSlug={page.slug} />
 
                     <main className="flex-1 min-w-0">
                         <div className="rounded-2xl border border-gray-200 bg-white shadow-xl p-6 md:p-10">
+                            <Breadcrumbs items={breadcrumbItems} />
                             <p className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-2">
                                 {track.language.name} Tutorial
                             </p>

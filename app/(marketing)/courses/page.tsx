@@ -1,15 +1,18 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import JsonLd from "@/components/seo/JsonLd";
 import PageHero from "@/components/PageHero";
 import SectionShell from "@/components/SectionShell";
+import { courseListJsonLd, pageMetadata } from "@/lib/seo";
 import { COURSES, COURSE_CATEGORIES, formatStudents } from "@/lib/courses";
-import { SITE_NAME } from "@/lib/site";
 
-export const metadata: Metadata = {
-    title: `Available Courses | ${SITE_NAME}`,
+export const metadata: Metadata = pageMetadata({
+    title: "Programming & Web Development Courses",
     description:
-        "Browse web development, programming, and cryptocurrency courses. Live cohorts, certificates, and industry-led instruction.",
-};
+        "Browse live cohort courses in web development, programming, JavaScript, Python, blockchain, and cryptocurrency. Certificates, instructor office hours, and industry-aligned curricula.",
+    path: "/courses",
+    keywords: ["programming courses", "web development bootcamp", "cryptocurrency course", "online coding classes"],
+});
 
 const levelColors: Record<string, string> = {
     Beginner: "bg-emerald-100/60 text-emerald-700",
@@ -22,6 +25,7 @@ export default function CoursesPage() {
 
     return (
         <div className="font-jakarta bg-page min-h-screen">
+            <JsonLd data={courseListJsonLd()} />
             <PageHero
                 highlight="Course Catalog"
                 title="Explore Our Courses"

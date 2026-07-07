@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
-import { SITE_NAME } from "@/lib/site";
+import { rootMetadata } from "@/lib/seo";
+import JsonLd from "@/components/seo/JsonLd";
+import { organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
@@ -10,10 +12,7 @@ const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
 });
 
-export const metadata: Metadata = {
-  title: `${SITE_NAME} | Education`,
-  description: "Web development, programming, and cryptocurrency courses at Sturdee",
-};
+export const metadata: Metadata = rootMetadata;
 
 export default function RootLayout({
   children,
@@ -25,7 +24,10 @@ export default function RootLayout({
       <head>
         <link rel="preload" href="/student.png" as="image" type="image/png" />
       </head>
-      <body className="font-jakarta antialiased text-gray-900 bg-page">{children}</body>
+      <body className="font-jakarta antialiased text-gray-900 bg-page">
+        <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />
+        {children}
+      </body>
     </html>
   );
 }

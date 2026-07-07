@@ -1,18 +1,35 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import JsonLd from "@/components/seo/JsonLd";
+import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 import { SITE_NAME } from "@/lib/site";
 import { TUTORIAL_LANGUAGES, TUTORIAL_TRACKS } from "@/lib/tutorials";
 
-export const metadata: Metadata = {
-    title: `Tutorials | ${SITE_NAME}`,
-    description: "Free tutorials for HTML, CSS, JavaScript, Liquid, Shopify themes, Python, and more.",
-};
+export const metadata: Metadata = pageMetadata({
+    title: "Free Coding Tutorials — Learn HTML, CSS, JavaScript, Python & More",
+    description:
+        "Browse 200+ free interactive programming tutorials. Learn HTML, CSS, JavaScript, Python, SQL, Java, Shopify Liquid, TypeScript, and 20+ languages with code examples, videos, and try-it-yourself editors.",
+    path: "/tutorials",
+    keywords: [
+        "free coding tutorials",
+        "learn programming online",
+        "W3Schools alternative",
+        "interactive coding lessons",
+        "programming tutorial hub",
+    ],
+});
 
 export default function TutorialsPage() {
     const popular = ["html", "css", "javascript", "liquid", "python", "sql", "java", "typescript"];
 
     return (
         <div className="font-jakarta bg-page min-h-screen pt-28 pb-20">
+            <JsonLd
+                data={breadcrumbJsonLd([
+                    { name: "Home", path: "/" },
+                    { name: "Tutorials", path: "/tutorials" },
+                ])}
+            />
             <div className="max-w-7xl mx-auto px-6 md:px-12">
                 <div className="text-center max-w-3xl mx-auto mb-14">
                     <span className="inline-flex mb-6 px-5 py-2.5 bg-[#FFE55E] rounded-full font-bold text-black text-xs sm:text-sm tracking-wide shadow-md">
@@ -32,12 +49,10 @@ export default function TutorialsPage() {
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                         {popular.map((id) => {
                             const lang = TUTORIAL_LANGUAGES.find((l) => l.id === id)!;
-                            const track = TUTORIAL_TRACKS.find((t) => t.language.id === id)!;
-                            const first = track.sections[0]?.pages[0];
                             return (
                                 <Link
                                     key={id}
-                                    href={first ? `/tutorials/${id}/${first.slug}` : `/tutorials/${id}`}
+                                    href={`/tutorials/${id}`}
                                     className="rounded-2xl p-5 bg-white border border-gray-100 shadow-xl hover:translate-y-[-2px] transition-all text-center"
                                 >
                                     <span className="text-3xl">{lang.icon}</span>
@@ -53,11 +68,10 @@ export default function TutorialsPage() {
                     {TUTORIAL_LANGUAGES.map((lang) => {
                         const track = TUTORIAL_TRACKS.find((t) => t.language.id === lang.id)!;
                         const pageCount = track.sections.reduce((n, s) => n + s.pages.length, 0);
-                        const first = track.sections[0]?.pages[0];
                         return (
                             <Link
                                 key={lang.id}
-                                href={first ? `/tutorials/${lang.id}/${first.slug}` : `/tutorials/${lang.id}`}
+                                href={`/tutorials/${lang.id}`}
                                 className="group rounded-2xl p-5 bg-white border border-gray-100/50 shadow-xl hover:translate-y-[-2px] transition-all"
                             >
                                 <div className="flex items-start gap-3">

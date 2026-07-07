@@ -28,6 +28,7 @@ export interface TutorialPage {
     title: string;
     sections: TutorialBlock[];
     video?: TutorialVideo;
+    description?: string;
 }
 
 export interface TutorialSection {

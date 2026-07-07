@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import TutorialLayout from "@/components/tutorials/TutorialLayout";
-import { SITE_NAME } from "@/lib/site";
 import {
     TUTORIAL_TRACKS,
     getAdjacentPages,
-    getAllTutorialPages,
     getTutorialPage,
     getTutorialTrack,
 } from "@/lib/tutorials";
+import { tutorialLessonMetadata } from "@/lib/seo";
 
 interface Props {
     params: Promise<{ lang: string; slug: string }>;
@@ -29,12 +28,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { lang, slug } = await params;
     const track = getTutorialTrack(lang);
     const page = getTutorialPage(lang, slug);
-    if (!track || !page) return { title: `Tutorials | ${SITE_NAME}` };
-
-    return {
-        title: `${page.title} | ${track.language.name} Tutorial | ${SITE_NAME}`,
-        description: `Learn ${track.language.name}: ${page.title}. Free interactive tutorial on ${SITE_NAME}.`,
-    };
+    if (!track || !page) return {};
+    return tutorialLessonMetadata(track, page, lang, slug);
 }
 
 export default async function TutorialLessonPage({ params }: Props) {
