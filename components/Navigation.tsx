@@ -3,12 +3,16 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useState, useEffect, Suspense } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { Link as LocaleLink, usePathname, useRouter } from "@/i18n/navigation";
+import LanguageSwitcher from "./LanguageSwitcher";
 import { useAuth } from "./AuthContext";
 
 const AuthModal = dynamic(() => import("./AuthModal"), { ssr: false });
 
 function NavigationInner() {
+    const t = useTranslations("Nav");
     const [scrolled, setScrolled] = useState(false);
     const [mobileMenu, setMobileMenu] = useState(false);
     const [authOpen, setAuthOpen] = useState(false);
@@ -46,21 +50,20 @@ function NavigationInner() {
     }, [authFromUrl, ensureAuth]);
 
     const navLinks = [
-        { label: "Home", href: "/" },
-        { label: "Tutorials", href: "/tutorials" },
-        { label: "Guides", href: "/guides" },
-        { label: "Blog", href: "/blog" },
-        { label: "Cheat Sheets", href: "/cheatsheets" },
-        { label: "Media", href: "/media" },
-        { label: "Courses", href: "/courses" },
-        { label: "Open Source", href: "/opensource" },
-        { label: "Practice", href: "/practice" },
-        { label: "Credentials", href: "/credentials" },
-        { label: "Programs", href: "/programs" },
-        { label: "Instructors", href: "/instructors" },
-        { label: "Tutors", href: "/tutors" },
-        { label: "Book", href: "/book" },
-    ];
+        { label: t("home"), href: "/" },
+        { label: t("tutorials"), href: "/tutorials" },
+        { label: t("guides"), href: "/guides" },
+        { label: t("blog"), href: "/blog" },
+        { label: t("cheatsheets"), href: "/cheatsheets" },
+        { label: t("media"), href: "/media" },
+        { label: t("courses"), href: "/courses" },
+        { label: t("openSource"), href: "/opensource" },
+        { label: t("practice"), href: "/practice" },
+        { label: t("credentials"), href: "/credentials" },
+        { label: t("programs"), href: "/programs" },
+        { label: t("instructors"), href: "/instructors" },
+        { label: t("tutors"), href: "/tutors" },
+    ] as const;
 
     return (
         <>
@@ -70,16 +73,16 @@ function NavigationInner() {
                 }`}
             >
                 <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
-                    <Link href="/" className="text-2xl font-bold tracking-tight text-gray-900 hover:opacity-85 transition-opacity">
+                    <LocaleLink href="/" className="text-2xl font-bold tracking-tight text-gray-900 hover:opacity-85 transition-opacity">
                         Sturdee
-                    </Link>
+                    </LocaleLink>
 
-                    <div className="hidden lg:flex items-center gap-7">
+                    <div className="hidden lg:flex items-center gap-6">
                         {navLinks.map((link) => {
                             const isActive = pathname === link.href;
                             return (
-                                <Link
-                                    key={link.label}
+                                <LocaleLink
+                                    key={link.href}
                                     href={link.href}
                                     className={`text-[14px] font-medium tracking-wide transition-colors ${
                                         isActive
@@ -88,31 +91,22 @@ function NavigationInner() {
                                     }`}
                                 >
                                     {link.label}
-                                </Link>
+                                </LocaleLink>
                             );
                         })}
                         {user?.role === "admin" && (
-                            <Link
-                                href="/admin"
-                                className={`text-[14px] font-medium tracking-wide transition-colors ${
-                                    pathname.startsWith("/admin")
-                                        ? "text-emerald-600 font-semibold"
-                                        : "text-gray-500 hover:text-emerald-600"
-                                }`}
-                            >
-                                Admin
+                            <Link href="/admin" className="text-[14px] font-medium tracking-wide text-gray-500 hover:text-emerald-600">
+                                {t("admin")}
                             </Link>
                         )}
                     </div>
 
-                    <div className="hidden md:flex items-center gap-4">
+                    <div className="hidden md:flex items-center gap-3">
+                        <LanguageSwitcher />
                         {user ? (
                             <>
-                                <Link
-                                    href="/dashboard"
-                                    className="text-[13px] font-semibold text-gray-600 hover:text-gray-900 transition-colors"
-                                >
-                                    Dashboard
+                                <Link href="/dashboard" className="text-[13px] font-semibold text-gray-600 hover:text-gray-900 transition-colors">
+                                    {t("dashboard")}
                                 </Link>
                                 <span className="text-[13px] font-semibold bg-gray-50 text-gray-800 px-3 py-1.5 rounded-full border border-gray-200">
                                     {user.name}
@@ -121,22 +115,19 @@ function NavigationInner() {
                                     onClick={logout}
                                     className="text-xs uppercase tracking-wider font-bold text-gray-400 hover:text-red-500 transition-colors"
                                 >
-                                    Log Out
+                                    {t("logout")}
                                 </button>
                             </>
                         ) : (
                             <>
-                                <button
-                                    onClick={openAuth}
-                                    className="text-[14px] font-semibold text-gray-600 hover:text-black transition-colors"
-                                >
-                                    Sign Up
+                                <button onClick={openAuth} className="text-[14px] font-semibold text-gray-600 hover:text-black transition-colors">
+                                    {t("signUp")}
                                 </button>
                                 <button
                                     onClick={openAuth}
                                     className="px-6 py-2 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold text-[14px] rounded-full shadow-xs hover:shadow-sm transition-all duration-200"
                                 >
-                                    Login
+                                    {t("login")}
                                 </button>
                             </>
                         )}
@@ -159,52 +150,52 @@ function NavigationInner() {
 
                 {mobileMenu && (
                     <div className="md:hidden absolute top-[100%] left-0 w-full bg-page/95 backdrop-blur-md border-b border-gray-200/70 px-6 py-6 space-y-3">
+                        <LanguageSwitcher />
                         {navLinks.map((link) => (
-                            <Link
-                                key={link.label}
+                            <LocaleLink
+                                key={link.href}
                                 href={link.href}
                                 onClick={() => setMobileMenu(false)}
                                 className="block text-base font-semibold text-gray-800 p-2.5 rounded-xl hover:bg-gray-50"
                             >
                                 {link.label}
-                            </Link>
+                            </LocaleLink>
                         ))}
                         {user?.role === "admin" && (
                             <Link href="/admin" onClick={() => setMobileMenu(false)} className="block text-base font-semibold text-emerald-600 p-2.5">
-                                Admin
+                                {t("admin")}
                             </Link>
                         )}
                         <hr className="border-gray-100 my-2" />
                         {user ? (
                             <>
                                 <Link href="/dashboard" onClick={() => setMobileMenu(false)} className="block text-center py-2.5 bg-gray-50 rounded-xl font-semibold">
-                                    Dashboard
+                                    {t("dashboard")}
                                 </Link>
                                 <button
-                                    onClick={() => { logout(); setMobileMenu(false); }}
+                                    onClick={() => {
+                                        logout();
+                                        setMobileMenu(false);
+                                    }}
                                     className="w-full text-center py-2.5 bg-red-50 text-red-600 rounded-xl font-semibold"
                                 >
-                                    Log Out
+                                    {t("logout")}
                                 </button>
                             </>
                         ) : (
                             <>
                                 <button onClick={() => { openAuth(); setMobileMenu(false); }} className="w-full py-2.5 border border-gray-200 rounded-xl font-semibold">
-                                    Sign Up
+                                    {t("signUp")}
                                 </button>
                                 <button onClick={() => { openAuth(); setMobileMenu(false); }} className="w-full py-2.5 bg-[#10B981] text-white rounded-xl font-semibold">
-                                    Login
+                                    {t("login")}
                                 </button>
                             </>
                         )}
                     </div>
                 )}
             </nav>
-            <AuthModal
-                isOpen={authOpen || authFromUrl}
-                onClose={closeAuth}
-                initialError={authError}
-            />
+            <AuthModal isOpen={authOpen || authFromUrl} onClose={closeAuth} initialError={authError} />
         </>
     );
 }

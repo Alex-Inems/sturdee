@@ -1,0 +1,78 @@
+{
+  "LanguageSwitcher": {
+    "label": "Idioma",
+    "en": "English",
+    "fr": "Français",
+    "es": "Español"
+  },
+  "Nav": {
+    "home": "Inicio",
+    "tutorials": "Tutoriales",
+    "guides": "Guías",
+    "blog": "Blog",
+    "cheatsheets": "Hojas de referencia",
+    "media": "Medios",
+    "courses": "Cursos",
+    "openSource": "Código abierto",
+    "practice": "Práctica",
+    "credentials": "Credenciales",
+    "programs": "Programas",
+    "instructors": "Instructores",
+    "tutors": "Tutores",
+    "book": "Reservar",
+    "admin": "Admin",
+    "dashboard": "Panel",
+    "signUp": "Registrarse",
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión"
+  },
+  "Footer": {
+    "tagline": "Formando desarrolladores con educación rigurosa alineada a la industria",
+    "programs": "Programas",
+    "webDev": "Desarrollo web",
+    "programming": "Programación",
+    "crypto": "Criptomonedas",
+    "blockchain": "Blockchain",
+    "resources": "Recursos",
+    "openSource": "Código abierto",
+    "practice": "Práctica",
+    "credentials": "Credenciales",
+    "resourceHub": "Recursos",
+    "tutors": "Tutores",
+    "bookSession": "Reservar sesión",
+    "courseCatalog": "Catálogo de cursos",
+    "learningPaths": "Rutas de aprendizaje",
+    "certifications": "Certificaciones",
+    "careerServices": "Servicios de carrera",
+    "company": "Empresa",
+    "privacy": "Política de privacidad",
+    "terms": "Términos de servicio",
+    "legal": "Legal"
+  },
+  "Home": {
+    "metaTitle": "Aprende a programar — Tutoriales, cursos y recursos gratis",
+    "metaDescription": "Sturdee es tu plataforma gratuita para desarrollo web, programación y Shopify Liquid. Tutoriales interactivos, vídeos, cursos en vivo e instructores expertos.",
+    "breadcrumb": "Inicio"
+  },
+  "Meta": {
+    "tutorialsTitle": "Tutoriales de programación gratis — HTML, CSS, JavaScript, Python y más",
+    "tutorialsDescription": "Explora tutoriales interactivos gratuitos. Aprende HTML, CSS, JavaScript, Python, SQL y más de 20 lenguajes con ejemplos de código.",
+    "blogTitle": "Blog para desarrolladores — Tutoriales, carrera y tecnología",
+    "blogDescription": "Lee el blog de Sturdee con guías web, consejos de carrera, preparación para entrevistas y buenas prácticas.",
+    "coursesTitle": "Cursos de programación online — En vivo y a tu ritmo",
+    "coursesDescription": "Explora cursos profesionales con cohortes en vivo, rutas autodirigidas y certificados verificados.",
+    "practiceTitle": "Práctica de código — Más de 1000 problemas estilo LeetCode con soluciones",
+    "practiceDescription": "Practica algoritmos en un entorno estilo LeetCode. Ejecuta código, envía soluciones y estudia las respuestas.",
+    "openSourceTitle": "Herramientas open source gratis — Integración y puntos",
+    "openSourceDescription": "Integra herramientas open source desde GitHub. Practica con React, Next.js, Tailwind, Docker y más.",
+    "suffixFr": "— Sturdee (Français)",
+    "suffixEs": "— Sturdee (Español)"
+  },
+  "Auto": {
+    "practiceTitle": "{title} — Problema {difficulty} #{number}",
+    "practiceDescription": "Practica {title} en nuestro IDE estilo LeetCode. Tema: {topic}. Incluye soluciones en JavaScript y Python.",
+    "courseTitle": "{title} — Curso online",
+    "blogTitle": "{title} — Blog para desarrolladores",
+    "tutorialTitle": "{title} — Tutorial de {language}"
+  }
+}

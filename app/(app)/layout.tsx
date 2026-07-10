@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { NOINDEX_ROBOTS } from "@/lib/seo";
 import { AuthProvider } from "@/components/AuthContext";
+import AppIntlProvider from "@/components/AppIntlProvider";
 import SiteShell from "@/components/SiteShell";
 
 export const metadata: Metadata = {
@@ -9,8 +10,10 @@ export const metadata: Metadata = {
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
     return (
-        <AuthProvider>
-            <SiteShell>{children}</SiteShell>
-        </AuthProvider>
+        <AppIntlProvider>
+            <AuthProvider>
+                <SiteShell>{children}</SiteShell>
+            </AuthProvider>
+        </AppIntlProvider>
     );
 }

@@ -5,6 +5,9 @@ import Breadcrumbs from "@/components/seo/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
 import CodingEnvironment from "@/components/practice/CodingEnvironment";
 import DifficultyBadge from "@/components/practice/DifficultyBadge";
+import { routing } from "@/i18n/routing";
+import { getLocalizedPracticeMeta } from "@/lib/i18n/metadata";
+import type { Locale } from "@/i18n/routing";
 import {
     getAdjacentProblems,
     getPracticeCatalog,
@@ -14,22 +17,25 @@ import {
 import { practiceProblemJsonLd, practiceProblemMetadata } from "@/lib/seo";
 
 interface Props {
-    params: Promise<{ slug: string }>;
+    params: Promise<{ locale: string; slug: string }>;
 }
 
 export function generateStaticParams() {
-    return getPracticeCatalog().map((p) => ({ slug: p.slug }));
+    return routing.locales.flatMap((locale) =>
+        getPracticeCatalog().map((p) => ({ locale, slug: p.slug }))
+    );
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const { slug } = await params;
+    const { locale, slug } = await params;
     const problem = getPracticeProblem(slug);
     if (!problem) return {};
-    return practiceProblemMetadata(problem);
+    const localized = await getLocalizedPracticeMeta(locale as Locale, problem);
+    return practiceProblemMetadata(problem, locale as Locale, localized);
 }
 
 export default async function PracticeProblemPage({ params }: Props) {
-    const { slug } = await params;
+    const { locale, slug } = await params;
     const problem = getPracticeProblem(slug);
     if (!problem) notFound();
 
@@ -37,7 +43,7 @@ export default async function PracticeProblemPage({ params }: Props) {
 
     return (
         <div className="font-jakarta bg-page min-h-screen pt-24 pb-16">
-            <JsonLd data={practiceProblemJsonLd(problem)} />
+            <JsonLd data={practiceProblemJsonLd(problem, locale as Locale)} />
             <div className="max-w-7xl mx-auto px-4 md:px-8">
                 <Breadcrumbs
                     items={[

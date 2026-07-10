@@ -3,6 +3,8 @@ import dynamic from "next/dynamic";
 import Hero from "@/components/Hero";
 import JsonLd from "@/components/seo/JsonLd";
 import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
+import { getLocalizedHomeMeta } from "@/lib/i18n/metadata";
+import type { Locale } from "@/i18n/routing";
 import Stats from "@/components/Stats";
 import AlumniOutcomes from "@/components/AlumniOutcomes";
 import Philosophy from "@/components/Philosophy";
@@ -24,24 +26,33 @@ const Instructors = dynamic(() => import("@/components/Instructors"), {
     loading: () => <SectionPlaceholder />,
 });
 
-export const metadata: Metadata = pageMetadata({
-    title: "Learn to Code — Free Tutorials, Courses & Study Resources",
-    description:
-        "Sturdee is your free study platform for web development, programming, and Shopify Liquid. Interactive tutorials, video lessons, live courses, and expert instructors — learn by doing.",
-    path: "/",
-    keywords: [
-        "learn to code free",
-        "programming study site",
-        "web development education",
-        "coding courses online",
-        "Shopify theme development",
-    ],
-});
+type Props = { params: Promise<{ locale: string }> };
 
-export default function HomePage() {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    const { locale } = await params;
+    const meta = await getLocalizedHomeMeta(locale as Locale);
+    return pageMetadata({
+        title: meta.title,
+        description: meta.description,
+        path: "/",
+        locale: locale as Locale,
+        keywords: [
+            "learn to code free",
+            "programming study site",
+            "web development education",
+            "coding courses online",
+            "Shopify theme development",
+        ],
+    });
+}
+
+export default async function HomePage({ params }: Props) {
+    const { locale } = await params;
+    const meta = await getLocalizedHomeMeta(locale as Locale);
+
     return (
         <div className="font-jakarta bg-page">
-            <JsonLd data={breadcrumbJsonLd([{ name: "Home", path: "/" }])} />
+            <JsonLd data={breadcrumbJsonLd([{ name: meta.breadcrumb, path: "/" }])} />
             <Hero />
             <Stats />
             <AlumniOutcomes />

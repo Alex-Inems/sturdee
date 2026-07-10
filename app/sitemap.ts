@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import type { Locale } from "@/i18n/routing";
 import { BLOG_POSTS, getAllCategorySlugs } from "@/lib/blog";
 import { CHEATSHEETS } from "@/lib/cheatsheets";
 import { getCourseCurriculum } from "@/lib/course-content";
@@ -6,104 +7,108 @@ import { COURSE_CATEGORIES, COURSES, EXTENDED_INSTRUCTORS, LEARNING_PATHS } from
 import { GUIDES } from "@/lib/guides";
 import { MEDIA_ASSETS } from "@/lib/media";
 import { categorySlug } from "@/lib/slug";
-import { SITE_URL } from "@/lib/site";
+import { LOCALES, localizedUrl } from "@/lib/site";
+import { SITE_URL } from "@/lib/site-core";
 import { TUTORIAL_TRACKS } from "@/lib/tutorials";
 import { OSS_TOOLS } from "@/lib/opensource";
 import { getPracticeCatalog, PRACTICE_TOPICS, topicSlug } from "@/lib/practice";
 import { getPublishedTutorSlugs } from "@/lib/tutors-db";
 
-function entry(
+type Sitemap = MetadataRoute.Sitemap;
+
+function localeEntries(
     path: string,
     priority: number,
-    changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] = "weekly",
+    changeFrequency: Sitemap[number]["changeFrequency"] = "weekly",
     images?: string[],
     lastModified?: string
-): MetadataRoute.Sitemap[number] {
-    return {
-        url: `${SITE_URL}${path}`,
+): Sitemap {
+    return LOCALES.map((locale) => ({
+        url: localizedUrl(locale as Locale, path),
         lastModified: lastModified ? new Date(lastModified) : new Date(),
         changeFrequency,
         priority,
         ...(images && images.length > 0 && { images: images.map((img) => `${SITE_URL}${img}`) }),
-    };
+    }));
 }
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const staticRoutes: MetadataRoute.Sitemap = [
-        entry("/", 1, "weekly"),
-        entry("/tutorials", 0.95, "daily"),
-        entry("/guides", 0.9, "weekly"),
-        entry("/blog", 0.92, "daily"),
-        entry("/cheatsheets", 0.9, "weekly"),
-        entry("/resources", 0.85, "monthly"),
-        entry("/courses", 0.9, "weekly"),
-        entry("/opensource", 0.91, "weekly"),
-        entry("/practice", 0.93, "daily"),
-        entry("/credentials", 0.9, "weekly"),
-        entry("/programs", 0.85, "weekly"),
-        entry("/instructors", 0.85, "weekly"),
-        entry("/tutors", 0.9, "daily"),
-        entry("/media", 0.8, "monthly"),
-        entry("/privacy", 0.3, "yearly"),
-        entry("/terms", 0.3, "yearly"),
-        entry("/legal", 0.3, "yearly"),
-    ];
-
-    const guideRoutes = GUIDES.map((guide) => entry(`/guides/${guide.slug}`, 0.88, "monthly"));
-    const blogRoutes = BLOG_POSTS.map((post) =>
-        entry(`/blog/${post.slug}`, 0.87, "weekly", undefined, post.publishedAt)
-    );
-    const blogCategoryRoutes = getAllCategorySlugs().map((c) =>
-        entry(`/blog/category/${c.category}`, 0.86, "weekly")
-    );
-    const cheatsheetRoutes = CHEATSHEETS.map((sheet) =>
-        entry(`/cheatsheets/${sheet.slug}`, 0.88, "monthly")
+export default async function sitemap(): Promise<Sitemap> {
+    const staticRoutes = localeEntries("/", 1, "weekly").concat(
+        localeEntries("/tutorials", 0.95, "daily"),
+        localeEntries("/guides", 0.9, "weekly"),
+        localeEntries("/blog", 0.92, "daily"),
+        localeEntries("/cheatsheets", 0.9, "weekly"),
+        localeEntries("/resources", 0.85, "monthly"),
+        localeEntries("/courses", 0.9, "weekly"),
+        localeEntries("/opensource", 0.91, "weekly"),
+        localeEntries("/practice", 0.93, "daily"),
+        localeEntries("/credentials", 0.9, "weekly"),
+        localeEntries("/programs", 0.85, "weekly"),
+        localeEntries("/instructors", 0.85, "weekly"),
+        localeEntries("/tutors", 0.9, "daily"),
+        localeEntries("/media", 0.8, "monthly"),
+        localeEntries("/privacy", 0.3, "yearly"),
+        localeEntries("/terms", 0.3, "yearly"),
+        localeEntries("/legal", 0.3, "yearly")
     );
 
-    const categoryRoutes = COURSE_CATEGORIES.map((cat) =>
-        entry(`/courses/category/${categorySlug(cat)}`, 0.87, "weekly")
+    const guideRoutes = GUIDES.flatMap((guide) => localeEntries(`/guides/${guide.slug}`, 0.88, "monthly"));
+    const blogRoutes = BLOG_POSTS.flatMap((post) =>
+        localeEntries(`/blog/${post.slug}`, 0.87, "weekly", undefined, post.publishedAt)
+    );
+    const blogCategoryRoutes = getAllCategorySlugs().flatMap((c) =>
+        localeEntries(`/blog/category/${c.category}`, 0.86, "weekly")
+    );
+    const cheatsheetRoutes = CHEATSHEETS.flatMap((sheet) =>
+        localeEntries(`/cheatsheets/${sheet.slug}`, 0.88, "monthly")
+    );
+
+    const categoryRoutes = COURSE_CATEGORIES.flatMap((cat) =>
+        localeEntries(`/courses/category/${categorySlug(cat)}`, 0.87, "weekly")
     );
 
     const courseRoutes = COURSES.flatMap((course) => {
-        const courseEntry = entry(`/courses/${course.slug}`, 0.86, "weekly", [course.image]);
+        const courseEntry = localeEntries(`/courses/${course.slug}`, 0.86, "weekly", [course.image]);
         const lessonEntries = getCourseCurriculum(course).flatMap((mod) =>
-            mod.lessons.map((lesson) =>
-                entry(`/courses/${course.slug}/lessons/${lesson.slug}`, 0.82, "monthly", [course.image])
+            mod.lessons.flatMap((lesson) =>
+                localeEntries(`/courses/${course.slug}/lessons/${lesson.slug}`, 0.82, "monthly", [course.image])
             )
         );
-        return [courseEntry, ...lessonEntries];
+        return [...courseEntry, ...lessonEntries];
     });
 
-    const programRoutes = LEARNING_PATHS.map((path) =>
-        entry(`/programs/${path.slug}`, 0.85, "monthly", [path.image])
+    const programRoutes = LEARNING_PATHS.flatMap((path) =>
+        localeEntries(`/programs/${path.slug}`, 0.85, "monthly", [path.image])
     );
 
-    const instructorRoutes = EXTENDED_INSTRUCTORS.map((instructor) =>
-        entry(`/instructors/${instructor.slug}`, 0.84, "monthly", [instructor.image])
+    const instructorRoutes = EXTENDED_INSTRUCTORS.flatMap((instructor) =>
+        localeEntries(`/instructors/${instructor.slug}`, 0.84, "monthly", [instructor.image])
     );
 
     const tutorSlugs = await getPublishedTutorSlugs();
-    const tutorRoutes = tutorSlugs.map((slug) => entry(`/tutors/${slug}`, 0.88, "weekly"));
+    const tutorRoutes = tutorSlugs.flatMap((slug) => localeEntries(`/tutors/${slug}`, 0.88, "weekly"));
 
-    const mediaRoutes = MEDIA_ASSETS.map((asset) =>
-        entry(`/media/${asset.slug}`, 0.75, "yearly", [asset.path])
+    const mediaRoutes = MEDIA_ASSETS.flatMap((asset) =>
+        localeEntries(`/media/${asset.slug}`, 0.75, "yearly", [asset.path])
     );
 
-    const tutorialRoutes: MetadataRoute.Sitemap = TUTORIAL_TRACKS.flatMap((track) => {
-        const langHub = entry(`/tutorials/${track.language.id}`, 0.9, "weekly");
+    const tutorialRoutes = TUTORIAL_TRACKS.flatMap((track) => {
+        const langHub = localeEntries(`/tutorials/${track.language.id}`, 0.9, "weekly");
         const lessons = track.sections.flatMap((section) =>
-            section.pages.map((page) =>
-                entry(`/tutorials/${track.language.id}/${page.slug}`, 0.8, "monthly")
+            section.pages.flatMap((page) =>
+                localeEntries(`/tutorials/${track.language.id}/${page.slug}`, 0.8, "monthly")
             )
         );
-        return [langHub, ...lessons];
+        return [...langHub, ...lessons];
     });
 
-    const ossRoutes = OSS_TOOLS.map((tool) => entry(`/opensource/${tool.slug}`, 0.86, "monthly"));
+    const ossRoutes = OSS_TOOLS.flatMap((tool) => localeEntries(`/opensource/${tool.slug}`, 0.86, "monthly"));
 
-    const practiceRoutes = getPracticeCatalog().map((p) => entry(`/practice/${p.slug}`, 0.84, "monthly"));
-    const practiceTopicRoutes = PRACTICE_TOPICS.map((t) =>
-        entry(`/practice/topic/${topicSlug(t)}`, 0.88, "weekly")
+    const practiceRoutes = getPracticeCatalog().flatMap((p) =>
+        localeEntries(`/practice/${p.slug}`, 0.84, "monthly")
+    );
+    const practiceTopicRoutes = PRACTICE_TOPICS.flatMap((t) =>
+        localeEntries(`/practice/topic/${topicSlug(t)}`, 0.88, "weekly")
     );
 
     return [

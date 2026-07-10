@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
-import { SITE_NAME, SITE_URL } from "@/lib/site";
+import type { Locale } from "@/i18n/routing";
+import { openGraphLocale, schemaLanguage } from "@/lib/i18n/translate";
+import { SITE_NAME, SITE_URL } from "@/lib/site-core";
+import { DEFAULT_LOCALE, hreflangAlternates, localizedUrl } from "@/lib/site";
 import type { Course, Instructor, LearningPath } from "@/lib/courses";
 import { COURSES } from "@/lib/courses";
 import type { MediaAsset } from "@/lib/media";
@@ -71,6 +74,7 @@ type PageMetaInput = {
     title: string;
     description: string;
     path: string;
+    locale?: Locale;
     keywords?: string[];
     type?: "website" | "article";
     image?: string;
@@ -81,33 +85,37 @@ export function pageMetadata({
     title,
     description,
     path,
+    locale = DEFAULT_LOCALE,
     keywords = [],
     type = "website",
     image,
     imageAlt,
 }: PageMetaInput): Metadata {
-    const url = `${SITE_URL}${path}`;
-    const ogImage = image ? (image.startsWith("http") ? image : `${SITE_URL}${image}`) : undefined;
+    const url = localizedUrl(locale, path);
+    const ogImage = image ? (image.startsWith("http") ? image : `${SITE_URL}${image}`) : localizedUrl(locale, "/opengraph-image");
+    const localizedImageAlt = imageAlt ?? title;
     return {
         title,
         description,
         keywords: [...DEFAULT_KEYWORDS, ...keywords],
-        alternates: { canonical: url },
+        alternates: {
+            canonical: url,
+            languages: hreflangAlternates(path),
+        },
         openGraph: {
             title: `${title} | ${SITE_NAME}`,
             description,
             url,
             type,
+            locale: openGraphLocale(locale),
             siteName: SITE_NAME,
-            ...(ogImage && {
-                images: [{ url: ogImage, alt: imageAlt ?? title, width: 1200, height: 630 }],
-            }),
+            images: [{ url: ogImage, alt: localizedImageAlt, width: 1200, height: 630 }],
         },
         twitter: {
             card: "summary_large_image",
             title: `${title} | ${SITE_NAME}`,
             description,
-            ...(ogImage && { images: [ogImage] }),
+            images: [ogImage],
         },
     };
 }
@@ -552,25 +560,36 @@ export function tutorJsonLd(tutor: import("@/lib/tutors").Tutor) {
     };
 }
 
-export function practiceProblemMetadata(problem: import("@/lib/practice").PracticeProblem): Metadata {
-    const title = `${problem.title} — ${problem.difficulty} Coding Problem #${problem.number}`;
-    const description = `${problem.description.replace(/\*\*/g, "")} Practice in our LeetCode-style IDE with JavaScript and Python solutions. Topic: ${problem.topic}.`;
+export function practiceProblemMetadata(
+    problem: import("@/lib/practice").PracticeProblem,
+    locale: Locale = DEFAULT_LOCALE,
+    localized?: { title: string; description: string }
+): Metadata {
+    const title = localized?.title ?? `${problem.title} — ${problem.difficulty} Coding Problem #${problem.number}`;
+    const description =
+        localized?.description ??
+        `${problem.description.replace(/\*\*/g, "")} Practice in our LeetCode-style IDE with JavaScript and Python solutions. Topic: ${problem.topic}.`;
     return pageMetadata({
         title,
         description: description.slice(0, 300),
         path: `/practice/${problem.slug}`,
+        locale,
         keywords: problem.seoKeywords,
         type: "article",
     });
 }
 
-export function practiceProblemJsonLd(problem: import("@/lib/practice").PracticeProblem) {
+export function practiceProblemJsonLd(
+    problem: import("@/lib/practice").PracticeProblem,
+    locale: Locale = DEFAULT_LOCALE
+) {
     return {
         "@context": "https://schema.org",
         "@type": "LearningResource",
         name: problem.title,
         description: problem.description.replace(/\*\*/g, ""),
-        url: `${SITE_URL}/practice/${problem.slug}`,
+        url: localizedUrl(locale, `/practice/${problem.slug}`),
+        inLanguage: schemaLanguage(locale),
         learningResourceType: "coding exercise",
         educationalLevel: problem.difficulty,
         teaches: problem.topics.join(", "),

@@ -1,0 +1,78 @@
+{
+  "LanguageSwitcher": {
+    "label": "Language",
+    "en": "English",
+    "fr": "Français",
+    "es": "Español"
+  },
+  "Nav": {
+    "home": "Home",
+    "tutorials": "Tutorials",
+    "guides": "Guides",
+    "blog": "Blog",
+    "cheatsheets": "Cheat Sheets",
+    "media": "Media",
+    "courses": "Courses",
+    "openSource": "Open Source",
+    "practice": "Practice",
+    "credentials": "Credentials",
+    "programs": "Programs",
+    "instructors": "Instructors",
+    "tutors": "Tutors",
+    "book": "Book",
+    "admin": "Admin",
+    "dashboard": "Dashboard",
+    "signUp": "Sign Up",
+    "login": "Login",
+    "logout": "Log Out"
+  },
+  "Footer": {
+    "tagline": "Elevating developers through rigorous, industry-aligned education",
+    "programs": "Programs",
+    "webDev": "Web Development",
+    "programming": "Programming",
+    "crypto": "Cryptocurrency",
+    "blockchain": "Blockchain",
+    "resources": "Resources",
+    "openSource": "Open Source",
+    "practice": "Practice",
+    "credentials": "Credentials",
+    "resourceHub": "Resources",
+    "tutors": "Tutors",
+    "bookSession": "Book a Session",
+    "courseCatalog": "Course Catalog",
+    "learningPaths": "Learning Paths",
+    "certifications": "Certifications",
+    "careerServices": "Career Services",
+    "company": "Company",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "legal": "Legal"
+  },
+  "Home": {
+    "metaTitle": "Learn to Code — Free Tutorials, Courses & Study Resources",
+    "metaDescription": "Sturdee is your free study platform for web development, programming, and Shopify Liquid. Interactive tutorials, video lessons, live courses, and expert instructors — learn by doing.",
+    "breadcrumb": "Home"
+  },
+  "Meta": {
+    "tutorialsTitle": "Free Coding Tutorials — HTML, CSS, JavaScript, Python & More",
+    "tutorialsDescription": "Browse free interactive programming tutorials. Learn HTML, CSS, JavaScript, Python, SQL, and 20+ languages with code examples and try-it-yourself editors.",
+    "blogTitle": "Developer Blog — Tutorials, Career Tips & Tech Insights",
+    "blogDescription": "Read the Sturdee blog for web development guides, career advice, interview prep, and programming best practices.",
+    "coursesTitle": "Online Coding Courses — Live & Self-Paced",
+    "coursesDescription": "Browse professional coding courses with live cohorts, self-paced tracks, and verified certificates.",
+    "practiceTitle": "Coding Practice — 1000+ LeetCode-Style Problems with Solutions",
+    "practiceDescription": "Practice algorithm and data structure problems in a LeetCode-standard environment. Run code, submit solutions, and study answers.",
+    "openSourceTitle": "Free Open Source Tools — Practice Integration & Earn Points",
+    "openSourceDescription": "Integrate free open-source tools from GitHub. Hands-on practice with React, Next.js, Tailwind, Docker, and more.",
+    "suffixFr": "— Sturdee (Français)",
+    "suffixEs": "— Sturdee (Español)"
+  },
+  "Auto": {
+    "practiceTitle": "{title} — {difficulty} Coding Problem #{number}",
+    "practiceDescription": "Practice {title} in our LeetCode-style IDE. Topic: {topic}. Includes JavaScript and Python solutions.",
+    "courseTitle": "{title} — Online Course",
+    "blogTitle": "{title} — Developer Blog",
+    "tutorialTitle": "{title} — {language} Tutorial"
+  }
+}
