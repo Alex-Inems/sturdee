@@ -1,4 +1,4 @@
-import type { TutorialBlock, TutorialPage, TutorialSection } from "./types";
+import type { SandboxId, TutorialBlock, TutorialPage, TutorialSection } from "./types";
 
 export function page(slug: string, title: string, sections: TutorialBlock[]): TutorialPage {
     return { slug, title, sections };
@@ -44,6 +44,15 @@ export function code(language: string, code: string, title?: string): TutorialBl
     return { type: "code", language, code, title };
 }
 
-export function tryit(language: string, code: string, title = "Try it Yourself"): TutorialBlock {
-    return { type: "tryit", language, code, title };
+export function tryit(language: string, code: string, title = "Try it Yourself", sandbox?: SandboxId): TutorialBlock {
+    return { type: "tryit", language, code, title, ...(sandbox && { sandbox }) };
+}
+
+/** Real-world API sandbox — Spotify playlist or OpenWeatherMap with failure simulation. */
+export function sandboxTryit(
+    sandbox: SandboxId,
+    code: string,
+    title = "Try it Yourself — Real API Trace"
+): TutorialBlock {
+    return { type: "tryit", language: "javascript", code, title, sandbox };
 }

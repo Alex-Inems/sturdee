@@ -167,7 +167,7 @@ export function courseFaqs(course: Course): { question: string; answer: string }
         },
         {
             question: "Do I get a certificate?",
-            answer: "Yes. Completing all modules, assignments, and the capstone project earns a verified Sturdee certificate you can share on LinkedIn.",
+            answer: "Yes. Each module has a free micro-certificate challenge. Pass by pushing bug-free code to a simulated Git repo — Sturdee issues a cryptographically signed credential with a public verify URL, not a paid multiple-choice quiz.",
         },
         {
             question: "Can I access free tutorials alongside this course?",

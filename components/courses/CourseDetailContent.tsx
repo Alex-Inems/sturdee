@@ -3,6 +3,7 @@ import Link from "next/link";
 import Breadcrumbs from "@/components/seo/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
 import TutorialPageContent from "@/components/tutorials/TutorialPageContent";
+import { getChallengeForLesson } from "@/lib/credentials";
 import { courseFaqs, courseOutcomes, coursePrerequisites, getCourseCurriculum } from "@/lib/course-content";
 import type { Course } from "@/lib/courses";
 import { formatStudents, EXTENDED_INSTRUCTORS } from "@/lib/courses";
@@ -103,7 +104,9 @@ export default function CourseDetailContent({ course }: CourseDetailContentProps
                                     <div key={mod.title}>
                                         <h3 className="text-lg font-bold text-gray-900 mb-4">{mod.title}</h3>
                                         <ul className="space-y-3">
-                                            {mod.lessons.map((lesson) => (
+                                            {mod.lessons.map((lesson) => {
+                                                const challenge = getChallengeForLesson(lesson.slug);
+                                                return (
                                                 <li key={lesson.slug}>
                                                     <Link
                                                         href={`/courses/${course.slug}/lessons/${lesson.slug}`}
@@ -112,11 +115,17 @@ export default function CourseDetailContent({ course }: CourseDetailContentProps
                                                         <div>
                                                             <p className="font-semibold text-gray-900">{lesson.title}</p>
                                                             <p className="text-sm text-gray-500 mt-1">{lesson.description}</p>
+                                                            {challenge && (
+                                                                <p className="text-xs font-bold text-emerald-600 mt-2">
+                                                                    🎓 Free micro-cert: {challenge.skill}
+                                                                </p>
+                                                            )}
                                                         </div>
                                                         <span className="text-xs font-bold text-gray-400 shrink-0">{lesson.duration}</span>
                                                     </Link>
                                                 </li>
-                                            ))}
+                                                );
+                                            })}
                                         </ul>
                                     </div>
                                 ))}
@@ -158,6 +167,12 @@ export default function CourseDetailContent({ course }: CourseDetailContentProps
                                 className="block w-full text-center py-3.5 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold rounded-full text-sm transition-all mb-3"
                             >
                                 Enroll Now
+                            </Link>
+                            <Link
+                                href="/credentials"
+                                className="block w-full text-center py-3.5 border border-emerald-200 text-emerald-700 font-semibold rounded-full text-sm hover:bg-emerald-50 transition-all mb-3"
+                            >
+                                Free Micro-Certificates
                             </Link>
                             <Link
                                 href="/tutorials"

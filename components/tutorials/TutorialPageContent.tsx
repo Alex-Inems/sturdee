@@ -1,5 +1,6 @@
 import type { TutorialBlock } from "@/lib/tutorials";
 import CodeBlock from "./CodeBlock";
+import SandboxTryItPanel from "./SandboxTryItPanel";
 import TryItPanel from "./TryItPanel";
 
 export default function TutorialPageContent({ sections }: { sections: TutorialBlock[] }) {
@@ -82,7 +83,15 @@ export default function TutorialPageContent({ sections }: { sections: TutorialBl
                     case "code":
                         return <CodeBlock key={i} language={block.language} code={block.code} title={block.title} />;
                     case "tryit":
-                        return (
+                        return block.sandbox ? (
+                            <SandboxTryItPanel
+                                key={i}
+                                language={block.language}
+                                code={block.code}
+                                sandbox={block.sandbox}
+                                title={block.title}
+                            />
+                        ) : (
                             <TryItPanel
                                 key={i}
                                 language={block.language}

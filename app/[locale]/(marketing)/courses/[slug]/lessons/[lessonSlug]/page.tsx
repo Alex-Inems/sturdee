@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getChallengeForLesson } from "@/lib/credentials";
 import { notFound } from "next/navigation";
 import Breadcrumbs from "@/components/seo/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
@@ -39,6 +40,7 @@ export default async function CourseLessonPage({ params }: Props) {
     if (!course || !match) notFound();
 
     const { module, lesson } = match;
+    const challenge = getChallengeForLesson(lessonSlug);
     const crumbs = [
         { label: "Home", href: "/" },
         { label: "Courses", href: "/courses" },
@@ -83,6 +85,14 @@ export default async function CourseLessonPage({ params }: Props) {
                     <p className="text-sm text-gray-400 font-medium mb-8">{lesson.duration}</p>
                     <TutorialPageContent sections={sections} />
                     <div className="mt-10 pt-8 border-t border-gray-100 flex flex-wrap gap-3">
+                        {challenge && (
+                            <Link
+                                href={`/workspace/${challenge.id}`}
+                                className="inline-flex items-center px-5 py-2.5 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold rounded-full text-sm transition-colors"
+                            >
+                                Earn {challenge.skill} micro-certificate →
+                            </Link>
+                        )}
                         {lesson.tutorialLink && (
                             <Link
                                 href={lesson.tutorialLink}

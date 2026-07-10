@@ -1,4 +1,13 @@
-import { section, h2, h3, list, page, code, tryit, p, faq, steps, tip } from "./builder";
+import { section, h2, h3, list, page, code, tryit, sandboxTryit, p, faq, steps, tip, note } from "./builder";
+import {
+    SPOTIFY_ARRAYS_CODE,
+    SPOTIFY_ARRAYS_TRYIT,
+    SPOTIFY_LOOPS_CODE,
+    SPOTIFY_LOOPS_TRYIT,
+    WEATHER_ASYNC_TRYIT,
+    WEATHER_ERRORS_TRYIT,
+    WEATHER_FETCH_TRYIT,
+} from "@/lib/sandbox/examples";
 import {
     classesPage,
     conditionalsPage,
@@ -221,19 +230,39 @@ function jsTrack(): TutorialTrack {
                 dataTypesPage(id, "JavaScript", ["String", "Number", "Boolean", "Object", "Array", "null", "undefined"], `let s = "text";\nlet n = 42;\nlet ok = true;\nlet items = [1, 2, 3];\nconsole.log(typeof s, items.length);`, ext),
                 operatorsPage(id, "JavaScript", ext, `let a = 10, b = 3;\nconsole.log(a + b, a ** b, a > b);`),
                 conditionalsPage(id, "JavaScript", ext, `const score = 88;\nif (score >= 90) console.log("A");\nelse if (score >= 80) console.log("B");\nelse console.log("C");`),
-                loopsPage(id, "JavaScript", ext, `for (let i = 0; i < 5; i++) {\n  console.log(i);\n}`, "For Loops"),
+                page(`${id}_loops`, "JavaScript For Loops", [
+                    h2("For Loops on API Collections"),
+                    p(
+                        "Instead of counting to 10 with a generic index loop, production code iterates API results — playlist tracks, order line items, GitHub pull requests."
+                    ),
+                    list(["for...of — iterate playlist tracks", "for...in — object keys (use sparingly)", "Classic for — indexed access when you need i"]),
+                    code(ext, SPOTIFY_LOOPS_CODE, "Loop Spotify track items"),
+                    sandboxTryit("spotify", SPOTIFY_LOOPS_TRYIT, "Render Discover Weekly track list"),
+                ]),
                 page(`${id}_arrays`, "JavaScript Arrays", [
-                    h2("Arrays"),
-                    p("Ordered lists with methods like push, map, filter, and reduce."),
-                    code(ext, `const nums = [1, 2, 3];\nconst doubled = nums.map(n => n * 2);\nconsole.log(doubled);`),
-                    tryit(ext, `const nums = [1,2,3];\nconsole.log(nums.map(n => n * 2));`),
+                    h2("Arrays with Real API Data"),
+                    p(
+                        "Production apps rarely loop over fruit lists. You work with API payloads — like Spotify playlist tracks returned from the Web API."
+                    ),
+                    list([
+                        "map — transform each track into UI-ready data",
+                        "filter — narrow results (e.g. songs over 3 minutes)",
+                        "reduce — aggregate totals (playlist duration, popularity scores)",
+                    ]),
+                    note("This sandbox uses the Spotify Web API response shape. Requests are mocked locally — no API key required."),
+                    code(ext, SPOTIFY_ARRAYS_CODE, "Fetch & transform playlist tracks"),
+                    sandboxTryit("spotify", SPOTIFY_ARRAYS_TRYIT, "Discover Weekly — map, filter, reduce"),
                 ]),
                 functionsPage(id, "JavaScript", ext, `function greet(name) {\n  return "Hello, " + name;\n}\nconsole.log(greet("Sturdee"));`),
                 classesPage(id, "JavaScript", ext, `class Course {\n  constructor(title) { this.title = title; }\n  summary() { return this.title; }\n}\nconsole.log(new Course("WEB-401").summary());`),
                 page(`${id}_async`, "JavaScript Async", [
-                    h2("Async / Await"),
-                    p("Handle asynchronous operations with Promises and async functions."),
-                    code(ext, `async function load() {\n  const res = await fetch("/api/courses");\n  return res.json();\n}`),
+                    h2("Async / Await with Real APIs"),
+                    p(
+                        "async/await wraps Promises so you can write sequential code that waits on network I/O — fetching weather, playlists, or payment status."
+                    ),
+                    note("The weather sandbox simulates real-world failures: ~1 in 3 requests returns HTTP 503. Run multiple times to see error handling in action."),
+                    code(ext, `async function fetchWeather(city) {\n  const res = await fetch(\n    \`https://api.openweathermap.org/data/2.5/weather?q=\${city}&units=metric&appid=demo\`\n  );\n  if (!res.ok) throw new Error(\`HTTP \${res.status}\`);\n  return res.json();\n}`),
+                    sandboxTryit("weather", WEATHER_ASYNC_TRYIT, "Fetch weather — handles API failures"),
                 ]),
                 page(`${id}_dom`, "JavaScript HTML DOM", [
                     h2("HTML DOM"),
@@ -252,12 +281,17 @@ function jsTrack(): TutorialTrack {
                     code(ext, `const user = { name: "Alex", score: 95 };\nconst { name, score } = user;\nconsole.log(Object.keys(user));`),
                 ]),
                 page(`${id}_fetch`, "JavaScript Fetch API", [
-                    h2("HTTP Requests"),
-                    code(ext, `async function getCourses() {\n  const res = await fetch("/api/courses");\n  return res.json();\n}`),
+                    h2("HTTP Requests — OpenWeatherMap"),
+                    p("fetch() is how browsers call REST APIs. Check res.ok, parse JSON, and handle HTTP error codes — the same flow used in production dashboards."),
+                    code(ext, `async function getWeather(city) {\n  const res = await fetch(\n    \`https://api.openweathermap.org/data/2.5/weather?q=\${city}&units=metric&appid=demo\`\n  );\n  const data = await res.json();\n  if (!res.ok) throw new Error(data.message);\n  return data;\n}`),
+                    sandboxTryit("weather", WEATHER_FETCH_TRYIT, "GET current weather"),
                 ]),
                 page(`${id}_errors`, "JavaScript Error Handling", [
-                    h2("try / catch"),
-                    code(ext, `try {\n  JSON.parse(badJson);\n} catch (e) {\n  console.error("Parse failed:", e.message);\n}`),
+                    h2("try / catch / retry"),
+                    p("Real APIs fail — timeouts, 503s, rate limits. Production code retries with backoff and falls back to cached data."),
+                    tip("Run this example twice. The sandbox returns intermittent 503 errors so you can practice retry logic."),
+                    code(ext, `async function loadWithRetry(fn, retries = 3) {\n  for (let i = 1; i <= retries; i++) {\n    try { return await fn(); }\n    catch (e) { if (i === retries) throw e; await new Promise(r => setTimeout(r, i * 300)); }\n  }\n}`),
+                    sandboxTryit("weather", WEATHER_ERRORS_TRYIT, "Weather API with retry backoff"),
                 ]),
             ]),
         ],

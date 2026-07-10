@@ -6,12 +6,14 @@ export interface TutorialLanguage {
     icon: string;
 }
 
+export type SandboxId = "spotify" | "weather";
+
 export type TutorialBlock =
     | { type: "h2"; text: string }
     | { type: "h3"; text: string }
     | { type: "p"; text: string }
     | { type: "code"; language: string; code: string; title?: string }
-    | { type: "tryit"; language: string; code: string; title?: string }
+    | { type: "tryit"; language: string; code: string; title?: string; sandbox?: SandboxId }
     | { type: "note"; text: string }
     | { type: "tip"; text: string }
     | { type: "list"; items: string[] }

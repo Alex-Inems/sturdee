@@ -551,3 +551,41 @@ export function tutorJsonLd(tutor: import("@/lib/tutors").Tutor) {
         },
     };
 }
+
+export function practiceProblemMetadata(problem: import("@/lib/practice").PracticeProblem): Metadata {
+    const title = `${problem.title} — ${problem.difficulty} Coding Problem #${problem.number}`;
+    const description = `${problem.description.replace(/\*\*/g, "")} Practice in our LeetCode-style IDE with JavaScript and Python solutions. Topic: ${problem.topic}.`;
+    return pageMetadata({
+        title,
+        description: description.slice(0, 300),
+        path: `/practice/${problem.slug}`,
+        keywords: problem.seoKeywords,
+        type: "article",
+    });
+}
+
+export function practiceProblemJsonLd(problem: import("@/lib/practice").PracticeProblem) {
+    return {
+        "@context": "https://schema.org",
+        "@type": "LearningResource",
+        name: problem.title,
+        description: problem.description.replace(/\*\*/g, ""),
+        url: `${SITE_URL}/practice/${problem.slug}`,
+        learningResourceType: "coding exercise",
+        educationalLevel: problem.difficulty,
+        teaches: problem.topics.join(", "),
+        provider: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+        isAccessibleForFree: true,
+    };
+}
+
+export function practiceHubJsonLd() {
+    return {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        name: "Sturdee Coding Practice — LeetCode-Style Problems",
+        description: "1000+ algorithm and data structure practice problems with live code execution and solutions.",
+        url: `${SITE_URL}/practice`,
+        provider: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+    };
+}

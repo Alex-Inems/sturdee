@@ -19,6 +19,7 @@ interface AuthContextType {
     login: (email: string, password: string) => Promise<{ error?: string }>;
     register: (email: string, name: string, password: string) => Promise<{ error?: string; message?: string }>;
     signInWithGoogle: () => Promise<{ error?: string }>;
+    signInWithGitHub: (next?: string) => Promise<{ error?: string }>;
     resetPassword: (email: string) => Promise<{ error?: string; message?: string }>;
     updatePassword: (password: string) => Promise<{ error?: string }>;
     logout: () => Promise<void>;
@@ -154,6 +155,22 @@ export function AuthProvider({
         return {};
     };
 
+    const signInWithGitHub = async (next = "/opensource") => {
+        ensureAuth();
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider: "github",
+            options: {
+                redirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent(next)}`,
+                scopes: "read:user repo",
+            },
+        });
+
+        if (error) return { error: error.message };
+        return {};
+    };
+
     const signInWithGoogle = async () => {
         ensureAuth();
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
@@ -207,6 +224,7 @@ export function AuthProvider({
                 login,
                 register,
                 signInWithGoogle,
+                signInWithGitHub,
                 resetPassword,
                 updatePassword,
                 logout,

@@ -5,8 +5,8 @@ const Benefits = () => {
     const benefits = [
         {
             icon: Award,
-            title: "Certification",
-            desc: "Receive prestigious credentials recognized by industry leaders worldwide.",
+            title: "Micro-Certificates",
+            desc: "Earn free cryptographic credentials by pushing working code — not by paying for quiz certificates.",
             color: "bg-amber-100/60 text-amber-600",
         },
         {

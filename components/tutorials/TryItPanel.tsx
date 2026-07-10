@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Play, RotateCcw } from "lucide-react";
+import { Play, RotateCcw, TreePine } from "lucide-react";
 import CopyCodeButton from "./CopyCodeButton";
+import ExecutionVisualizer from "./ExecutionVisualizer";
+import { canTraceLanguage } from "@/lib/execution";
 
 interface TryItPanelProps {
     language: string;
@@ -39,12 +41,19 @@ const runnable = (language: string) =>
 export default function TryItPanel({ language, code, title = "Try it Yourself" }: TryItPanelProps) {
     const [editorCode, setEditorCode] = useState(code);
     const [preview, setPreview] = useState(buildPreview(language, code));
+    const [showExecution, setShowExecution] = useState(false);
     const canRun = runnable(language);
+    const canExplain = canTraceLanguage(language);
 
     const run = () => setPreview(buildPreview(language, editorCode));
     const reset = () => {
         setEditorCode(code);
         setPreview(buildPreview(language, code));
+        setShowExecution(false);
+    };
+
+    const toggleExecution = () => {
+        setShowExecution((v) => !v);
     };
 
     return (
@@ -55,20 +64,33 @@ export default function TryItPanel({ language, code, title = "Try it Yourself" }
                     <CopyCodeButton code={editorCode} />
                     {canRun && (
                         <>
-                        <button
-                            type="button"
-                            onClick={reset}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-semibold transition-colors"
-                        >
-                            <RotateCcw className="w-3.5 h-3.5" /> Reset
-                        </button>
-                        <button
-                            type="button"
-                            onClick={run}
-                            className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#10B981] hover:bg-[#0F9F72] text-xs font-semibold transition-colors"
-                        >
-                            <Play className="w-3.5 h-3.5" /> Run
-                        </button>
+                            <button
+                                type="button"
+                                onClick={reset}
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-semibold transition-colors"
+                            >
+                                <RotateCcw className="w-3.5 h-3.5" /> Reset
+                            </button>
+                            {canExplain && (
+                                <button
+                                    type="button"
+                                    onClick={toggleExecution}
+                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                                        showExecution
+                                            ? "bg-violet-500 hover:bg-violet-600"
+                                            : "bg-white/10 hover:bg-white/20"
+                                    }`}
+                                >
+                                    <TreePine className="w-3.5 h-3.5" /> Explain Execution
+                                </button>
+                            )}
+                            <button
+                                type="button"
+                                onClick={run}
+                                className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#10B981] hover:bg-[#0F9F72] text-xs font-semibold transition-colors"
+                            >
+                                <Play className="w-3.5 h-3.5" /> Run
+                            </button>
                         </>
                     )}
                 </div>
@@ -80,6 +102,14 @@ export default function TryItPanel({ language, code, title = "Try it Yourself" }
                 className="w-full min-h-[140px] p-5 font-mono text-sm text-gray-100 bg-[#1e293b] border-0 resize-y focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                 aria-label="Code editor"
             />
+            {showExecution && canExplain && (
+                <ExecutionVisualizer
+                    key={editorCode}
+                    code={editorCode}
+                    language={language}
+                    onClose={() => setShowExecution(false)}
+                />
+            )}
             {canRun ? (
                 <iframe
                     title="Try it result"

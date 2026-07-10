@@ -8,6 +8,8 @@ import { MEDIA_ASSETS } from "@/lib/media";
 import { categorySlug } from "@/lib/slug";
 import { SITE_URL } from "@/lib/site";
 import { TUTORIAL_TRACKS } from "@/lib/tutorials";
+import { OSS_TOOLS } from "@/lib/opensource";
+import { getPracticeCatalog, PRACTICE_TOPICS, topicSlug } from "@/lib/practice";
 import { getPublishedTutorSlugs } from "@/lib/tutors-db";
 
 function entry(
@@ -35,6 +37,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         entry("/cheatsheets", 0.9, "weekly"),
         entry("/resources", 0.85, "monthly"),
         entry("/courses", 0.9, "weekly"),
+        entry("/opensource", 0.91, "weekly"),
+        entry("/practice", 0.93, "daily"),
+        entry("/credentials", 0.9, "weekly"),
         entry("/programs", 0.85, "weekly"),
         entry("/instructors", 0.85, "weekly"),
         entry("/tutors", 0.9, "daily"),
@@ -94,12 +99,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         return [langHub, ...lessons];
     });
 
+    const ossRoutes = OSS_TOOLS.map((tool) => entry(`/opensource/${tool.slug}`, 0.86, "monthly"));
+
+    const practiceRoutes = getPracticeCatalog().map((p) => entry(`/practice/${p.slug}`, 0.84, "monthly"));
+    const practiceTopicRoutes = PRACTICE_TOPICS.map((t) =>
+        entry(`/practice/topic/${topicSlug(t)}`, 0.88, "weekly")
+    );
+
     return [
         ...staticRoutes,
         ...guideRoutes,
         ...blogRoutes,
         ...blogCategoryRoutes,
         ...cheatsheetRoutes,
+        ...ossRoutes,
+        ...practiceRoutes,
+        ...practiceTopicRoutes,
         ...categoryRoutes,
         ...courseRoutes,
         ...programRoutes,
