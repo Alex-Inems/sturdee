@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import Breadcrumbs from "@/components/seo/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
+import type { Course } from "@/lib/courses";
 import type { Tutor } from "@/lib/tutors";
 import { getAverageRating, getReviewCount } from "@/lib/tutors";
 import { breadcrumbJsonLd, tutorJsonLd } from "@/lib/seo";
@@ -26,9 +27,10 @@ const badgeStyles: Record<string, string> = {
 interface TutorProfileViewProps {
     tutor: Tutor;
     similar?: Tutor[];
+    courses?: Course[];
 }
 
-export default function TutorProfileView({ tutor, similar: similarProp }: TutorProfileViewProps) {
+export default function TutorProfileView({ tutor, similar: similarProp, courses = [] }: TutorProfileViewProps) {
     const rating = getAverageRating(tutor);
     const reviewCount = getReviewCount(tutor);
     const similar = similarProp ?? [];
@@ -325,6 +327,25 @@ export default function TutorProfileView({ tutor, similar: similarProp }: TutorP
                         </div>
                     </aside>
                 </div>
+
+                {courses.length > 0 && (
+                    <section className="mt-12">
+                        <h2 className="text-xl font-bold text-gray-900 mb-4">Courses by {tutor.name}</h2>
+                        <div className="grid md:grid-cols-2 gap-4">
+                            {courses.map((course) => (
+                                <Link
+                                    key={course.id}
+                                    href={`/courses/${course.slug}`}
+                                    className="p-5 rounded-xl border border-gray-200 bg-white hover:border-emerald-200 transition-colors"
+                                >
+                                    <p className="text-xs font-bold text-gray-400 mb-1">{course.code}</p>
+                                    <p className="font-bold text-gray-900">{course.title}</p>
+                                    <p className="text-sm text-gray-500 mt-2">{course.duration} · ${course.price}</p>
+                                </Link>
+                            ))}
+                        </div>
+                    </section>
+                )}
 
                 {/* Similar tutors */}
                 {similar.length > 0 && (

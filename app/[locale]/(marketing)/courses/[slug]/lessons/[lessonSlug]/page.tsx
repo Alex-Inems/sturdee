@@ -5,29 +5,20 @@ import { notFound } from "next/navigation";
 import Breadcrumbs from "@/components/seo/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
 import TutorialPageContent from "@/components/tutorials/TutorialPageContent";
-import { getCourseCurriculum, getCourseLesson } from "@/lib/course-content";
-import { COURSES, getCourse } from "@/lib/courses";
+import { getCourseLesson } from "@/lib/course-content";
+import { getPublishedCourseBySlug } from "@/lib/courses-db";
 import { h2, list, p } from "@/lib/tutorials/builder";
 import { breadcrumbJsonLd, courseLessonJsonLd, courseLessonMetadata } from "@/lib/seo";
 
-interface Props {
-    params: Promise<{ slug: string; lessonSlug: string }>;
-}
+export const dynamic = "force-dynamic";
 
-export function generateStaticParams() {
-    return COURSES.flatMap((course) =>
-        getCourseCurriculum(course).flatMap((mod) =>
-            mod.lessons.map((lesson) => ({
-                slug: course.slug,
-                lessonSlug: lesson.slug,
-            }))
-        )
-    );
+interface Props {
+    params: Promise<{ locale: string; slug: string; lessonSlug: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { slug, lessonSlug } = await params;
-    const course = getCourse(slug);
+    const course = await getPublishedCourseBySlug(slug);
     const match = course ? getCourseLesson(course, lessonSlug) : undefined;
     if (!course || !match) return {};
     return courseLessonMetadata(course, match.lesson.title, lessonSlug);
@@ -35,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CourseLessonPage({ params }: Props) {
     const { slug, lessonSlug } = await params;
-    const course = getCourse(slug);
+    const course = await getPublishedCourseBySlug(slug);
     const match = course ? getCourseLesson(course, lessonSlug) : undefined;
     if (!course || !match) notFound();
 
@@ -57,7 +48,7 @@ export default async function CourseLessonPage({ params }: Props) {
         list([
             `Duration: ${lesson.duration}`,
             `Course: ${course.title} (${course.code})`,
-            `Instructor: ${course.instructor}`,
+            `Tutor: ${course.instructor}`,
             `Format: ${course.format}`,
         ]),
     ];

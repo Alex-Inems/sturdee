@@ -102,14 +102,18 @@ const CRYPTO_MODULES: CourseModule[] = [
     },
 ];
 
-const MODULES_BY_CATEGORY: Record<CourseCategory, CourseModule[]> = {
-    "Web Development": WEB_MODULES,
-    Programming: PROG_MODULES,
-    Cryptocurrency: CRYPTO_MODULES,
-};
+export function getDefaultModulesForCategory(category: CourseCategory): CourseModule[] {
+    const map: Record<CourseCategory, CourseModule[]> = {
+        "Web Development": WEB_MODULES,
+        Programming: PROG_MODULES,
+        Cryptocurrency: CRYPTO_MODULES,
+    };
+    return map[category] ?? [];
+}
 
 export function getCourseCurriculum(course: Course): CourseModule[] {
-    return MODULES_BY_CATEGORY[course.category];
+    if (course.modules?.length) return course.modules;
+    return [];
 }
 
 export function getCourseLesson(course: Course, lessonSlug: string): { module: CourseModule; lesson: CourseLesson } | undefined {

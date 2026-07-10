@@ -1,10 +1,35 @@
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Play, Star, Clock, Users, ArrowRight } from "lucide-react";
 import SectionShell from "./SectionShell";
-import { FEATURED_COURSES, formatPrice, formatStudents } from "@/lib/courses";
+import { getFeaturedCourses } from "@/lib/courses-db";
+import { formatPrice, formatStudents } from "@/lib/courses";
 
-const FeaturedCourses = () => {
+export default async function FeaturedCourses() {
+    const courses = await getFeaturedCourses();
+
+    if (!courses.length) {
+        return (
+            <SectionShell id="courses">
+                <div className="mb-12 lg:mb-16">
+                    <span className="inline-flex mb-6 px-5 py-2.5 bg-[#FFE55E] rounded-full font-bold text-black text-xs sm:text-sm tracking-wide shadow-md">
+                        Courses
+                    </span>
+                    <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 leading-[1.08] tracking-tight">
+                        Tutor-Led Courses
+                    </h2>
+                    <p className="text-base sm:text-lg text-gray-500 font-medium mt-4 max-w-2xl">
+                        Published tutors can create and list courses here.{" "}
+                        <Link href="/tutors/register" className="text-emerald-600 font-semibold hover:underline">
+                            Become a tutor
+                        </Link>{" "}
+                        to publish your first course.
+                    </p>
+                </div>
+            </SectionShell>
+        );
+    }
+
     return (
         <SectionShell id="courses">
             <div className="mb-12 lg:mb-16">
@@ -15,12 +40,12 @@ const FeaturedCourses = () => {
                     Featured Courses
                 </h2>
                 <p className="text-base sm:text-lg text-gray-500 font-medium mt-4">
-                    Web development, programming, and cryptocurrency — taught by industry practitioners
+                    Courses created by verified Sturdee tutors
                 </p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-6">
-                {FEATURED_COURSES.map((course) => (
+                {courses.map((course) => (
                     <Link
                         key={course.id}
                         href={`/courses/${course.slug}`}
@@ -55,19 +80,21 @@ const FeaturedCourses = () => {
                                 <span className="text-[11px] font-bold uppercase tracking-wide text-gray-400">
                                     {course.code}
                                 </span>
-                                <div className="flex items-center gap-2">
-                                    <div className="flex">
-                                        {[...Array(5)].map((_, j) => (
-                                            <Star
-                                                key={j}
-                                                className={`w-3.5 h-3.5 ${j < Math.floor(course.rating) ? "fill-amber-400 text-amber-400" : "text-gray-200"}`}
-                                            />
-                                        ))}
+                                {course.reviews > 0 && (
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex">
+                                            {[...Array(5)].map((_, j) => (
+                                                <Star
+                                                    key={j}
+                                                    className={`w-3.5 h-3.5 ${j < Math.floor(course.rating) ? "fill-amber-400 text-amber-400" : "text-gray-200"}`}
+                                                />
+                                            ))}
+                                        </div>
+                                        <span className="text-xs text-gray-500 font-medium">
+                                            {course.rating} ({course.reviews})
+                                        </span>
                                     </div>
-                                    <span className="text-xs text-gray-500 font-medium">
-                                        {course.rating} ({course.reviews})
-                                    </span>
-                                </div>
+                                )}
                             </div>
 
                             <h3 className="text-xl font-bold text-gray-900 mb-1">{course.title}</h3>
@@ -78,10 +105,12 @@ const FeaturedCourses = () => {
                                     <Clock className="w-3.5 h-3.5" />
                                     {course.duration}
                                 </span>
-                                <span className="flex items-center gap-1.5">
-                                    <Users className="w-3.5 h-3.5" />
-                                    {formatStudents(course.students)}
-                                </span>
+                                {course.students > 0 && (
+                                    <span className="flex items-center gap-1.5">
+                                        <Users className="w-3.5 h-3.5" />
+                                        {formatStudents(course.students)}
+                                    </span>
+                                )}
                             </div>
 
                             <div className="flex items-center justify-between pt-4 border-t border-gray-100">
@@ -96,6 +125,4 @@ const FeaturedCourses = () => {
             </div>
         </SectionShell>
     );
-};
-
-export default FeaturedCourses;
+}

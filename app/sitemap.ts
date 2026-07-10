@@ -3,7 +3,8 @@ import type { Locale } from "@/i18n/routing";
 import { BLOG_POSTS, getAllCategorySlugs } from "@/lib/blog";
 import { CHEATSHEETS } from "@/lib/cheatsheets";
 import { getCourseCurriculum } from "@/lib/course-content";
-import { COURSE_CATEGORIES, COURSES, EXTENDED_INSTRUCTORS, LEARNING_PATHS } from "@/lib/courses";
+import { COURSE_CATEGORIES, LEARNING_PATHS } from "@/lib/courses";
+import { getPublishedCourses } from "@/lib/courses-db";
 import { GUIDES } from "@/lib/guides";
 import { MEDIA_ASSETS } from "@/lib/media";
 import { categorySlug } from "@/lib/slug";
@@ -44,7 +45,6 @@ export default async function sitemap(): Promise<Sitemap> {
         localeEntries("/practice", 0.93, "daily"),
         localeEntries("/credentials", 0.9, "weekly"),
         localeEntries("/programs", 0.85, "weekly"),
-        localeEntries("/instructors", 0.85, "weekly"),
         localeEntries("/tutors", 0.9, "daily"),
         localeEntries("/media", 0.8, "monthly"),
         localeEntries("/privacy", 0.3, "yearly"),
@@ -67,7 +67,9 @@ export default async function sitemap(): Promise<Sitemap> {
         localeEntries(`/courses/category/${categorySlug(cat)}`, 0.87, "weekly")
     );
 
-    const courseRoutes = COURSES.flatMap((course) => {
+    const publishedCourses = await getPublishedCourses();
+
+    const courseRoutes = publishedCourses.flatMap((course) => {
         const courseEntry = localeEntries(`/courses/${course.slug}`, 0.86, "weekly", [course.image]);
         const lessonEntries = getCourseCurriculum(course).flatMap((mod) =>
             mod.lessons.flatMap((lesson) =>
@@ -79,10 +81,6 @@ export default async function sitemap(): Promise<Sitemap> {
 
     const programRoutes = LEARNING_PATHS.flatMap((path) =>
         localeEntries(`/programs/${path.slug}`, 0.85, "monthly", [path.image])
-    );
-
-    const instructorRoutes = EXTENDED_INSTRUCTORS.flatMap((instructor) =>
-        localeEntries(`/instructors/${instructor.slug}`, 0.84, "monthly", [instructor.image])
     );
 
     const tutorSlugs = await getPublishedTutorSlugs();
@@ -123,7 +121,6 @@ export default async function sitemap(): Promise<Sitemap> {
         ...categoryRoutes,
         ...courseRoutes,
         ...programRoutes,
-        ...instructorRoutes,
         ...tutorRoutes,
         ...mediaRoutes,
         ...tutorialRoutes,

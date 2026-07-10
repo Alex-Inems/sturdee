@@ -25,7 +25,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         keywords: [
             "free coding tutorials",
             "learn programming online",
-            "W3Schools alternative",
             "interactive coding lessons",
             "programming tutorial hub",
         ],

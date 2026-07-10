@@ -6,7 +6,7 @@ import TutorialPageContent from "@/components/tutorials/TutorialPageContent";
 import { getChallengeForLesson } from "@/lib/credentials";
 import { courseFaqs, courseOutcomes, coursePrerequisites, getCourseCurriculum } from "@/lib/course-content";
 import type { Course } from "@/lib/courses";
-import { formatStudents, EXTENDED_INSTRUCTORS } from "@/lib/courses";
+import { formatStudents } from "@/lib/courses";
 import { faq, h2, list, p } from "@/lib/tutorials/builder";
 import { breadcrumbJsonLd, courseJsonLd, faqJsonLd } from "@/lib/seo";
 
@@ -22,7 +22,6 @@ interface CourseDetailContentProps {
 
 export default function CourseDetailContent({ course }: CourseDetailContentProps) {
     const curriculum = getCourseCurriculum(course);
-    const instructor = EXTENDED_INSTRUCTORS.find((i) => i.name === course.instructor);
 
     const crumbs = [
         { label: "Home", href: "/" },
@@ -84,13 +83,9 @@ export default function CourseDetailContent({ course }: CourseDetailContentProps
                                 </div>
                                 <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{course.title}</h1>
                                 <p className="text-gray-500 font-medium mb-6">
-                                    {instructor ? (
-                                        <Link href={`/instructors/${instructor.slug}`} className="text-emerald-600 hover:text-emerald-700">
-                                            {course.instructor}
-                                        </Link>
-                                    ) : (
-                                        course.instructor
-                                    )}
+                                    <Link href={`/tutors/${course.instructorSlug}`} className="text-emerald-600 hover:text-emerald-700">
+                                        {course.instructor}
+                                    </Link>
                                     {" · "}{course.instructorTitle}
                                 </p>
                                 <TutorialPageContent sections={sections} />
@@ -99,6 +94,11 @@ export default function CourseDetailContent({ course }: CourseDetailContentProps
 
                         <section className="mt-10 rounded-2xl border border-gray-200 bg-white shadow-xl p-6 md:p-10">
                             <h2 className="text-2xl font-bold text-gray-900 mb-6">Course Curriculum</h2>
+                            {curriculum.length === 0 ? (
+                                <p className="text-gray-500 font-medium text-sm">
+                                    The tutor has not added lessons to this course yet.
+                                </p>
+                            ) : (
                             <div className="space-y-8">
                                 {curriculum.map((mod) => (
                                     <div key={mod.title}>
@@ -130,6 +130,7 @@ export default function CourseDetailContent({ course }: CourseDetailContentProps
                                     </div>
                                 ))}
                             </div>
+                            )}
                         </section>
 
                         <section className="mt-10 rounded-2xl border border-gray-200 bg-white shadow-xl p-6 md:p-10">

@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { notFound } from "next/navigation";
 import Breadcrumbs from "@/components/seo/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
 import SectionShell from "@/components/SectionShell";
-import { LEARNING_PATHS, getCoursesForPath, getLearningPath } from "@/lib/courses";
+import { countCoursesForPath, getCoursesForPath, getLearningPath } from "@/lib/courses";
+import { getPublishedCourses } from "@/lib/courses-db";
 import { breadcrumbJsonLd, learningPathJsonLd, learningPathMetadata } from "@/lib/seo";
 
 interface Props {
@@ -13,14 +14,19 @@ interface Props {
 }
 
 export function generateStaticParams() {
-    return LEARNING_PATHS.map((p) => ({ slug: p.slug }));
+    return [
+        { slug: "full-stack-web-development" },
+        { slug: "professional-programming" },
+        { slug: "blockchain-cryptocurrency" },
+    ];
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { slug } = await params;
     const path = getLearningPath(slug);
     if (!path) return {};
-    return learningPathMetadata(path);
+    const courses = await getPublishedCourses();
+    return learningPathMetadata(path, countCoursesForPath(path, courses));
 }
 
 export default async function ProgramPage({ params }: Props) {
@@ -28,7 +34,8 @@ export default async function ProgramPage({ params }: Props) {
     const path = getLearningPath(slug);
     if (!path) notFound();
 
-    const courses = getCoursesForPath(path);
+    const allCourses = await getPublishedCourses();
+    const courses = getCoursesForPath(path, allCourses);
 
     return (
         <div className="font-jakarta bg-page min-h-screen pt-28 pb-20">
@@ -58,7 +65,7 @@ export default async function ProgramPage({ params }: Props) {
                         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{path.title}</h1>
                         <p className="text-gray-500 font-medium leading-relaxed mb-6">{path.description}</p>
                         <p className="text-sm text-gray-400 font-medium mb-8">
-                            {path.courses} courses · {path.duration} · {path.category}
+                            {courses.length} course{courses.length !== 1 ? "s" : ""} · {path.duration} · {path.category}
                         </p>
                         <h2 className="text-xl font-bold text-gray-900 mb-4">Program Outcomes</h2>
                         <ul className="space-y-2 mb-8">
@@ -88,19 +95,29 @@ export default async function ProgramPage({ params }: Props) {
 
                 <SectionShell>
                     <h2 className="text-2xl font-bold text-gray-900 mb-6">Courses in This Path</h2>
-                    <div className="grid md:grid-cols-2 gap-4">
-                        {courses.map((course) => (
-                            <Link
-                                key={course.id}
-                                href={`/courses/${course.slug}`}
-                                className="p-5 rounded-xl border border-gray-100 bg-white hover:border-emerald-200 transition-colors"
-                            >
-                                <p className="text-xs font-bold text-gray-400 mb-1">{course.code}</p>
-                                <p className="font-bold text-gray-900">{course.title}</p>
-                                <p className="text-sm text-gray-500 mt-2">{course.duration} · {course.level}</p>
+                    {courses.length === 0 ? (
+                        <p className="text-gray-500 font-medium">
+                            No tutor-created courses in this path yet.{" "}
+                            <Link href="/tutors/register" className="text-emerald-600 font-semibold hover:underline">
+                                Published tutors can add courses
                             </Link>
-                        ))}
-                    </div>
+                            .
+                        </p>
+                    ) : (
+                        <div className="grid md:grid-cols-2 gap-4">
+                            {courses.map((course) => (
+                                <Link
+                                    key={course.id}
+                                    href={`/courses/${course.slug}`}
+                                    className="p-5 rounded-xl border border-gray-100 bg-white hover:border-emerald-200 transition-colors"
+                                >
+                                    <p className="text-xs font-bold text-gray-400 mb-1">{course.code}</p>
+                                    <p className="font-bold text-gray-900">{course.title}</p>
+                                    <p className="text-sm text-gray-500 mt-2">{course.duration} · {course.level}</p>
+                                </Link>
+                            ))}
+                        </div>
+                    )}
                 </SectionShell>
             </div>
         </div>

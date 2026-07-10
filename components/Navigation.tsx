@@ -109,10 +109,10 @@ function NavigationInner() {
                                 {t("login")}
                             </button>
                         )}
+                        <LanguageSwitcher />
                     </div>
 
-                    <div className="flex md:hidden items-center gap-2">
-                        <LanguageSwitcher compact />
+                    <div className="flex md:hidden items-center gap-2 shrink-0">
                         <button
                             onClick={() => setMobileMenu(!mobileMenu)}
                             className="p-2 rounded-full hover:bg-gray-50"
@@ -126,6 +126,7 @@ function NavigationInner() {
                                 )}
                             </svg>
                         </button>
+                        <LanguageSwitcher compact />
                     </div>
                 </div>
 

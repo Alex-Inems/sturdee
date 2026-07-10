@@ -3,8 +3,7 @@ import type { Locale } from "@/i18n/routing";
 import { openGraphLocale, schemaLanguage } from "@/lib/i18n/translate";
 import { SITE_NAME, SITE_URL } from "@/lib/site-core";
 import { DEFAULT_LOCALE, hreflangAlternates, localizedUrl } from "@/lib/site";
-import type { Course, Instructor, LearningPath } from "@/lib/courses";
-import { COURSES } from "@/lib/courses";
+import type { Course, LearningPath } from "@/lib/courses";
 import type { MediaAsset } from "@/lib/media";
 import type { TutorialPage, TutorialTrack } from "@/lib/tutorials/types";
 
@@ -343,15 +342,15 @@ export function blogListJsonLd(count: number) {
     };
 }
 
-export function courseListJsonLd() {
+export function courseListJsonLd(courses: Course[]) {
     return {
         "@context": "https://schema.org",
         "@type": "ItemList",
         name: `${SITE_NAME} Courses`,
         url: `${SITE_URL}/courses`,
         description: "Web development, programming, and cryptocurrency courses.",
-        numberOfItems: COURSES.length,
-        itemListElement: COURSES.map((course, index) => ({
+        numberOfItems: courses.length,
+        itemListElement: courses.map((course, index) => ({
             "@type": "ListItem",
             position: index + 1,
             url: `${SITE_URL}/courses/${course.slug}`,
@@ -439,10 +438,10 @@ export function courseLessonJsonLd(course: Course, lessonTitle: string, lessonSl
     };
 }
 
-export function learningPathMetadata(path: LearningPath): Metadata {
+export function learningPathMetadata(path: LearningPath, courseCount = 0): Metadata {
     return pageMetadata({
         title: `${path.title} — Learning Path`,
-        description: `${path.description} ${path.courses} courses over ${path.duration}. ${path.category} program at ${SITE_NAME}.`,
+        description: `${path.description}${courseCount ? ` ${courseCount} courses` : ""} over ${path.duration}. ${path.category} program at ${SITE_NAME}.`,
         path: `/programs/${path.slug}`,
         keywords: [path.title.toLowerCase(), "learning path", path.category.toLowerCase()],
         image: path.image,
@@ -464,26 +463,40 @@ export function learningPathJsonLd(path: LearningPath) {
     };
 }
 
-export function instructorMetadata(instructor: Instructor): Metadata {
+export function instructorMetadata(instructor: {
+    name: string;
+    title: string;
+    bio: string;
+    slug: string;
+    image: string;
+    expertise: string[];
+}): Metadata {
     return pageMetadata({
-        title: `${instructor.name} — Instructor Profile`,
-        description: `${instructor.bio} Teaches ${instructor.courses.join(", ")} at ${SITE_NAME}. ${instructor.credentials}.`,
-        path: `/instructors/${instructor.slug}`,
-        keywords: [instructor.name, "coding instructor", ...instructor.expertise.map((e) => e.toLowerCase())],
+        title: `${instructor.name} — Tutor Profile`,
+        description: `${instructor.bio} Tutor at ${SITE_NAME}. ${instructor.title}.`,
+        path: `/tutors/${instructor.slug}`,
+        keywords: [instructor.name, "coding tutor", ...instructor.expertise.map((e) => e.toLowerCase())],
         image: instructor.image,
         imageAlt: instructor.name,
     });
 }
 
-export function instructorJsonLd(instructor: Instructor) {
+export function instructorJsonLd(instructor: {
+    name: string;
+    title: string;
+    bio: string;
+    slug: string;
+    image: string;
+    expertise: string[];
+}) {
     return {
         "@context": "https://schema.org",
         "@type": "Person",
         name: instructor.name,
         jobTitle: instructor.title,
         description: instructor.bio,
-        url: `${SITE_URL}/instructors/${instructor.slug}`,
-        image: `${SITE_URL}${instructor.image}`,
+        url: `${SITE_URL}/tutors/${instructor.slug}`,
+        image: instructor.image.startsWith("http") ? instructor.image : `${SITE_URL}${instructor.image}`,
         worksFor: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
         knowsAbout: instructor.expertise,
     };

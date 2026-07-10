@@ -14,7 +14,7 @@ export const metadata: Metadata = pageMetadata({
         "free coding certificate",
         "git certificate",
         "verified developer credentials",
-        "alternative to W3Schools certificate",
+        "commit verified certificate",
     ],
 });
 
@@ -38,7 +38,7 @@ export default function CredentialsMarketingPage() {
                     Micro-Certificates Verified by Real Code
                 </h1>
                 <p className="text-lg text-gray-500 font-medium mb-10 max-w-3xl leading-relaxed">
-                    W3Schools charges for generic quiz certificates. Sturdee issues{" "}
+                    Generic quiz certificates charge for multiple-choice tests. Sturdee issues{" "}
                     <strong className="text-gray-800">free, cryptographic micro-credentials</strong> when you
                     successfully push a working, bug-free feature to a simulated Git repository — the same way
                     professional teams ship software.

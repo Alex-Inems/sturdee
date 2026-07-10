@@ -1,10 +1,13 @@
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { ArrowRight } from "lucide-react";
 import SectionShell from "./SectionShell";
-import { LEARNING_PATHS } from "@/lib/courses";
+import { countCoursesForPath, LEARNING_PATHS } from "@/lib/courses";
+import { getPublishedCourses } from "@/lib/courses-db";
 
-const LearningPaths = () => {
+export default async function LearningPaths() {
+    const allCourses = await getPublishedCourses();
+
     return (
         <SectionShell id="programs">
             <div className="mb-12 lg:mb-16">
@@ -20,45 +23,46 @@ const LearningPaths = () => {
             </div>
 
             <div className="grid md:grid-cols-3 gap-6">
-                {LEARNING_PATHS.map((path) => (
-                    <Link
-                        key={path.id}
-                        href={`/programs/${path.slug}`}
-                        className="group relative rounded-2xl overflow-hidden shadow-xl border border-gray-100/50 hover:translate-y-[-2px] transition-all duration-300"
-                    >
-                        <div className="aspect-[3/4] overflow-hidden relative">
-                            <Image
-                                src={path.image}
-                                alt={path.title}
-                                width={640}
-                                height={853}
-                                sizes="(max-width: 768px) 100vw, 33vw"
-                                loading="lazy"
-                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/30 to-transparent" />
-                        </div>
-                        <span className="absolute top-4 left-4 px-4 py-2 bg-[#FFE55E] rounded-full font-bold text-black text-xs z-10">
-                            {path.tag}
-                        </span>
-                        <div className="absolute bottom-0 left-0 right-0 p-6 text-white z-10">
-                            <p className="text-xs font-semibold text-white/70 mb-2">{path.category}</p>
-                            <h3 className="text-2xl font-bold mb-2">{path.title}</h3>
-                            <p className="text-sm text-white/75 font-medium mb-4 line-clamp-2">{path.description}</p>
-                            <div className="flex gap-4 text-sm font-medium text-white/80 mb-4">
-                                <span>{path.courses} Courses</span>
-                                <span>•</span>
-                                <span>{path.duration}</span>
+                {LEARNING_PATHS.map((path) => {
+                    const courseCount = countCoursesForPath(path, allCourses);
+                    return (
+                        <Link
+                            key={path.id}
+                            href={`/programs/${path.slug}`}
+                            className="group relative rounded-2xl overflow-hidden shadow-xl border border-gray-100/50 hover:translate-y-[-2px] transition-all duration-300"
+                        >
+                            <div className="aspect-[3/4] overflow-hidden relative">
+                                <Image
+                                    src={path.image}
+                                    alt={path.title}
+                                    width={640}
+                                    height={853}
+                                    sizes="(max-width: 768px) 100vw, 33vw"
+                                    loading="lazy"
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/30 to-transparent" />
                             </div>
-                            <span className="flex items-center gap-2 text-sm font-semibold text-white hover:gap-3 transition-all">
-                                View Path <ArrowRight className="w-4 h-4" />
+                            <span className="absolute top-4 left-4 px-4 py-2 bg-[#FFE55E] rounded-full font-bold text-black text-xs z-10">
+                                {path.tag}
                             </span>
-                        </div>
-                    </Link>
-                ))}
+                            <div className="absolute bottom-0 left-0 right-0 p-6 text-white z-10">
+                                <p className="text-xs font-semibold text-white/70 mb-2">{path.category}</p>
+                                <h3 className="text-2xl font-bold mb-2">{path.title}</h3>
+                                <p className="text-sm text-white/75 font-medium mb-4 line-clamp-2">{path.description}</p>
+                                <div className="flex gap-4 text-sm font-medium text-white/80 mb-4">
+                                    <span>{courseCount} Course{courseCount !== 1 ? "s" : ""}</span>
+                                    <span>•</span>
+                                    <span>{path.duration}</span>
+                                </div>
+                                <span className="flex items-center gap-2 text-sm font-semibold text-white hover:gap-3 transition-all">
+                                    View Path <ArrowRight className="w-4 h-4" />
+                                </span>
+                            </div>
+                        </Link>
+                    );
+                })}
             </div>
         </SectionShell>
     );
-};
-
-export default LearningPaths;
+}

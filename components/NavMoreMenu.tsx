@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
-import LanguageSwitcher from "./LanguageSwitcher";
 
 const MORE_LINKS = [
     { key: "openSource", href: "/opensource" },
@@ -61,9 +60,6 @@ export default function NavMoreMenu() {
                             {t(link.key)}
                         </Link>
                     ))}
-                    <div className="border-t border-gray-100 mt-2 pt-2 px-3 pb-1">
-                        <LanguageSwitcher />
-                    </div>
                 </div>
             )}
         </div>

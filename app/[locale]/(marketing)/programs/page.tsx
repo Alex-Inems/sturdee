@@ -5,7 +5,8 @@ import PageHero from "@/components/PageHero";
 import SectionShell from "@/components/SectionShell";
 import { pageMetadata } from "@/lib/seo";
 import { IMAGES } from "@/lib/images";
-import { LEARNING_PATHS } from "@/lib/courses";
+import { countCoursesForPath, LEARNING_PATHS } from "@/lib/courses";
+import { getPublishedCourses } from "@/lib/courses-db";
 
 export const metadata: Metadata = pageMetadata({
     title: "Academic Programs & Learning Paths",
@@ -15,7 +16,9 @@ export const metadata: Metadata = pageMetadata({
     keywords: ["learning paths", "technology programs", "coding degree paths", "professional development"],
 });
 
-export default function ProgramsPage() {
+export default async function ProgramsPage() {
+    const allCourses = await getPublishedCourses();
+
     return (
         <div className="font-jakarta bg-page min-h-screen">
             <PageHero
@@ -47,7 +50,9 @@ export default function ProgramsPage() {
             <SectionShell>
                 <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">Technology Learning Paths</h2>
                 <div className="grid md:grid-cols-3 gap-6">
-                    {LEARNING_PATHS.map((path) => (
+                    {LEARNING_PATHS.map((path) => {
+                        const courseCount = countCoursesForPath(path, allCourses);
+                        return (
                         <Link
                             key={path.id}
                             href={`/programs/${path.slug}`}
@@ -70,10 +75,11 @@ export default function ProgramsPage() {
                             </span>
                             <div className="absolute bottom-0 left-0 right-0 p-6 text-white z-10">
                                 <h3 className="text-xl font-bold mb-2">{path.title}</h3>
-                                <p className="text-sm text-white/75 font-medium">{path.duration} · {path.courses} courses</p>
+                                <p className="text-sm text-white/75 font-medium">{path.duration} · {courseCount} courses</p>
                             </div>
                         </Link>
-                    ))}
+                        );
+                    })}
                 </div>
             </SectionShell>
 

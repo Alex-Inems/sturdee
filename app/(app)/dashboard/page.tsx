@@ -175,18 +175,29 @@ export default function DashboardPage() {
                                   : "Register as a tutor and earn from 1:1 sessions."}
                         </p>
                     </div>
-                    <Link
-                        href={
-                            tutorStatus === "published"
-                                ? `/tutors/${tutorSlug}`
-                                : tutorSlug
-                                  ? "/tutors/register"
-                                  : "/tutors/register"
-                        }
-                        className="shrink-0 px-5 py-2.5 border border-emerald-200 text-emerald-700 font-semibold rounded-full text-sm hover:bg-emerald-50"
-                    >
-                        {tutorStatus === "published" ? "View public profile" : "Become a tutor"}
-                    </Link>
+                    {tutorStatus === "published" ? (
+                        <div className="flex flex-wrap gap-2 shrink-0">
+                            <Link
+                                href="/tutors/courses"
+                                className="px-5 py-2.5 bg-[#10B981] text-white font-semibold rounded-full text-sm hover:bg-[#0F9F72]"
+                            >
+                                Manage courses
+                            </Link>
+                            <Link
+                                href={`/tutors/${tutorSlug}`}
+                                className="px-5 py-2.5 border border-emerald-200 text-emerald-700 font-semibold rounded-full text-sm hover:bg-emerald-50"
+                            >
+                                View public profile
+                            </Link>
+                        </div>
+                    ) : (
+                        <Link
+                            href="/tutors/register"
+                            className="shrink-0 px-5 py-2.5 border border-emerald-200 text-emerald-700 font-semibold rounded-full text-sm hover:bg-emerald-50"
+                        >
+                            Become a tutor
+                        </Link>
+                    )}
                 </div>
 
                 <div className="mb-6 flex items-center justify-between">
