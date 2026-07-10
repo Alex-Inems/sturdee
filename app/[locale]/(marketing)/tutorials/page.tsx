@@ -1,23 +1,36 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import JsonLd from "@/components/seo/JsonLd";
+import type { Locale } from "@/i18n/routing";
+import { routing } from "@/i18n/routing";
+import { getLocalizedHubMeta } from "@/lib/i18n/metadata";
 import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 import { SITE_NAME } from "@/lib/site";
 import { TUTORIAL_LANGUAGES, TUTORIAL_TRACKS } from "@/lib/tutorials";
 
-export const metadata: Metadata = pageMetadata({
-    title: "Free Coding Tutorials — Learn HTML, CSS, JavaScript, Python & More",
-    description:
-        "Browse 200+ free interactive programming tutorials. Learn HTML, CSS, JavaScript, Python, SQL, Java, Shopify Liquid, TypeScript, and 20+ languages with code examples, videos, and try-it-yourself editors.",
-    path: "/tutorials",
-    keywords: [
-        "free coding tutorials",
-        "learn programming online",
-        "W3Schools alternative",
-        "interactive coding lessons",
-        "programming tutorial hub",
-    ],
-});
+type Props = { params: Promise<{ locale: string }> };
+
+export function generateStaticParams() {
+    return routing.locales.map((locale) => ({ locale }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    const { locale } = await params;
+    const meta = await getLocalizedHubMeta(locale as Locale, "tutorials");
+    return pageMetadata({
+        title: meta.title,
+        description: meta.description,
+        path: "/tutorials",
+        locale: locale as Locale,
+        keywords: [
+            "free coding tutorials",
+            "learn programming online",
+            "W3Schools alternative",
+            "interactive coding lessons",
+            "programming tutorial hub",
+        ],
+    });
+}
 
 export default function TutorialsPage() {
     const popular = ["html", "css", "javascript", "liquid", "python", "sql", "java", "typescript"];

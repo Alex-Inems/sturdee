@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { notFound } from "next/navigation";
 import Breadcrumbs from "@/components/seo/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
 import PracticeProblemList from "@/components/practice/PracticeProblemList";
+import type { Locale } from "@/i18n/routing";
+import { routing } from "@/i18n/routing";
 import {
     getProblemsByTopic,
     PRACTICE_TOPICS,
@@ -14,7 +16,7 @@ import { pageMetadata } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 
 interface Props {
-    params: Promise<{ topic: string }>;
+    params: Promise<{ locale: string; topic: string }>;
 }
 
 function resolveTopic(slug: string): PracticeTopic | undefined {
@@ -22,11 +24,13 @@ function resolveTopic(slug: string): PracticeTopic | undefined {
 }
 
 export function generateStaticParams() {
-    return PRACTICE_TOPICS.map((topic) => ({ topic: topicSlug(topic) }));
+    return routing.locales.flatMap((locale) =>
+        PRACTICE_TOPICS.map((topic) => ({ locale, topic: topicSlug(topic) }))
+    );
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const { topic: topicParam } = await params;
+    const { locale, topic: topicParam } = await params;
     const topic = resolveTopic(topicParam);
     if (!topic) return {};
     const problems = getProblemsByTopic(topic);
@@ -34,6 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title: `${topic} Coding Problems — Practice & Solutions`,
         description: `Practice ${problems.length} ${topic.toLowerCase()} coding interview problems. LeetCode-style environment with JavaScript and Python solutions on Sturdee.`,
         path: `/practice/topic/${topicParam}`,
+        locale: locale as Locale,
         keywords: [
             `${topic.toLowerCase()} coding problems`,
             "leetcode practice",

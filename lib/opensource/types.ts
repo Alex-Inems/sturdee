@@ -6,7 +6,10 @@ export type OssCategory =
     | "Testing"
     | "Utilities"
     | "Mobile"
-    | "AI/ML";
+    | "AI/ML"
+    | "AI Tools"
+    | "Developer Tools"
+    | "Data & Search";
 
 export interface OssTool {
     slug: string;

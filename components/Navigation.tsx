@@ -7,9 +7,17 @@ import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Link as LocaleLink, usePathname, useRouter } from "@/i18n/navigation";
 import LanguageSwitcher from "./LanguageSwitcher";
+import NavMoreMenu from "./NavMoreMenu";
 import { useAuth } from "./AuthContext";
 
 const AuthModal = dynamic(() => import("./AuthModal"), { ssr: false });
+
+const PRIMARY_LINKS = [
+    { key: "tutorials", href: "/tutorials" },
+    { key: "practice", href: "/practice" },
+    { key: "courses", href: "/courses" },
+    { key: "blog", href: "/blog" },
+] as const;
 
 function NavigationInner() {
     const t = useTranslations("Nav");
@@ -32,9 +40,7 @@ function NavigationInner() {
 
     const closeAuth = () => {
         setAuthOpen(false);
-        if (authFromUrl) {
-            router.replace(pathname);
-        }
+        if (authFromUrl) router.replace(pathname);
     };
 
     const openAuth = () => {
@@ -49,148 +55,120 @@ function NavigationInner() {
         }
     }, [authFromUrl, ensureAuth]);
 
-    const navLinks = [
-        { label: t("home"), href: "/" },
-        { label: t("tutorials"), href: "/tutorials" },
-        { label: t("guides"), href: "/guides" },
-        { label: t("blog"), href: "/blog" },
-        { label: t("cheatsheets"), href: "/cheatsheets" },
-        { label: t("media"), href: "/media" },
-        { label: t("courses"), href: "/courses" },
-        { label: t("openSource"), href: "/opensource" },
-        { label: t("practice"), href: "/practice" },
-        { label: t("credentials"), href: "/credentials" },
-        { label: t("programs"), href: "/programs" },
-        { label: t("instructors"), href: "/instructors" },
-        { label: t("tutors"), href: "/tutors" },
-    ] as const;
+    const linkClass = (href: string) =>
+        `text-[14px] font-medium tracking-wide transition-colors ${
+            pathname === href || pathname.startsWith(`${href}/`)
+                ? "text-black font-semibold"
+                : "text-gray-500 hover:text-black"
+        }`;
 
     return (
         <>
             <nav
                 className={`fixed w-full z-50 transition-all duration-300 font-jakarta bg-page/85 backdrop-blur-md ${
-                    scrolled ? "py-4 border-b border-gray-200/70 shadow-xs" : "py-6 border-b border-transparent"
+                    scrolled ? "py-2.5 border-b border-gray-200/70 shadow-xs" : "py-3.5 border-b border-transparent"
                 }`}
             >
-                <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
-                    <LocaleLink href="/" className="text-2xl font-bold tracking-tight text-gray-900 hover:opacity-85 transition-opacity">
+                <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between gap-3">
+                    <LocaleLink href="/" className="text-xl font-bold tracking-tight text-gray-900 hover:opacity-85 shrink-0">
                         Sturdee
                     </LocaleLink>
 
-                    <div className="hidden lg:flex items-center gap-6">
-                        {navLinks.map((link) => {
-                            const isActive = pathname === link.href;
-                            return (
-                                <LocaleLink
-                                    key={link.href}
-                                    href={link.href}
-                                    className={`text-[14px] font-medium tracking-wide transition-colors ${
-                                        isActive
-                                            ? "text-black font-semibold border-b border-black pb-0.5"
-                                            : "text-gray-500 hover:text-black"
-                                    }`}
-                                >
-                                    {link.label}
-                                </LocaleLink>
-                            );
-                        })}
+                    <div className="hidden lg:flex items-center gap-4">
+                        {PRIMARY_LINKS.map((link) => (
+                            <LocaleLink key={link.href} href={link.href} className={linkClass(link.href)}>
+                                {t(link.key)}
+                            </LocaleLink>
+                        ))}
+                        <NavMoreMenu />
                         {user?.role === "admin" && (
-                            <Link href="/admin" className="text-[14px] font-medium tracking-wide text-gray-500 hover:text-emerald-600">
+                            <Link href="/admin" className="text-[14px] font-medium text-gray-500 hover:text-emerald-600">
                                 {t("admin")}
                             </Link>
                         )}
                     </div>
 
-                    <div className="hidden md:flex items-center gap-3">
-                        <LanguageSwitcher />
+                    <div className="hidden md:flex items-center gap-2 shrink-0">
                         {user ? (
                             <>
-                                <Link href="/dashboard" className="text-[13px] font-semibold text-gray-600 hover:text-gray-900 transition-colors">
+                                <Link href="/dashboard" className="text-[13px] font-semibold text-gray-600 hover:text-gray-900">
                                     {t("dashboard")}
                                 </Link>
-                                <span className="text-[13px] font-semibold bg-gray-50 text-gray-800 px-3 py-1.5 rounded-full border border-gray-200">
-                                    {user.name}
-                                </span>
                                 <button
                                     onClick={logout}
-                                    className="text-xs uppercase tracking-wider font-bold text-gray-400 hover:text-red-500 transition-colors"
+                                    className="text-xs font-semibold text-gray-400 hover:text-red-500 px-2"
                                 >
                                     {t("logout")}
                                 </button>
                             </>
                         ) : (
-                            <>
-                                <button onClick={openAuth} className="text-[14px] font-semibold text-gray-600 hover:text-black transition-colors">
-                                    {t("signUp")}
-                                </button>
-                                <button
-                                    onClick={openAuth}
-                                    className="px-6 py-2 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold text-[14px] rounded-full shadow-xs hover:shadow-sm transition-all duration-200"
-                                >
-                                    {t("login")}
-                                </button>
-                            </>
+                            <button
+                                onClick={openAuth}
+                                className="px-5 py-2 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold text-[13px] rounded-full transition-colors"
+                            >
+                                {t("login")}
+                            </button>
                         )}
                     </div>
 
-                    <button
-                        onClick={() => setMobileMenu(!mobileMenu)}
-                        className="md:hidden p-2 rounded-full hover:bg-gray-50 transition-colors"
-                        aria-label="Toggle menu"
-                    >
-                        <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            {mobileMenu ? (
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M6 18L18 6M6 6l12 12" />
-                            ) : (
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M4 6h16M4 12h16M4 18h16" />
-                            )}
-                        </svg>
-                    </button>
+                    <div className="flex md:hidden items-center gap-2">
+                        <LanguageSwitcher compact />
+                        <button
+                            onClick={() => setMobileMenu(!mobileMenu)}
+                            className="p-2 rounded-full hover:bg-gray-50"
+                            aria-label="Toggle menu"
+                        >
+                            <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                {mobileMenu ? (
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M6 18L18 6M6 6l12 12" />
+                                ) : (
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M4 6h16M4 12h16M4 18h16" />
+                                )}
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
                 {mobileMenu && (
-                    <div className="md:hidden absolute top-[100%] left-0 w-full bg-page/95 backdrop-blur-md border-b border-gray-200/70 px-6 py-6 space-y-3">
-                        <LanguageSwitcher />
-                        {navLinks.map((link) => (
+                    <div className="md:hidden border-t border-gray-200/70 bg-page/95 backdrop-blur-md px-6 py-4 space-y-1">
+                        {PRIMARY_LINKS.map((link) => (
                             <LocaleLink
                                 key={link.href}
                                 href={link.href}
                                 onClick={() => setMobileMenu(false)}
-                                className="block text-base font-semibold text-gray-800 p-2.5 rounded-xl hover:bg-gray-50"
+                                className="block text-sm font-semibold text-gray-800 py-2.5"
                             >
-                                {link.label}
+                                {t(link.key)}
                             </LocaleLink>
                         ))}
-                        {user?.role === "admin" && (
-                            <Link href="/admin" onClick={() => setMobileMenu(false)} className="block text-base font-semibold text-emerald-600 p-2.5">
-                                {t("admin")}
-                            </Link>
-                        )}
-                        <hr className="border-gray-100 my-2" />
+                        <p className="text-[10px] font-bold uppercase text-gray-400 pt-3 pb-1">{t("more")}</p>
+                        {[
+                            { key: "openSource", href: "/opensource" },
+                            { key: "guides", href: "/guides" },
+                            { key: "cheatsheets", href: "/cheatsheets" },
+                            { key: "credentials", href: "/credentials" },
+                            { key: "programs", href: "/programs" },
+                            { key: "instructors", href: "/instructors" },
+                            { key: "tutors", href: "/tutors" },
+                        ].map((link) => (
+                            <LocaleLink
+                                key={link.href}
+                                href={link.href}
+                                onClick={() => setMobileMenu(false)}
+                                className="block text-sm text-gray-600 py-2 pl-2"
+                            >
+                                {t(link.key)}
+                            </LocaleLink>
+                        ))}
+                        <hr className="border-gray-100 my-3" />
                         {user ? (
-                            <>
-                                <Link href="/dashboard" onClick={() => setMobileMenu(false)} className="block text-center py-2.5 bg-gray-50 rounded-xl font-semibold">
-                                    {t("dashboard")}
-                                </Link>
-                                <button
-                                    onClick={() => {
-                                        logout();
-                                        setMobileMenu(false);
-                                    }}
-                                    className="w-full text-center py-2.5 bg-red-50 text-red-600 rounded-xl font-semibold"
-                                >
-                                    {t("logout")}
-                                </button>
-                            </>
+                            <Link href="/dashboard" onClick={() => setMobileMenu(false)} className="block text-center py-2.5 bg-gray-50 rounded-xl font-semibold text-sm">
+                                {t("dashboard")}
+                            </Link>
                         ) : (
-                            <>
-                                <button onClick={() => { openAuth(); setMobileMenu(false); }} className="w-full py-2.5 border border-gray-200 rounded-xl font-semibold">
-                                    {t("signUp")}
-                                </button>
-                                <button onClick={() => { openAuth(); setMobileMenu(false); }} className="w-full py-2.5 bg-[#10B981] text-white rounded-xl font-semibold">
-                                    {t("login")}
-                                </button>
-                            </>
+                            <button onClick={() => { openAuth(); setMobileMenu(false); }} className="w-full py-2.5 bg-[#10B981] text-white rounded-xl font-semibold text-sm">
+                                {t("login")}
+                            </button>
                         )}
                     </div>
                 )}

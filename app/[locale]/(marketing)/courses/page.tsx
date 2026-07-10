@@ -1,19 +1,32 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import JsonLd from "@/components/seo/JsonLd";
 import PageHero from "@/components/PageHero";
 import SectionShell from "@/components/SectionShell";
+import type { Locale } from "@/i18n/routing";
+import { routing } from "@/i18n/routing";
+import { getLocalizedHubMeta } from "@/lib/i18n/metadata";
 import { courseListJsonLd, pageMetadata } from "@/lib/seo";
 import { COURSES, COURSE_CATEGORIES, formatStudents } from "@/lib/courses";
 
-export const metadata: Metadata = pageMetadata({
-    title: "Programming & Web Development Courses",
-    description:
-        "Browse live cohort courses in web development, programming, JavaScript, Python, blockchain, and cryptocurrency. Certificates, instructor office hours, and industry-aligned curricula.",
-    path: "/courses",
-    keywords: ["programming courses", "web development bootcamp", "cryptocurrency course", "online coding classes"],
-});
+type Props = { params: Promise<{ locale: string }> };
+
+export function generateStaticParams() {
+    return routing.locales.map((locale) => ({ locale }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    const { locale } = await params;
+    const meta = await getLocalizedHubMeta(locale as Locale, "courses");
+    return pageMetadata({
+        title: meta.title,
+        description: meta.description,
+        path: "/courses",
+        locale: locale as Locale,
+        keywords: ["programming courses", "web development bootcamp", "cryptocurrency course", "online coding classes"],
+    });
+}
 
 const levelColors: Record<string, string> = {
     Beginner: "bg-emerald-100/60 text-emerald-700",

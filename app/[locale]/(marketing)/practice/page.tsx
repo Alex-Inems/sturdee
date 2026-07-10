@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import JsonLd from "@/components/seo/JsonLd";
 import PracticeProblemList from "@/components/practice/PracticeProblemList";
+import type { Locale } from "@/i18n/routing";
+import { routing } from "@/i18n/routing";
+import { getLocalizedHubMeta } from "@/lib/i18n/metadata";
 import {
     getDifficultyCounts,
     getPracticeCatalog,
@@ -11,19 +14,34 @@ import {
 } from "@/lib/practice";
 import { pageMetadata, practiceHubJsonLd } from "@/lib/seo";
 
-export const metadata: Metadata = pageMetadata({
-    title: "Coding Practice — 1000+ LeetCode-Style Problems with Solutions",
-    description: `Practice ${PRACTICE_PROBLEM_COUNT}+ algorithm and data structure problems in a LeetCode-standard environment. Run code, submit solutions, and study answers for JavaScript and Python.`,
-    path: "/practice",
-    keywords: [
-        "leetcode practice",
-        "coding interview problems",
-        "algorithm practice",
-        "data structures practice",
-        "free coding challenges",
-        "javascript python solutions",
-    ],
-});
+type Props = { params: Promise<{ locale: string }> };
+
+export function generateStaticParams() {
+    return routing.locales.map((locale) => ({ locale }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    const { locale } = await params;
+    const meta = await getLocalizedHubMeta(locale as Locale, "practice");
+    const description =
+        locale === "en"
+            ? `Practice ${PRACTICE_PROBLEM_COUNT}+ algorithm and data structure problems in a LeetCode-standard environment. Run code, submit solutions, and study answers for JavaScript and Python.`
+            : meta.description;
+    return pageMetadata({
+        title: meta.title,
+        description,
+        path: "/practice",
+        locale: locale as Locale,
+        keywords: [
+            "leetcode practice",
+            "coding interview problems",
+            "algorithm practice",
+            "data structures practice",
+            "free coding challenges",
+            "javascript python solutions",
+        ],
+    });
+}
 
 export default function PracticeHubPage() {
     const catalog = getPracticeCatalog();

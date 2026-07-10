@@ -1,15 +1,33 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import JsonLd from "@/components/seo/JsonLd";
+import type { Locale } from "@/i18n/routing";
+import { routing } from "@/i18n/routing";
+import { getLocalizedHubMeta } from "@/lib/i18n/metadata";
 import { BLOG_POSTS, BLOG_POST_COUNT, getCategorySlug } from "@/lib/blog";
 import { blogListJsonLd, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = pageMetadata({
-    title: "Tech Blog — Programming Tutorials & Web Dev Lessons",
-    description: `Read ${BLOG_POST_COUNT}+ free articles on HTML, CSS, JavaScript, Python, Shopify Liquid, SQL, and developer careers. SEO-optimized lessons linked to Sturdee tutorials.`,
-    path: "/blog",
-    keywords: ["programming blog", "web development blog", "coding tutorials blog", "tech lessons"],
-});
+type Props = { params: Promise<{ locale: string }> };
+
+export function generateStaticParams() {
+    return routing.locales.map((locale) => ({ locale }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    const { locale } = await params;
+    const meta = await getLocalizedHubMeta(locale as Locale, "blog");
+    const description =
+        locale === "en"
+            ? `Read ${BLOG_POST_COUNT}+ free articles on HTML, CSS, JavaScript, Python, Shopify Liquid, SQL, and developer careers. SEO-optimized lessons linked to Sturdee tutorials.`
+            : meta.description;
+    return pageMetadata({
+        title: meta.title,
+        description,
+        path: "/blog",
+        locale: locale as Locale,
+        keywords: ["programming blog", "web development blog", "coding tutorials blog", "tech lessons"],
+    });
+}
 
 const CATEGORIES = [...new Set(BLOG_POSTS.map((p) => p.category))];
 
