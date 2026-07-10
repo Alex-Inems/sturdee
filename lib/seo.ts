@@ -269,6 +269,72 @@ export function articleJsonLd(title: string, description: string, path: string) 
     };
 }
 
+export function blogPostMetadata(post: import("@/lib/blog/types").BlogPost): Metadata {
+    const path = `/blog/${post.slug}`;
+    const base = pageMetadata({
+        title: post.seoTitle,
+        description: post.description,
+        path,
+        keywords: post.keywords,
+        type: "article",
+    });
+
+    return {
+        ...base,
+        openGraph: {
+            ...base.openGraph,
+            type: "article",
+            publishedTime: post.publishedAt,
+            modifiedTime: post.updatedAt,
+            section: post.category,
+            tags: post.keywords,
+        },
+        other: {
+            "article:section": post.category,
+            "article:tag": post.keywords.join(", "),
+        },
+    };
+}
+
+export function blogPostJsonLd(post: import("@/lib/blog/types").BlogPost) {
+    const path = `/blog/${post.slug}`;
+    return {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        headline: post.title,
+        name: post.seoTitle,
+        description: post.description,
+        url: `${SITE_URL}${path}`,
+        mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE_URL}${path}` },
+        datePublished: post.publishedAt,
+        dateModified: post.updatedAt,
+        inLanguage: "en-US",
+        author: { "@type": "Organization", name: SITE_NAME },
+        publisher: {
+            "@type": "Organization",
+            name: SITE_NAME,
+            url: SITE_URL,
+            logo: { "@type": "ImageObject", url: `${SITE_URL}/icon.svg` },
+        },
+        articleSection: post.category,
+        keywords: post.keywords.join(", "),
+        about: { "@type": "Thing", name: post.focusKeyword },
+        timeRequired: post.readTime,
+        isAccessibleForFree: true,
+    };
+}
+
+export function blogListJsonLd(count: number) {
+    return {
+        "@context": "https://schema.org",
+        "@type": "Blog",
+        name: `${SITE_NAME} Tech Blog`,
+        url: `${SITE_URL}/blog`,
+        description: "Free programming tutorials, web development guides, and tech lessons.",
+        blogPost: `${count} articles on HTML, CSS, JavaScript, Python, Shopify, and more.`,
+    };
+}
+
 export function courseListJsonLd() {
     return {
         "@context": "https://schema.org",
@@ -447,4 +513,41 @@ export function categoryMetadata(category: string, slug: string): Metadata {
         path: `/courses/category/${slug}`,
         keywords: [`${category.toLowerCase()} courses`, "online classes", "programming bootcamp"],
     });
+}
+
+export function tutorMetadata(tutor: import("@/lib/tutors").Tutor): Metadata {
+    return pageMetadata({
+        title: `${tutor.name} — ${tutor.title}`,
+        description: `${tutor.bio} $${tutor.hourlyRate}/hr · ${tutor.jobSuccess}% job success · ${tutor.location}. Book 1:1 sessions on ${SITE_NAME}.`,
+        path: `/tutors/${tutor.slug}`,
+        keywords: [...tutor.skills.map((s) => s.name.toLowerCase()), "tutor", "mentor", tutor.name],
+        image: tutor.image,
+        imageAlt: tutor.name,
+    });
+}
+
+export function tutorJsonLd(tutor: import("@/lib/tutors").Tutor) {
+    return {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        name: tutor.name,
+        jobTitle: tutor.title,
+        description: tutor.bio,
+        url: `${SITE_URL}/tutors/${tutor.slug}`,
+        image: `${SITE_URL}${tutor.image}`,
+        address: { "@type": "PostalAddress", addressLocality: tutor.location },
+        knowsAbout: tutor.skills.map((s) => s.name),
+        worksFor: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+        offers: {
+            "@type": "Offer",
+            price: tutor.hourlyRate,
+            priceCurrency: "USD",
+            priceSpecification: {
+                "@type": "UnitPriceSpecification",
+                price: tutor.hourlyRate,
+                priceCurrency: "USD",
+                unitText: "hour",
+            },
+        },
+    };
 }

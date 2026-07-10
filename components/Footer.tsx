@@ -34,9 +34,11 @@ const Footer = () => (
                         {[
                             { label: "Tutorials", href: "/tutorials" },
                             { label: "Guides", href: "/guides" },
+                            { label: "Blog", href: "/blog" },
                             { label: "Cheat Sheets", href: "/cheatsheets" },
                             { label: "Media", href: "/media" },
                             { label: "Resources", href: "/resources" },
+                            { label: "Tutors", href: "/tutors" },
                             { label: "Book a Session", href: "/book" },
                             { label: "Course Catalog", href: "/courses" },
                             { label: "Learning Paths", href: "/programs" },

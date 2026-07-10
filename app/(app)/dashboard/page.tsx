@@ -15,6 +15,8 @@ export default function DashboardPage() {
     const router = useRouter();
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [fetching, setFetching] = useState(true);
+    const [tutorSlug, setTutorSlug] = useState<string | null>(null);
+    const [tutorStatus, setTutorStatus] = useState<string | null>(null);
 
     useEffect(() => {
         if (loading) return;
@@ -26,10 +28,20 @@ export default function DashboardPage() {
         let active = true;
 
         (async () => {
-            const res = await fetch("/api/bookings");
-            if (active && res.ok) {
-                const data = await res.json();
+            const [bookingsRes, tutorRes] = await Promise.all([
+                fetch("/api/bookings"),
+                fetch("/api/tutors/me"),
+            ]);
+            if (active && bookingsRes.ok) {
+                const data = await bookingsRes.json();
                 setBookings(data.bookings);
+            }
+            if (active && tutorRes.ok) {
+                const data = await tutorRes.json();
+                if (data.profile) {
+                    setTutorSlug(data.profile.slug);
+                    setTutorStatus(data.profile.status);
+                }
             }
             if (active) setFetching(false);
         })();
@@ -70,6 +82,31 @@ export default function DashboardPage() {
                 subtitle="Track and manage all your scheduled sessions in one place."
             />
             <SectionShell compact>
+                <div className="mb-8 rounded-2xl border border-gray-100 bg-white p-6 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h3 className="font-bold text-gray-900">Sturdee Tutor Profile</h3>
+                        <p className="text-sm text-gray-500 mt-1">
+                            {tutorStatus === "published"
+                                ? "Your profile is live in the tutors marketplace."
+                                : tutorSlug
+                                  ? "Finish onboarding to publish your tutor profile."
+                                  : "Register as a tutor and earn from 1:1 sessions."}
+                        </p>
+                    </div>
+                    <Link
+                        href={
+                            tutorStatus === "published"
+                                ? `/tutors/${tutorSlug}`
+                                : tutorSlug
+                                  ? "/tutors/register"
+                                  : "/tutors/register"
+                        }
+                        className="shrink-0 px-5 py-2.5 border border-emerald-200 text-emerald-700 font-semibold rounded-full text-sm hover:bg-emerald-50"
+                    >
+                        {tutorStatus === "published" ? "View public profile" : "Become a tutor"}
+                    </Link>
+                </div>
+
                 <div className="mb-6 flex items-center justify-between">
                     <p className="text-sm text-gray-500 font-medium">
                         {bookings.length} booking{bookings.length !== 1 ? "s" : ""}

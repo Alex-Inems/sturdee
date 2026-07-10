@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import PageHero from "@/components/PageHero";
 import SectionShell from "@/components/SectionShell";
@@ -16,7 +17,9 @@ export default function BookPage() {
                 subtitle="Book a personalized session with our team — consultations, tours, admissions, and tutoring."
             />
             <SectionShell compact>
-                <BookingForm />
+                <Suspense fallback={<SectionPlaceholder />}>
+                    <BookingForm />
+                </Suspense>
             </SectionShell>
         </div>
     );

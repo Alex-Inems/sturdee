@@ -1,14 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Calendar, Clock, CheckCircle2, ArrowRight } from "lucide-react";
 import { BOOKING_SERVICES, TIME_SLOTS } from "@/lib/constants";
 import { useAuth } from "@/components/AuthContext";
+import type { Tutor } from "@/lib/tutors";
 
 export default function BookingForm() {
     const { isAuthenticated } = useAuth();
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const tutorSlug = searchParams.get("tutor");
+    const [tutor, setTutor] = useState<Tutor | null>(null);
     const [step, setStep] = useState(1);
     const [service, setService] = useState("");
     const [date, setDate] = useState("");
@@ -17,6 +21,23 @@ export default function BookingForm() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
+
+    useEffect(() => {
+        if (!tutorSlug) return;
+        (async () => {
+            const res = await fetch(`/api/tutors/${tutorSlug}`);
+            if (res.ok) {
+                const data = await res.json();
+                setTutor(data.tutor);
+            }
+        })();
+    }, [tutorSlug]);
+
+    useEffect(() => {
+        if (tutor) {
+            setNotes((prev) => prev || `Requesting session with ${tutor.name} (@${tutor.slug}) — ${tutor.title}`);
+        }
+    }, [tutor]);
 
     const selectedService = BOOKING_SERVICES.find((s) => s.id === service);
     const minDate = new Date().toISOString().split("T")[0];
@@ -107,6 +128,13 @@ export default function BookingForm() {
                 {error && (
                     <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
                         {error}
+                    </div>
+                )}
+
+                {tutor && (
+                    <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50/50 px-4 py-3 text-sm">
+                        <p className="font-bold text-gray-900">Hiring: {tutor.name}</p>
+                        <p className="text-gray-600 mt-0.5">{tutor.title} · ${tutor.hourlyRate}/hr</p>
                     </div>
                 )}
 
