@@ -9,6 +9,7 @@ import { routing } from "@/i18n/routing";
 import { getLocalizedHubMeta } from "@/lib/i18n/metadata";
 import { COURSE_CATEGORIES, formatStudents } from "@/lib/courses";
 import { getPublishedCourses } from "@/lib/courses-db";
+import { assertFeatureEnabled } from "@/lib/features";
 import { courseListJsonLd, pageMetadata } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -36,6 +37,8 @@ const levelColors: Record<string, string> = {
 };
 
 export default async function CoursesPage() {
+    assertFeatureEnabled("courses");
+
     const courses = await getPublishedCourses();
     const featured = courses.find((c) => c.featured) ?? courses[0];
 

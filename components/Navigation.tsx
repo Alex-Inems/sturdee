@@ -1,22 +1,19 @@
 "use client";
 
-import Link from "next/link";
-import dynamic from "next/dynamic";
-import { useState, useEffect, Suspense } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import dynamic from "next/dynamic";
+import Link from "next/link";
 import { Link as LocaleLink, usePathname, useRouter } from "@/i18n/navigation";
-import LanguageSwitcher from "./LanguageSwitcher";
-import NavMoreMenu from "./NavMoreMenu";
 import { useAuth } from "./AuthContext";
+import { dashboardPathForRole } from "@/lib/types";
 
 const AuthModal = dynamic(() => import("./AuthModal"), { ssr: false });
 
 const PRIMARY_LINKS = [
     { key: "tutorials", href: "/tutorials" },
-    { key: "practice", href: "/practice" },
-    { key: "courses", href: "/courses" },
-    { key: "blog", href: "/blog" },
+    { key: "classroom", href: "/classroom" },
 ] as const;
 
 function NavigationInner() {
@@ -29,8 +26,12 @@ function NavigationInner() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const authParam = searchParams.get("auth");
+    const authReason = searchParams.get("reason");
     const authFromUrl = authParam === "login" || authParam === "error";
-    const authError = authParam === "error" ? "Sign in failed. Please try again." : undefined;
+    const authError =
+        authParam === "error"
+            ? authReason || "Sign in failed. Please try again."
+            : undefined;
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -62,6 +63,8 @@ function NavigationInner() {
                 : "text-gray-500 hover:text-black"
         }`;
 
+    const dashboardHref = user ? dashboardPathForRole(user.role) : "/dashboard";
+
     return (
         <>
             <nav
@@ -74,28 +77,25 @@ function NavigationInner() {
                         Sturdee
                     </LocaleLink>
 
-                    <div className="hidden lg:flex items-center gap-4">
+                    <div className="hidden md:flex items-center gap-4">
                         {PRIMARY_LINKS.map((link) => (
                             <LocaleLink key={link.href} href={link.href} className={linkClass(link.href)}>
                                 {t(link.key)}
                             </LocaleLink>
                         ))}
-                        <NavMoreMenu />
-                        {user?.role === "admin" && (
-                            <Link href="/admin" className="text-[14px] font-medium text-gray-500 hover:text-emerald-600">
-                                {t("admin")}
-                            </Link>
-                        )}
                     </div>
 
                     <div className="hidden md:flex items-center gap-2 shrink-0">
                         {user ? (
                             <>
-                                <Link href="/dashboard" className="text-[13px] font-semibold text-gray-600 hover:text-gray-900">
+                                <Link
+                                    href={dashboardHref}
+                                    className="text-[13px] font-semibold text-gray-600 hover:text-gray-900"
+                                >
                                     {t("dashboard")}
                                 </Link>
                                 <button
-                                    onClick={logout}
+                                    onClick={() => void logout()}
                                     className="text-xs font-semibold text-gray-400 hover:text-red-500 px-2"
                                 >
                                     {t("logout")}
@@ -109,7 +109,6 @@ function NavigationInner() {
                                 {t("login")}
                             </button>
                         )}
-                        <LanguageSwitcher />
                     </div>
 
                     <div className="flex md:hidden items-center gap-2 shrink-0">
@@ -126,7 +125,6 @@ function NavigationInner() {
                                 )}
                             </svg>
                         </button>
-                        <LanguageSwitcher compact />
                     </div>
                 </div>
 
@@ -142,32 +140,33 @@ function NavigationInner() {
                                 {t(link.key)}
                             </LocaleLink>
                         ))}
-                        <p className="text-[10px] font-bold uppercase text-gray-400 pt-3 pb-1">{t("more")}</p>
-                        {[
-                            { key: "openSource", href: "/opensource" },
-                            { key: "guides", href: "/guides" },
-                            { key: "cheatsheets", href: "/cheatsheets" },
-                            { key: "credentials", href: "/credentials" },
-                            { key: "programs", href: "/programs" },
-                            { key: "instructors", href: "/instructors" },
-                            { key: "tutors", href: "/tutors" },
-                        ].map((link) => (
-                            <LocaleLink
-                                key={link.href}
-                                href={link.href}
-                                onClick={() => setMobileMenu(false)}
-                                className="block text-sm text-gray-600 py-2 pl-2"
-                            >
-                                {t(link.key)}
-                            </LocaleLink>
-                        ))}
-                        <hr className="border-gray-100 my-3" />
                         {user ? (
-                            <Link href="/dashboard" onClick={() => setMobileMenu(false)} className="block text-center py-2.5 bg-gray-50 rounded-xl font-semibold text-sm">
-                                {t("dashboard")}
-                            </Link>
+                            <>
+                                <Link
+                                    href={dashboardHref}
+                                    onClick={() => setMobileMenu(false)}
+                                    className="block text-sm font-semibold text-gray-800 py-2.5"
+                                >
+                                    {t("dashboard")}
+                                </Link>
+                                <button
+                                    onClick={() => {
+                                        void logout();
+                                        setMobileMenu(false);
+                                    }}
+                                    className="block text-sm font-semibold text-red-600 py-2.5"
+                                >
+                                    {t("logout")}
+                                </button>
+                            </>
                         ) : (
-                            <button onClick={() => { openAuth(); setMobileMenu(false); }} className="w-full py-2.5 bg-[#10B981] text-white rounded-xl font-semibold text-sm">
+                            <button
+                                onClick={() => {
+                                    openAuth();
+                                    setMobileMenu(false);
+                                }}
+                                className="w-full mt-2 py-2.5 bg-[#10B981] text-white rounded-xl font-semibold text-sm"
+                            >
                                 {t("login")}
                             </button>
                         )}

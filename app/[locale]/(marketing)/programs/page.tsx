@@ -7,6 +7,7 @@ import { pageMetadata } from "@/lib/seo";
 import { IMAGES } from "@/lib/images";
 import { countCoursesForPath, LEARNING_PATHS } from "@/lib/courses";
 import { getPublishedCourses } from "@/lib/courses-db";
+import { assertFeatureEnabled } from "@/lib/features";
 
 export const metadata: Metadata = pageMetadata({
     title: "Academic Programs & Learning Paths",
@@ -17,6 +18,8 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default async function ProgramsPage() {
+    assertFeatureEnabled("programs");
+
     const allCourses = await getPublishedCourses();
 
     return (

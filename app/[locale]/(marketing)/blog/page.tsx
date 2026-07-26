@@ -5,6 +5,7 @@ import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
 import { getLocalizedHubMeta } from "@/lib/i18n/metadata";
 import { BLOG_POSTS, BLOG_POST_COUNT, getCategorySlug } from "@/lib/blog";
+import { assertFeatureEnabled } from "@/lib/features";
 import { blogListJsonLd, pageMetadata } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -32,6 +33,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 const CATEGORIES = [...new Set(BLOG_POSTS.map((p) => p.category))];
 
 export default function BlogIndexPage() {
+    assertFeatureEnabled("blog");
+
     const sorted = [...BLOG_POSTS].sort(
         (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
     );

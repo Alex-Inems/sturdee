@@ -7,6 +7,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import SectionShell from "@/components/SectionShell";
 import { countCoursesForPath, getCoursesForPath, getLearningPath } from "@/lib/courses";
 import { getPublishedCourses } from "@/lib/courses-db";
+import { assertFeatureEnabled, staticParamsFor } from "@/lib/features";
 import { breadcrumbJsonLd, learningPathJsonLd, learningPathMetadata } from "@/lib/seo";
 
 interface Props {
@@ -14,11 +15,11 @@ interface Props {
 }
 
 export function generateStaticParams() {
-    return [
+    return staticParamsFor("programs", () => [
         { slug: "full-stack-web-development" },
         { slug: "professional-programming" },
         { slug: "blockchain-cryptocurrency" },
-    ];
+    ]);
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -30,6 +31,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ProgramPage({ params }: Props) {
+    assertFeatureEnabled("programs");
+
     const { slug } = await params;
     const path = getLearningPath(slug);
     if (!path) notFound();

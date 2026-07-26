@@ -6,6 +6,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import CodingEnvironment from "@/components/practice/CodingEnvironment";
 import DifficultyBadge from "@/components/practice/DifficultyBadge";
 import { routing } from "@/i18n/routing";
+import { assertFeatureEnabled, staticParamsFor } from "@/lib/features";
 import { getLocalizedPracticeMeta } from "@/lib/i18n/metadata";
 import type { Locale } from "@/i18n/routing";
 import {
@@ -21,8 +22,10 @@ interface Props {
 }
 
 export function generateStaticParams() {
-    return routing.locales.flatMap((locale) =>
-        getPracticeCatalog().map((p) => ({ locale, slug: p.slug }))
+    return staticParamsFor("practice", () =>
+        routing.locales.flatMap((locale) =>
+            getPracticeCatalog().map((p) => ({ locale, slug: p.slug }))
+        )
     );
 }
 
@@ -35,6 +38,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function PracticeProblemPage({ params }: Props) {
+    assertFeatureEnabled("practice");
+
     const { locale, slug } = await params;
     const problem = getPracticeProblem(slug);
     if (!problem) notFound();

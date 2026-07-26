@@ -6,6 +6,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import PracticeProblemList from "@/components/practice/PracticeProblemList";
 import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
+import { assertFeatureEnabled, staticParamsFor } from "@/lib/features";
 import {
     getProblemsByTopic,
     PRACTICE_TOPICS,
@@ -24,8 +25,10 @@ function resolveTopic(slug: string): PracticeTopic | undefined {
 }
 
 export function generateStaticParams() {
-    return routing.locales.flatMap((locale) =>
-        PRACTICE_TOPICS.map((topic) => ({ locale, topic: topicSlug(topic) }))
+    return staticParamsFor("practice", () =>
+        routing.locales.flatMap((locale) =>
+            PRACTICE_TOPICS.map((topic) => ({ locale, topic: topicSlug(topic) }))
+        )
     );
 }
 
@@ -49,6 +52,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function PracticeTopicPage({ params }: Props) {
+    assertFeatureEnabled("practice");
+
     const { topic: topicParam } = await params;
     const topic = resolveTopic(topicParam);
     if (!topic) notFound();

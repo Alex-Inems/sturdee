@@ -11,14 +11,26 @@ import {
 } from "react";
 import type { User, SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
-import type { SessionUser } from "@/lib/types";
+import { MEET_OAUTH_SCOPE } from "@/lib/google-meet";
+import type { AccountRole, SessionUser, UserRole } from "@/lib/types";
+import { dashboardPathForRole, normalizeAccountRole } from "@/lib/types";
 
 interface AuthContextType {
     user: SessionUser | null;
     loading: boolean;
-    login: (email: string, password: string) => Promise<{ error?: string }>;
-    register: (email: string, name: string, password: string) => Promise<{ error?: string; message?: string }>;
-    signInWithGoogle: () => Promise<{ error?: string }>;
+    login: (
+        email: string,
+        password: string,
+        asRole: AccountRole
+    ) => Promise<{ error?: string; redirectTo?: string }>;
+    register: (
+        email: string,
+        name: string,
+        password: string,
+        asRole: AccountRole
+    ) => Promise<{ error?: string; message?: string; redirectTo?: string }>;
+    signInWithGoogle: (asRole: AccountRole, next?: string) => Promise<{ error?: string }>;
+    signInWithGoogleMeet: (next?: string) => Promise<{ error?: string }>;
     signInWithGitHub: (next?: string) => Promise<{ error?: string }>;
     resetPassword: (email: string) => Promise<{ error?: string; message?: string }>;
     updatePassword: (password: string) => Promise<{ error?: string }>;
@@ -30,6 +42,11 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+function coerceRole(role: string | undefined): UserRole {
+    if (role === "tutor" || role === "admin" || role === "student") return role;
+    return "student";
+}
+
 async function fetchProfile(supabase: SupabaseClient, userId: string): Promise<SessionUser | null> {
     const { data, error } = await supabase
         .from("profiles")
@@ -38,12 +55,16 @@ async function fetchProfile(supabase: SupabaseClient, userId: string): Promise<S
         .single();
 
     if (error || !data) return null;
-    return data as SessionUser;
+    return {
+        ...(data as SessionUser),
+        role: coerceRole((data as SessionUser).role),
+    };
 }
 
 function sessionUserFromAuth(authUser: User, profile: SessionUser | null): SessionUser {
     if (profile) return profile;
 
+    const metaRole = normalizeAccountRole(authUser.user_metadata?.account_role);
     return {
         id: authUser.id,
         email: authUser.email ?? "",
@@ -52,8 +73,16 @@ function sessionUserFromAuth(authUser: User, profile: SessionUser | null): Sessi
             (authUser.user_metadata?.full_name as string) ||
             authUser.email?.split("@")[0] ||
             "User",
-        role: "user",
+        role: metaRole ?? "student",
     };
+}
+
+function roleMismatchMessage(asRole: AccountRole, actual: UserRole) {
+    if (actual === "admin") return undefined;
+    if (actual !== asRole) {
+        return `This account is registered as a ${actual}. Choose “${actual}” to sign in.`;
+    }
+    return undefined;
 }
 
 export function AuthProvider({
@@ -122,15 +151,28 @@ export function AuthProvider({
         };
     }, [deferAuth, authEnabled]);
 
-    const login = async (email: string, password: string) => {
+    const login = async (email: string, password: string, asRole: AccountRole) => {
         ensureAuth();
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) return { error: error.message };
-        await refreshUser();
-        return {};
+
+        const profile = data.user ? await fetchProfile(supabase, data.user.id) : null;
+        const sessionUser = data.user ? sessionUserFromAuth(data.user, profile) : null;
+        if (!sessionUser) return { error: "Could not load your profile" };
+
+        const mismatch = roleMismatchMessage(asRole, sessionUser.role);
+        if (mismatch) {
+            await supabase.auth.signOut();
+            setUser(null);
+            return { error: mismatch };
+        }
+
+        setUser(sessionUser);
+        setLoading(false);
+        return { redirectTo: dashboardPathForRole(sessionUser.role) };
     };
 
-    const register = async (email: string, name: string, password: string) => {
+    const register = async (email: string, name: string, password: string, asRole: AccountRole) => {
         ensureAuth();
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
 
@@ -138,8 +180,8 @@ export function AuthProvider({
             email,
             password,
             options: {
-                data: { name, full_name: name },
-                emailRedirectTo: `${siteUrl}/auth/callback`,
+                data: { name, full_name: name, account_role: asRole },
+                emailRedirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent(dashboardPathForRole(asRole))}&role=${asRole}`,
             },
         });
 
@@ -152,18 +194,27 @@ export function AuthProvider({
         }
 
         await refreshUser();
-        return {};
+        return { redirectTo: dashboardPathForRole(asRole) };
     };
 
-    const signInWithGitHub = async (next = "/opensource") => {
+    const signInWithGoogle = async (asRole: AccountRole, next?: string) => {
         ensureAuth();
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+        const dest = next ?? dashboardPathForRole(asRole);
+        const scopes =
+            asRole === "tutor"
+                ? `openid email profile ${MEET_OAUTH_SCOPE}`
+                : "openid email profile";
 
         const { error } = await supabase.auth.signInWithOAuth({
-            provider: "github",
+            provider: "google",
             options: {
-                redirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent(next)}`,
-                scopes: "read:user repo",
+                redirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent(dest)}&role=${asRole}`,
+                scopes,
+                queryParams: {
+                    access_type: "offline",
+                    prompt: "consent",
+                },
             },
         });
 
@@ -171,18 +222,19 @@ export function AuthProvider({
         return {};
     };
 
-    const signInWithGoogle = async () => {
+    const signInWithGoogleMeet = async (next = "/dashboard/tutor") => {
+        return signInWithGoogle("tutor", next);
+    };
+
+    const signInWithGitHub = async (next = "/") => {
         ensureAuth();
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
 
         const { error } = await supabase.auth.signInWithOAuth({
-            provider: "google",
+            provider: "github",
             options: {
-                redirectTo: `${siteUrl}/auth/callback`,
-                queryParams: {
-                    access_type: "offline",
-                    prompt: "consent",
-                },
+                redirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent(next)}&role=student`,
+                scopes: "read:user repo",
             },
         });
 
@@ -224,6 +276,7 @@ export function AuthProvider({
                 login,
                 register,
                 signInWithGoogle,
+                signInWithGoogleMeet,
                 signInWithGitHub,
                 resetPassword,
                 updatePassword,

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ContentPage from "@/components/content/ContentPage";
+import { assertFeatureEnabled, staticParamsFor } from "@/lib/features";
 import { GUIDES, getGuide } from "@/lib/guides";
 import { pageMetadata } from "@/lib/seo";
 
@@ -9,7 +10,7 @@ interface Props {
 }
 
 export function generateStaticParams() {
-    return GUIDES.map((g) => ({ slug: g.slug }));
+    return staticParamsFor("guides", () => GUIDES.map((g) => ({ slug: g.slug })));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -26,6 +27,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function GuidePage({ params }: Props) {
+    assertFeatureEnabled("guides");
+
     const { slug } = await params;
     const guide = getGuide(slug);
     if (!guide) notFound();

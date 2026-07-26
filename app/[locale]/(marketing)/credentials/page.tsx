@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import JsonLd from "@/components/seo/JsonLd";
 import { CHALLENGES } from "@/lib/credentials";
+import { assertFeatureEnabled } from "@/lib/features";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
@@ -19,6 +20,8 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default function CredentialsMarketingPage() {
+    assertFeatureEnabled("credentials");
+
     return (
         <div className="font-jakarta bg-page min-h-screen pt-28 pb-20">
             <JsonLd

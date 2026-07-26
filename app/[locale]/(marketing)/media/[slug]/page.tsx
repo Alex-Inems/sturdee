@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Breadcrumbs from "@/components/seo/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
+import { assertFeatureEnabled, staticParamsFor } from "@/lib/features";
 import { MEDIA_ASSETS, getMediaAsset } from "@/lib/media";
 import { breadcrumbJsonLd, imageObjectJsonLd, mediaMetadata } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
@@ -13,7 +14,7 @@ interface Props {
 }
 
 export function generateStaticParams() {
-    return MEDIA_ASSETS.map((a) => ({ slug: a.slug }));
+    return staticParamsFor("media", () => MEDIA_ASSETS.map((a) => ({ slug: a.slug })));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -24,6 +25,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function MediaAssetPage({ params }: Props) {
+    assertFeatureEnabled("media");
+
     const { slug } = await params;
     const asset = getMediaAsset(slug);
     if (!asset) notFound();

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import CourseDetailContent from "@/components/courses/CourseDetailContent";
 import { getPublishedCourseBySlug } from "@/lib/courses-db";
+import { assertFeatureEnabled } from "@/lib/features";
 import { courseMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -18,6 +19,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CoursePage({ params }: Props) {
+    assertFeatureEnabled("courses");
+
     const { slug } = await params;
     const course = await getPublishedCourseBySlug(slug);
     if (!course) notFound();

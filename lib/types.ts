@@ -1,4 +1,5 @@
-export type UserRole = "user" | "admin";
+export type AccountRole = "student" | "tutor";
+export type UserRole = AccountRole | "admin";
 
 export type BookingStatus = "pending" | "confirmed" | "cancelled" | "completed";
 
@@ -49,4 +50,19 @@ export interface BookingRow {
     status: BookingStatus;
     notes: string;
     created_at: string;
+}
+
+export function dashboardPathForRole(role: UserRole): string {
+    if (role === "tutor" || role === "admin") return "/dashboard/tutor";
+    return "/dashboard/student";
+}
+
+export function isTutorRole(role: UserRole): boolean {
+    return role === "tutor" || role === "admin";
+}
+
+export function normalizeAccountRole(value: unknown): AccountRole | null {
+    if (value === "student" || value === "tutor") return value;
+    if (value === "user") return "student";
+    return null;
 }

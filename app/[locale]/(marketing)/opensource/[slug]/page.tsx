@@ -5,6 +5,7 @@ import { Link as LocaleLink } from "@/i18n/navigation";
 import Breadcrumbs from "@/components/seo/Breadcrumbs";
 import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
+import { assertFeatureEnabled, staticParamsFor } from "@/lib/features";
 import { getOssTool, OSS_TOOLS } from "@/lib/opensource";
 import { pageMetadata } from "@/lib/seo";
 
@@ -13,7 +14,9 @@ interface Props {
 }
 
 export function generateStaticParams() {
-    return routing.locales.flatMap((locale) => OSS_TOOLS.map((t) => ({ locale, slug: t.slug })));
+    return staticParamsFor("openSource", () =>
+        routing.locales.flatMap((locale) => OSS_TOOLS.map((t) => ({ locale, slug: t.slug })))
+    );
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -30,6 +33,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function OpenSourceToolPage({ params }: Props) {
+    assertFeatureEnabled("openSource");
+
     const { slug } = await params;
     const tool = getOssTool(slug);
     if (!tool) notFound();

@@ -5,6 +5,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import { getChallenge } from "@/lib/credentials";
 import { verifySignature } from "@/lib/credentials/crypto";
 import { getCertificateByCode } from "@/lib/credentials-db";
+import { assertFeatureEnabled } from "@/lib/features";
 import { pageMetadata } from "@/lib/seo";
 
 interface Props {
@@ -24,6 +25,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function VerifyCredentialPage({ params }: Props) {
+    assertFeatureEnabled("credentials");
+
     const { code } = await params;
     const certificate = await getCertificateByCode(code).catch(() => null);
     if (!certificate) notFound();

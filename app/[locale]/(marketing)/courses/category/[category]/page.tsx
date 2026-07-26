@@ -7,6 +7,7 @@ import PageHero from "@/components/PageHero";
 import SectionShell from "@/components/SectionShell";
 import { COURSE_CATEGORIES, type CourseCategory } from "@/lib/courses";
 import { getCoursesByCategory } from "@/lib/courses-db";
+import { assertFeatureEnabled, staticParamsFor } from "@/lib/features";
 import { categorySlug } from "@/lib/slug";
 import { breadcrumbJsonLd, categoryMetadata } from "@/lib/seo";
 
@@ -21,7 +22,7 @@ const SLUG_TO_CATEGORY: Record<string, CourseCategory> = {
 };
 
 export function generateStaticParams() {
-    return COURSE_CATEGORIES.map((cat) => ({ category: categorySlug(cat) }));
+    return staticParamsFor("courses", () => COURSE_CATEGORIES.map((cat) => ({ category: categorySlug(cat) })));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -38,6 +39,8 @@ const levelColors: Record<string, string> = {
 };
 
 export default async function CourseCategoryPage({ params }: Props) {
+    assertFeatureEnabled("courses");
+
     const { category } = await params;
     const cat = SLUG_TO_CATEGORY[category];
     if (!cat) notFound();

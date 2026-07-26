@@ -1,22 +1,28 @@
 "use client";
 
-import { useState } from "react";
-import { X, BookOpen, Mail, Lock, ArrowRight, User, AlertCircle, CheckCircle2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+    X,
+    BookOpen,
+    Mail,
+    Lock,
+    ArrowRight,
+    User,
+    AlertCircle,
+    CheckCircle2,
+    GraduationCap,
+    Presentation,
+} from "lucide-react";
 import { SITE_NAME } from "@/lib/site";
 import { useAuth } from "./AuthContext";
+import type { AccountRole } from "@/lib/types";
 
 interface AuthModalProps {
     isOpen: boolean;
     onClose: () => void;
     initialError?: string;
-}
-
-function GithubIcon() {
-    return (
-        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-        </svg>
-    );
+    initialRole?: AccountRole | null;
 }
 
 function GoogleIcon() {
@@ -42,43 +48,62 @@ function GoogleIcon() {
     );
 }
 
-type AuthView = "login" | "register" | "forgot";
+type AuthView = "role" | "login" | "register" | "forgot";
 
-export default function AuthModal({ isOpen, onClose, initialError }: AuthModalProps) {
-    const [view, setView] = useState<AuthView>("login");
+export default function AuthModal({ isOpen, onClose, initialError, initialRole = null }: AuthModalProps) {
+    const [view, setView] = useState<AuthView>(initialRole ? "login" : "role");
+    const [accountRole, setAccountRole] = useState<AccountRole | null>(initialRole);
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(initialError ?? "");
     const [success, setSuccess] = useState("");
     const [submitting, setSubmitting] = useState(false);
-    const { login, register, signInWithGoogle, signInWithGitHub, resetPassword } = useAuth();
+    const { login, register, signInWithGoogle, resetPassword } = useAuth();
+    const router = useRouter();
 
-    const isLogin = view === "login";
-    const isForgot = view === "forgot";
+    useEffect(() => {
+        if (initialError) setError(initialError);
+    }, [initialError]);
+
+    useEffect(() => {
+        if (!isOpen) return;
+        if (initialRole) {
+            setAccountRole(initialRole);
+            setView("login");
+        } else {
+            setView("role");
+            setAccountRole(null);
+        }
+    }, [isOpen, initialRole]);
 
     if (!isOpen) return null;
 
+    const isLogin = view === "login";
+    const isForgot = view === "forgot";
+    const isRole = view === "role";
     const displayError = error || initialError || "";
 
-    const handleGitHubSignIn = async () => {
+    const chooseRole = (role: AccountRole) => {
+        setAccountRole(role);
+        setView("login");
         setError("");
-        setSubmitting(true);
-        const result = await signInWithGitHub("/opensource");
-        setSubmitting(false);
-        if (result.error) setError(result.error);
+        setSuccess("");
     };
 
     const handleGoogleSignIn = async () => {
+        if (!accountRole) return;
         setError("");
         setSubmitting(true);
-        const result = await signInWithGoogle();
+        const result = await signInWithGoogle(accountRole);
         setSubmitting(false);
         if (result.error) setError(result.error);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!accountRole && !isForgot) return;
+
         setError("");
         setSuccess("");
         setSubmitting(true);
@@ -86,8 +111,8 @@ export default function AuthModal({ isOpen, onClose, initialError }: AuthModalPr
         const result = isForgot
             ? await resetPassword(email)
             : isLogin
-              ? await login(email, password)
-              : await register(email, name, password);
+              ? await login(email, password, accountRole!)
+              : await register(email, name, password, accountRole!);
 
         setSubmitting(false);
 
@@ -105,7 +130,12 @@ export default function AuthModal({ isOpen, onClose, initialError }: AuthModalPr
         setEmail("");
         setName("");
         setPassword("");
-        setView("login");
+        setView("role");
+        setAccountRole(null);
+
+        if ("redirectTo" in result && result.redirectTo) {
+            router.push(result.redirectTo);
+        }
     };
 
     const switchView = (next: AuthView) => {
@@ -127,12 +157,22 @@ export default function AuthModal({ isOpen, onClose, initialError }: AuthModalPr
                             {SITE_NAME}
                         </div>
                         <h2 className="text-3xl font-bold leading-tight mb-4">
-                            {isForgot ? "Reset Password" : isLogin ? "Welcome Back" : "Begin Your Journey"}
+                            {isRole
+                                ? "How will you use Sturdee?"
+                                : isForgot
+                                  ? "Reset Password"
+                                  : accountRole === "tutor"
+                                    ? "Tutor sign-in"
+                                    : "Student sign-in"}
                         </h2>
                         <p className="text-white/70 font-medium leading-relaxed">
-                            {isForgot
-                                ? "We'll email you a link to choose a new password."
-                                : "Sign in with Google or email to book sessions and access your dashboard."}
+                            {isRole
+                                ? "Students join live classes. Tutors schedule Google Meet sessions for up to 100 learners."
+                                : isForgot
+                                  ? "We'll email you a link to choose a new password."
+                                  : accountRole === "tutor"
+                                    ? "Host live classroom sessions and manage your classes."
+                                    : "Enroll in live classes and join Google Meet from your dashboard."}
                         </p>
                     </div>
                     <p className="relative z-10 text-xs text-white/40">© 2026 {SITE_NAME}</p>
@@ -146,168 +186,214 @@ export default function AuthModal({ isOpen, onClose, initialError }: AuthModalPr
                         <X className="w-5 h-5 text-gray-500" />
                     </button>
 
-                    <div className="mb-6">
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                            {isForgot ? "Forgot password?" : isLogin ? "Sign in" : "Create account"}
-                        </h3>
-                        <p className="text-gray-500 text-sm">
-                            {isForgot
-                                ? "Enter your email and we'll send a reset link."
-                                : isLogin
-                                  ? "Continue to your account."
-                                  : "Get started in seconds."}
-                        </p>
-                    </div>
-
-                    {!isForgot && (
+                    {isRole ? (
+                        <div>
+                            <h3 className="text-2xl font-bold text-gray-900 mb-2">Choose your role</h3>
+                            <p className="text-gray-500 text-sm mb-8">You can only access the dashboard for the role you sign in as.</p>
+                            <div className="grid gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => chooseRole("student")}
+                                    className="flex items-start gap-4 rounded-2xl border border-gray-200 p-5 text-left hover:border-emerald-400 hover:bg-emerald-50/40 transition-colors"
+                                >
+                                    <span className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                                        <GraduationCap className="w-5 h-5" />
+                                    </span>
+                                    <span>
+                                        <span className="block font-bold text-gray-900">I&apos;m a student</span>
+                                        <span className="block text-sm text-gray-500 font-medium mt-1">
+                                            Enroll in classes and join live Google Meet sessions.
+                                        </span>
+                                    </span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => chooseRole("tutor")}
+                                    className="flex items-start gap-4 rounded-2xl border border-gray-200 p-5 text-left hover:border-emerald-400 hover:bg-emerald-50/40 transition-colors"
+                                >
+                                    <span className="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                                        <Presentation className="w-5 h-5" />
+                                    </span>
+                                    <span>
+                                        <span className="block font-bold text-gray-900">I&apos;m a tutor</span>
+                                        <span className="block text-sm text-gray-500 font-medium mt-1">
+                                            Create and run live classes for up to 100 students.
+                                        </span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
                         <>
-                    <button
-                        type="button"
-                        onClick={handleGoogleSignIn}
-                        disabled={submitting}
-                        className="w-full flex items-center justify-center gap-3 border border-gray-200 rounded-full py-3.5 font-semibold text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-60 transition-all mb-3"
-                    >
-                        <GoogleIcon />
-                        Continue with Google
-                    </button>
-
-                    <button
-                        type="button"
-                        onClick={handleGitHubSignIn}
-                        disabled={submitting}
-                        className="w-full flex items-center justify-center gap-3 border border-gray-200 rounded-full py-3.5 font-semibold text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-60 transition-all mb-6"
-                    >
-                        <GithubIcon />
-                        Continue with GitHub — for OSS integrations
-                    </button>
-
-                    <div className="relative mb-6">
-                        <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-gray-200" />
-                        </div>
-                        <div className="relative flex justify-center text-xs">
-                            <span className="bg-white px-3 text-gray-400 font-medium">or continue with email</span>
-                        </div>
-                    </div>
-                        </>
-                    )}
-
-                    {displayError && (
-                        <div className="mb-5 flex items-center gap-2 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
-                            <AlertCircle className="h-4 w-4 shrink-0" />
-                            {displayError}
-                        </div>
-                    )}
-
-                    {success && (
-                        <div className="mb-5 flex items-center gap-2 rounded-lg bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-700">
-                            <CheckCircle2 className="h-4 w-4 shrink-0" />
-                            {success}
-                        </div>
-                    )}
-
-                    <form onSubmit={handleSubmit} className="space-y-5">
-                        {view === "register" && (
-                            <div>
-                                <label className="block text-xs font-semibold text-gray-500 mb-2">Full Name</label>
-                                <div className="relative">
-                                    <input
-                                        type="text"
-                                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-                                        placeholder="John Doe"
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        required
-                                    />
-                                    <User className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
-                                </div>
+                            <div className="mb-6">
+                                <button
+                                    type="button"
+                                    onClick={() => switchView("role")}
+                                    className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 mb-3"
+                                >
+                                    ← Change role
+                                </button>
+                                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                                    {isForgot
+                                        ? "Forgot password?"
+                                        : isLogin
+                                          ? `Sign in as ${accountRole}`
+                                          : `Create ${accountRole} account`}
+                                </h3>
+                                <p className="text-gray-500 text-sm">
+                                    {isForgot
+                                        ? "Enter your email and we'll send a reset link."
+                                        : `Continuing as ${accountRole}.`}
+                                </p>
                             </div>
-                        )}
 
-                        <div>
-                            <label className="block text-xs font-semibold text-gray-500 mb-2">Email</label>
-                            <div className="relative">
-                                <input
-                                    type="email"
-                                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-                                    placeholder="you@email.com"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    required
-                                />
-                                <Mail className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
-                            </div>
-                        </div>
-
-                        {!isForgot && (
-                        <div>
-                            <div className="flex items-center justify-between mb-2">
-                                <label className="block text-xs font-semibold text-gray-500">Password</label>
-                                {isLogin && (
+                            {!isForgot && (
+                                <>
                                     <button
                                         type="button"
-                                        onClick={() => switchView("forgot")}
-                                        className="text-xs font-semibold text-emerald-600 hover:text-emerald-700"
+                                        onClick={handleGoogleSignIn}
+                                        disabled={submitting}
+                                        className="w-full flex items-center justify-center gap-3 border border-gray-200 rounded-full py-3.5 font-semibold text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-60 transition-all mb-6"
                                     >
-                                        Forgot password?
+                                        <GoogleIcon />
+                                        Continue with Google
                                     </button>
+
+                                    <div className="relative mb-6">
+                                        <div className="absolute inset-0 flex items-center">
+                                            <div className="w-full border-t border-gray-200" />
+                                        </div>
+                                        <div className="relative flex justify-center text-xs">
+                                            <span className="bg-white px-3 text-gray-400 font-medium">
+                                                or continue with email
+                                            </span>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+
+                            {displayError && (
+                                <div className="mb-5 flex items-center gap-2 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+                                    <AlertCircle className="h-4 w-4 shrink-0" />
+                                    {displayError}
+                                </div>
+                            )}
+
+                            {success && (
+                                <div className="mb-5 flex items-center gap-2 rounded-lg bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-700">
+                                    <CheckCircle2 className="h-4 w-4 shrink-0" />
+                                    {success}
+                                </div>
+                            )}
+
+                            <form onSubmit={handleSubmit} className="space-y-5">
+                                {view === "register" && (
+                                    <div>
+                                        <label className="block text-xs font-semibold text-gray-500 mb-2">
+                                            Full Name
+                                        </label>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                                                placeholder="John Doe"
+                                                value={name}
+                                                onChange={(e) => setName(e.target.value)}
+                                                required
+                                            />
+                                            <User className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div>
+                                    <label className="block text-xs font-semibold text-gray-500 mb-2">Email</label>
+                                    <div className="relative">
+                                        <input
+                                            type="email"
+                                            className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                                            placeholder="you@email.com"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            required
+                                        />
+                                        <Mail className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
+                                    </div>
+                                </div>
+
+                                {!isForgot && (
+                                    <div>
+                                        <div className="flex items-center justify-between mb-2">
+                                            <label className="block text-xs font-semibold text-gray-500">
+                                                Password
+                                            </label>
+                                            {isLogin && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => switchView("forgot")}
+                                                    className="text-xs font-semibold text-emerald-600 hover:text-emerald-700"
+                                                >
+                                                    Forgot password?
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div className="relative">
+                                            <input
+                                                type="password"
+                                                className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                                                placeholder="••••••••"
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                                required
+                                                minLength={6}
+                                            />
+                                            <Lock className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
+                                        </div>
+                                    </div>
+                                )}
+
+                                <button
+                                    type="submit"
+                                    disabled={submitting}
+                                    className="w-full bg-[#10B981] hover:bg-[#0F9F72] disabled:opacity-60 text-white py-4 rounded-full font-semibold flex items-center justify-center gap-2 transition-all"
+                                >
+                                    {submitting
+                                        ? "Please wait..."
+                                        : isForgot
+                                          ? "Send Reset Link"
+                                          : isLogin
+                                            ? "Sign In"
+                                            : "Create Account"}
+                                    <ArrowRight className="w-4 h-4" />
+                                </button>
+                            </form>
+
+                            <div className="mt-8 pt-8 border-t border-gray-100 flex justify-center text-sm">
+                                {isForgot ? (
+                                    <button
+                                        type="button"
+                                        onClick={() => switchView("login")}
+                                        className="text-emerald-600 hover:text-emerald-700 font-semibold"
+                                    >
+                                        Back to sign in
+                                    </button>
+                                ) : (
+                                    <>
+                                        <span className="text-gray-500 mr-2">
+                                            {isLogin ? "No account?" : "Already have one?"}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => switchView(isLogin ? "register" : "login")}
+                                            className="text-emerald-600 hover:text-emerald-700 font-semibold"
+                                        >
+                                            {isLogin ? "Sign up" : "Sign in"}
+                                        </button>
+                                    </>
                                 )}
                             </div>
-                            <div className="relative">
-                                <input
-                                    type="password"
-                                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-                                    placeholder="••••••••"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                    minLength={6}
-                                />
-                                <Lock className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
-                            </div>
-                        </div>
-                        )}
-
-                        <button
-                            type="submit"
-                            disabled={submitting}
-                            className="w-full bg-[#10B981] hover:bg-[#0F9F72] disabled:opacity-60 text-white py-4 rounded-full font-semibold flex items-center justify-center gap-2 transition-all"
-                        >
-                            {submitting
-                                ? "Please wait..."
-                                : isForgot
-                                  ? "Send Reset Link"
-                                  : isLogin
-                                    ? "Sign In"
-                                    : "Create Account"}
-                            <ArrowRight className="w-4 h-4" />
-                        </button>
-                    </form>
-
-                    <div className="mt-8 pt-8 border-t border-gray-100 flex justify-center text-sm">
-                        {isForgot ? (
-                            <button
-                                type="button"
-                                onClick={() => switchView("login")}
-                                className="text-emerald-600 hover:text-emerald-700 font-semibold"
-                            >
-                                Back to sign in
-                            </button>
-                        ) : (
-                            <>
-                        <span className="text-gray-500 mr-2">
-                            {isLogin ? "No account?" : "Already have one?"}
-                        </span>
-                        <button
-                            type="button"
-                            onClick={() => switchView(isLogin ? "register" : "login")}
-                            className="text-emerald-600 hover:text-emerald-700 font-semibold"
-                        >
-                            {isLogin ? "Sign up" : "Sign in"}
-                        </button>
-                            </>
-                        )}
-                    </div>
+                        </>
+                    )}
                 </div>
             </div>
         </div>

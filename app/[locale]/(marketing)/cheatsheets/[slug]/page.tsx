@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ContentPage from "@/components/content/ContentPage";
 import { CHEATSHEETS, getCheatsheet } from "@/lib/cheatsheets";
+import { assertFeatureEnabled, staticParamsFor } from "@/lib/features";
 import { pageMetadata } from "@/lib/seo";
 
 interface Props {
@@ -9,7 +10,7 @@ interface Props {
 }
 
 export function generateStaticParams() {
-    return CHEATSHEETS.map((c) => ({ slug: c.slug }));
+    return staticParamsFor("cheatsheets", () => CHEATSHEETS.map((c) => ({ slug: c.slug })));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -26,6 +27,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CheatsheetPage({ params }: Props) {
+    assertFeatureEnabled("cheatsheets");
+
     const { slug } = await params;
     const sheet = getCheatsheet(slug);
     if (!sheet) notFound();

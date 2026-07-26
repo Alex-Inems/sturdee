@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ContentPage from "@/components/content/ContentPage";
+import { assertFeatureEnabled } from "@/lib/features";
 import { h2, h3, list, p, steps, code, tip, faq } from "@/lib/tutorials/builder";
 import { pageMetadata } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
@@ -99,6 +100,8 @@ const sections = [
 ];
 
 export default function ResourcesPage() {
+    assertFeatureEnabled("resources");
+
     return (
         <ContentPage
             title="Developer Resources & SEO Setup"

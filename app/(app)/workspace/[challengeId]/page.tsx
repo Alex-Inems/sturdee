@@ -5,6 +5,7 @@ import SectionShell from "@/components/SectionShell";
 import GitWorkspace from "@/components/credentials/GitWorkspace";
 import { getSessionUser } from "@/lib/auth";
 import { getChallenge } from "@/lib/credentials";
+import { assertFeatureEnabled } from "@/lib/features";
 import {
     getCertificateForChallenge,
     getOrCreateWorkspace,
@@ -15,6 +16,8 @@ interface Props {
 }
 
 export default async function WorkspacePage({ params }: Props) {
+    assertFeatureEnabled("credentials");
+
     const session = await getSessionUser();
     if (!session) redirect(`/?auth=login`);
 

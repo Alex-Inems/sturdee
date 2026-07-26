@@ -4,6 +4,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import PracticeProblemList from "@/components/practice/PracticeProblemList";
 import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
+import { assertFeatureEnabled } from "@/lib/features";
 import { getLocalizedHubMeta } from "@/lib/i18n/metadata";
 import {
     getDifficultyCounts,
@@ -44,6 +45,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default function PracticeHubPage() {
+    assertFeatureEnabled("practice");
+
     const catalog = getPracticeCatalog();
     const counts = getDifficultyCounts();
 

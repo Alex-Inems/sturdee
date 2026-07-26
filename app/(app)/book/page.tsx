@@ -3,12 +3,15 @@ import dynamic from "next/dynamic";
 import PageHero from "@/components/PageHero";
 import SectionShell from "@/components/SectionShell";
 import SectionPlaceholder from "@/components/SectionPlaceholder";
+import { assertFeatureEnabled } from "@/lib/features";
 
 const BookingForm = dynamic(() => import("@/components/booking/BookingForm"), {
     loading: () => <SectionPlaceholder />,
 });
 
 export default function BookPage() {
+    assertFeatureEnabled("booking");
+
     return (
         <div className="font-jakarta bg-page min-h-screen">
             <PageHero

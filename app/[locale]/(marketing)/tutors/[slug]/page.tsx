@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import TutorProfileView from "@/components/tutors/TutorProfileView";
 import { getCoursesByTutorSlug } from "@/lib/courses-db";
+import { assertFeatureEnabled } from "@/lib/features";
 import { getPublishedTutorBySlug, getPublishedTutors } from "@/lib/tutors-db";
 import { tutorMetadata } from "@/lib/seo";
 
@@ -19,6 +20,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function TutorProfilePage({ params }: Props) {
+    assertFeatureEnabled("tutors");
+
     const { slug } = await params;
     const tutor = await getPublishedTutorBySlug(slug);
     if (!tutor) notFound();

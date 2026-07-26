@@ -4,6 +4,7 @@ import PageHero from "@/components/PageHero";
 import SectionShell from "@/components/SectionShell";
 import IntegrationWorkspace from "@/components/opensource/IntegrationWorkspace";
 import { getSessionUser } from "@/lib/auth";
+import { assertFeatureEnabled } from "@/lib/features";
 import { getOssTool } from "@/lib/opensource";
 import { getCompletion, getIntegrationWorkspace } from "@/lib/opensource-db";
 
@@ -12,6 +13,8 @@ interface Props {
 }
 
 export default async function IntegrateToolPage({ params }: Props) {
+    assertFeatureEnabled("openSource");
+
     const session = await getSessionUser();
     if (!session) redirect(`/?auth=login&next=/integrate/${(await params).slug}`);
 

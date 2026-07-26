@@ -19,6 +19,7 @@
     "programs": "Programmes",
     "instructors": "Instructeurs",
     "tutors": "Tuteurs",
+    "classroom": "Classe",
     "book": "Réserver",
     "more": "Plus",
     "resources": "Ressources",
@@ -52,8 +53,8 @@
     "legal": "Mentions légales"
   },
   "Home": {
-    "metaTitle": "Apprendre à coder — Tutoriels, cours et ressources gratuits",
-    "metaDescription": "Sturdee est votre plateforme gratuite pour le développement web, la programmation et Shopify Liquid. Tutoriels interactifs, vidéos, cours en direct et instructeurs experts.",
+    "metaTitle": "Apprendre à coder — Tutoriels interactifs gratuits",
+    "metaDescription": "Sturdee enseigne le code en pratiquant. Tutoriels gratuits pour HTML, CSS, JavaScript, Python, SQL, Shopify Liquid et plus de 20 langages — lisez, modifiez et exécutez du code dans le navigateur.",
     "breadcrumb": "Accueil"
   },
   "Meta": {

@@ -19,6 +19,7 @@
     "programs": "Programas",
     "instructors": "Instructores",
     "tutors": "Tutores",
+    "classroom": "Aula",
     "book": "Reservar",
     "more": "Más",
     "resources": "Recursos",
@@ -52,8 +53,8 @@
     "legal": "Legal"
   },
   "Home": {
-    "metaTitle": "Aprende a programar — Tutoriales, cursos y recursos gratis",
-    "metaDescription": "Sturdee es tu plataforma gratuita para desarrollo web, programación y Shopify Liquid. Tutoriales interactivos, vídeos, cursos en vivo e instructores expertos.",
+    "metaTitle": "Aprende a programar — Tutoriales interactivos gratis",
+    "metaDescription": "Sturdee enseña a programar practicando. Tutoriales gratis de HTML, CSS, JavaScript, Python, SQL, Shopify Liquid y más de 20 lenguajes — lee, edita y ejecuta código en el navegador.",
     "breadcrumb": "Inicio"
   },
   "Meta": {

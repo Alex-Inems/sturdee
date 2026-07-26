@@ -1,8 +1,11 @@
 import PageHero from "@/components/PageHero";
 import SectionShell from "@/components/SectionShell";
 import CourseManager from "@/components/tutors/CourseManager";
+import { assertFeatureEnabled } from "@/lib/features";
 
 export default function TutorCoursesPage() {
+    assertFeatureEnabled("courses");
+
     return (
         <div className="font-jakarta bg-page min-h-screen">
             <PageHero

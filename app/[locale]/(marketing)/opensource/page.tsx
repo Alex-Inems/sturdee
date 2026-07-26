@@ -4,6 +4,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import OssToolCard from "@/components/opensource/OssToolCard";
 import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
+import { assertFeatureEnabled } from "@/lib/features";
 import { getLocalizedHubMeta } from "@/lib/i18n/metadata";
 import { getAllCategories, MAX_OSS_POINTS, OSS_TOOL_COUNT, OSS_TOOLS } from "@/lib/opensource";
 import { pageMetadata } from "@/lib/seo";
@@ -27,6 +28,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function OpenSourceHubPage({ params }: Props) {
+    assertFeatureEnabled("openSource");
+
     const { locale } = await params;
     const categories = getAllCategories();
     const aiCount = OSS_TOOLS.filter((t) => t.category === "AI Tools" || t.category === "AI/ML").length;

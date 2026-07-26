@@ -7,6 +7,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import TutorialPageContent from "@/components/tutorials/TutorialPageContent";
 import { getCourseLesson } from "@/lib/course-content";
 import { getPublishedCourseBySlug } from "@/lib/courses-db";
+import { assertFeatureEnabled } from "@/lib/features";
 import { h2, list, p } from "@/lib/tutorials/builder";
 import { breadcrumbJsonLd, courseLessonJsonLd, courseLessonMetadata } from "@/lib/seo";
 
@@ -25,6 +26,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CourseLessonPage({ params }: Props) {
+    assertFeatureEnabled("courses");
+
     const { slug, lessonSlug } = await params;
     const course = await getPublishedCourseBySlug(slug);
     const match = course ? getCourseLesson(course, lessonSlug) : undefined;

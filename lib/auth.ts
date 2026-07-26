@@ -33,8 +33,13 @@ export async function getSessionUser(): Promise<SessionUser | null> {
                 (user.user_metadata?.full_name as string) ||
                 user.email?.split("@")[0] ||
                 "User",
-            role: "user",
+            role: "student",
         };
+    }
+
+    // Legacy "user" rows → treat as student until migration runs
+    if ((profile.role as string) === "user") {
+        return { ...profile, role: "student" };
     }
 
     return profile;
@@ -49,6 +54,14 @@ export async function requireSessionUser(): Promise<SessionUser> {
 export async function requireAdmin(): Promise<SessionUser> {
     const user = await requireSessionUser();
     if (user.role !== "admin") throw new Error("Forbidden");
+    return user;
+}
+
+export async function requireTutor(): Promise<SessionUser> {
+    const user = await requireSessionUser();
+    if (user.role !== "tutor" && user.role !== "admin") {
+        throw new Error("Only tutors can do this");
+    }
     return user;
 }
 

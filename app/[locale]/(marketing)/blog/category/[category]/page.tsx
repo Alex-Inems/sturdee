@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/seo/JsonLd";
 import { BLOG_POSTS, getCategorySlug, getPostsByCategory, type BlogCategory } from "@/lib/blog";
+import { assertFeatureEnabled, staticParamsFor } from "@/lib/features";
 import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 
 interface Props {
@@ -14,7 +15,7 @@ const SLUG_TO_CATEGORY: Record<string, BlogCategory> = Object.fromEntries(
 ) as Record<string, BlogCategory>;
 
 export function generateStaticParams() {
-    return Object.keys(SLUG_TO_CATEGORY).map((category) => ({ category }));
+    return staticParamsFor("blog", () => Object.keys(SLUG_TO_CATEGORY).map((category) => ({ category })));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -31,6 +32,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function BlogCategoryPage({ params }: Props) {
+    assertFeatureEnabled("blog");
+
     const { category } = await params;
     const cat = SLUG_TO_CATEGORY[category];
     if (!cat) notFound();

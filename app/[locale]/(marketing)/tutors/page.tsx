@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import TutorMarketplace from "@/components/tutors/TutorMarketplace";
+import { assertFeatureEnabled } from "@/lib/features";
 import JsonLd from "@/components/seo/JsonLd";
 import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 
@@ -12,6 +13,8 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default function TutorsPage() {
+    assertFeatureEnabled("tutors");
+
     return (
         <>
             <JsonLd

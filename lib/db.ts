@@ -18,7 +18,7 @@ interface ProfileRow {
     id: string;
     email: string;
     name: string;
-    role: "user" | "admin";
+    role: "student" | "tutor" | "admin";
     created_at: string;
 }
 

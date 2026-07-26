@@ -4,6 +4,7 @@ import Link from "next/link";
 import PageHero from "@/components/PageHero";
 import SectionShell from "@/components/SectionShell";
 import JsonLd from "@/components/seo/JsonLd";
+import { assertFeatureEnabled } from "@/lib/features";
 import { MEDIA_ASSETS } from "@/lib/media";
 import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 
@@ -18,6 +19,8 @@ export const metadata: Metadata = pageMetadata({
 const categories = ["featured", "courses", "programs", "instructors", "paths"] as const;
 
 export default function MediaIndexPage() {
+    assertFeatureEnabled("media");
+
     return (
         <div className="font-jakarta bg-page min-h-screen">
             <JsonLd

@@ -8,8 +8,11 @@ import PageHero from "@/components/PageHero";
 import SectionShell from "@/components/SectionShell";
 import { useAuth } from "@/components/AuthContext";
 import type { MicroCertificate } from "@/lib/credentials/types";
+import { assertFeatureEnabled } from "@/lib/features";
 
 export default function MyCredentialsPage() {
+    assertFeatureEnabled("credentials");
+
     const { isAuthenticated, loading } = useAuth();
     const router = useRouter();
     const [certs, setCerts] = useState<MicroCertificate[]>([]);

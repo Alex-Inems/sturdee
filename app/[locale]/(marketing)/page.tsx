@@ -1,30 +1,17 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
-import Hero from "@/components/Hero";
 import JsonLd from "@/components/seo/JsonLd";
+import LandingHero from "@/components/landing/LandingHero";
+import LandingLanguages from "@/components/landing/LandingLanguages";
+import LandingMethod from "@/components/landing/LandingMethod";
+import LandingCTA from "@/components/landing/LandingCTA";
 import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 import { getLocalizedHomeMeta } from "@/lib/i18n/metadata";
 import type { Locale } from "@/i18n/routing";
-import Stats from "@/components/Stats";
-import AlumniOutcomes from "@/components/AlumniOutcomes";
-import Philosophy from "@/components/Philosophy";
-import LearningExperience from "@/components/LearningExperience";
-import Testimonial from "@/components/Testimonial";
-import Benefits from "@/components/Benefits";
-import Accreditation from "@/components/Accreditation";
-import DirectionalCTA from "@/components/DirectionalCTA";
-import Newsletter from "@/components/Newsletter";
-import SectionPlaceholder from "@/components/SectionPlaceholder";
 
-const FeaturedCourses = dynamic(() => import("@/components/FeaturedCourses"), {
-    loading: () => <SectionPlaceholder />,
-});
-const LearningPaths = dynamic(() => import("@/components/LearningPaths"), {
-    loading: () => <SectionPlaceholder />,
-});
-const Instructors = dynamic(() => import("@/components/Instructors"), {
-    loading: () => <SectionPlaceholder />,
-});
+// Previous marketing sections (disabled with feature flags) kept for restore:
+// Stats, AlumniOutcomes, Philosophy, LearningExperience, FeaturedCourses,
+// LearningPaths, Instructors, Testimonial, Benefits, Accreditation,
+// DirectionalCTA, Newsletter
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -38,10 +25,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         locale: locale as Locale,
         keywords: [
             "learn to code free",
-            "programming study site",
-            "web development education",
-            "coding courses online",
-            "Shopify theme development",
+            "free coding tutorials",
+            "programming tutorials online",
+            "interactive coding lessons",
+            "HTML CSS JavaScript tutorials",
         ],
     });
 }
@@ -53,19 +40,10 @@ export default async function HomePage({ params }: Props) {
     return (
         <div className="font-jakarta bg-page">
             <JsonLd data={breadcrumbJsonLd([{ name: meta.breadcrumb, path: "/" }])} />
-            <Hero />
-            <Stats />
-            <AlumniOutcomes />
-            <Philosophy />
-            <LearningExperience />
-            <FeaturedCourses />
-            <LearningPaths />
-            <Instructors />
-            <Testimonial />
-            <Benefits />
-            <Accreditation />
-            <DirectionalCTA />
-            <Newsletter />
+            <LandingHero />
+            <LandingLanguages />
+            <LandingMethod />
+            <LandingCTA />
         </div>
     );
 }

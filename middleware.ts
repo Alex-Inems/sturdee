@@ -1,12 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "@/i18n/routing";
+import { disabledFeatureForPath } from "@/lib/feature-flags";
 import { updateSession } from "@/lib/supabase/middleware";
 
 const intlMiddleware = createMiddleware(routing);
 
 export async function middleware(request: NextRequest) {
     const pathname = request.nextUrl.pathname;
+
+    // Disabled sections: block their API and auth handlers outright.
+    if (disabledFeatureForPath(pathname)) {
+        return NextResponse.json({ error: "This feature is currently unavailable" }, { status: 404 });
+    }
+
     const isProtected =
         pathname.startsWith("/dashboard") ||
         pathname.startsWith("/admin") ||
@@ -15,7 +22,8 @@ export async function middleware(request: NextRequest) {
         pathname.startsWith("/book") ||
         pathname.startsWith("/workspace") ||
         pathname.startsWith("/integrate") ||
-        pathname.startsWith("/my-credentials");
+        pathname.startsWith("/my-credentials") ||
+        pathname.startsWith("/classroom/host");
 
     if (isProtected) {
         return updateSession(request);
