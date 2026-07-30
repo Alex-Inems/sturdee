@@ -51,11 +51,11 @@ export default function FeatureUnavailableFallback({
                         Go to Home
                     </Link>
                     <Link
-                        href="/tutorials"
+                        href="/classroom"
                         className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-700 hover:border-gray-300 font-semibold rounded-full text-sm transition-colors shadow-sm"
                     >
                         <BookOpen className="w-4 h-4" />
-                        Browse Tutorials
+                        Browse Classroom
                     </Link>
                 </div>
             )}

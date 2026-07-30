@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
     extractMeetCode,
     isValidMeetUrl,
@@ -6,7 +7,14 @@ import {
     normalizeMeetUrl,
 } from "@/lib/google-meet";
 
+type DbOpts = { bypassRls?: boolean };
+
+async function db(opts?: DbOpts) {
+    return opts?.bypassRls ? createAdminClient() : await createClient();
+}
+
 export type LiveClassStatus = "draft" | "scheduled" | "live" | "ended" | "cancelled";
+export type LiveClassProvider = "livekit" | "meet";
 
 export interface LiveClassRow {
     id: string;
@@ -17,6 +25,9 @@ export interface LiveClassRow {
     slug: string;
     description: string;
     topic: string;
+    provider: LiveClassProvider;
+    room_name: string | null;
+    recording_enabled: boolean;
     meet_url: string;
     meet_space_name: string;
     meet_code: string;
@@ -48,6 +59,8 @@ export interface LiveClassInput {
     title: string;
     description?: string;
     topic?: string;
+    provider?: LiveClassProvider;
+    recordingEnabled?: boolean;
     meetUrl?: string;
     meetSpaceName?: string;
     meetCode?: string;
@@ -66,8 +79,8 @@ function slugify(title: string): string {
         .slice(0, 60);
 }
 
-async function uniqueSlug(base: string): Promise<string> {
-    const supabase = await createClient();
+async function uniqueSlug(base: string, opts?: DbOpts): Promise<string> {
+    const supabase = await db(opts);
     let slug = base || "class";
     let n = 0;
     while (true) {
@@ -105,8 +118,11 @@ export async function getClassBySlug(slug: string): Promise<(LiveClassRow & { en
     return { ...row, enrolled_count: count ?? 0 };
 }
 
-export async function getClassesByHost(userId: string): Promise<(LiveClassRow & { enrolled_count: number })[]> {
-    const supabase = await createClient();
+export async function getClassesByHost(
+    userId: string,
+    opts?: DbOpts
+): Promise<(LiveClassRow & { enrolled_count: number })[]> {
+    const supabase = await db(opts);
     const { data, error } = await supabase
         .from("live_classes")
         .select("*")
@@ -131,18 +147,20 @@ export async function getClassesByHost(userId: string): Promise<(LiveClassRow & 
 
 export async function createLiveClass(
     host: { id: string; name: string; email: string },
-    input: LiveClassInput
+    input: LiveClassInput,
+    opts?: DbOpts
 ): Promise<LiveClassRow> {
     const title = input.title.trim();
     if (!title) throw new Error("Title is required");
     if (!input.startsAt) throw new Error("Start time is required");
 
     const capacity = Math.min(MAX_CLASS_CAPACITY, Math.max(1, input.capacity ?? MAX_CLASS_CAPACITY));
+    const provider: LiveClassProvider = input.provider ?? "meet";
     let meetUrl = "";
     let meetCode = "";
     let meetSpaceName = "";
 
-    if (input.meetUrl) {
+    if (provider === "meet" && input.meetUrl) {
         if (!isValidMeetUrl(input.meetUrl)) {
             throw new Error("Enter a valid Google Meet URL (meet.google.com/xxx-xxxx-xxx)");
         }
@@ -151,8 +169,13 @@ export async function createLiveClass(
         meetSpaceName = input.meetSpaceName || "";
     }
 
-    const slug = await uniqueSlug(slugify(title));
-    const supabase = await createClient();
+    const slug = await uniqueSlug(slugify(title), opts);
+    const supabase = await db(opts);
+
+    // Native (LiveKit) classes are ready to schedule immediately; Meet classes
+    // need a link before they leave draft.
+    const defaultStatus: LiveClassStatus =
+        provider === "livekit" ? "scheduled" : meetUrl ? "scheduled" : "draft";
 
     const { data, error } = await supabase
         .from("live_classes")
@@ -164,13 +187,16 @@ export async function createLiveClass(
             slug,
             description: (input.description ?? "").trim(),
             topic: (input.topic ?? "").trim(),
+            provider,
+            room_name: provider === "livekit" ? `room_${slug}` : null,
+            recording_enabled: input.recordingEnabled ?? false,
             meet_url: meetUrl,
             meet_space_name: meetSpaceName,
             meet_code: meetCode,
             starts_at: input.startsAt,
             ends_at: input.endsAt ?? null,
             capacity,
-            status: input.status ?? (meetUrl ? "scheduled" : "draft"),
+            status: input.status ?? defaultStatus,
             updated_at: new Date().toISOString(),
         })
         .select("*")
@@ -183,9 +209,10 @@ export async function createLiveClass(
 export async function updateLiveClass(
     classId: string,
     hostUserId: string,
-    patch: Partial<LiveClassInput> & { status?: LiveClassStatus }
+    patch: Partial<LiveClassInput> & { status?: LiveClassStatus },
+    opts?: DbOpts
 ): Promise<LiveClassRow> {
-    const supabase = await createClient();
+    const supabase = await db(opts);
     const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
 
     if (patch.title !== undefined) updates.title = patch.title.trim();
@@ -222,9 +249,10 @@ export async function updateLiveClass(
 
 export async function enrollInClass(
     classId: string,
-    user: { id: string; name: string; email: string }
+    user: { id: string; name: string; email: string },
+    opts?: DbOpts
 ): Promise<void> {
-    const supabase = await createClient();
+    const supabase = await db(opts);
     const { data: cls, error: classError } = await supabase
         .from("live_classes")
         .select("id, status, capacity, host_user_id")
@@ -255,8 +283,8 @@ export async function enrollInClass(
     }
 }
 
-export async function isEnrolled(classId: string, userId: string): Promise<boolean> {
-    const supabase = await createClient();
+export async function isEnrolled(classId: string, userId: string, opts?: DbOpts): Promise<boolean> {
+    const supabase = await db(opts);
     const { data } = await supabase
         .from("live_class_enrollments")
         .select("id")
@@ -266,8 +294,8 @@ export async function isEnrolled(classId: string, userId: string): Promise<boole
     return !!data;
 }
 
-export async function markJoined(classId: string, userId: string): Promise<void> {
-    const supabase = await createClient();
+export async function markJoined(classId: string, userId: string, opts?: DbOpts): Promise<void> {
+    const supabase = await db(opts);
     await supabase
         .from("live_class_enrollments")
         .update({ joined_at: new Date().toISOString() })

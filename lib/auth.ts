@@ -45,6 +45,22 @@ export async function getSessionUser(): Promise<SessionUser | null> {
     return profile;
 }
 
+/** Real session, or sticky guest tutor/student when guest classroom mode is on. */
+export async function getClassroomActor(): Promise<SessionUser | null> {
+    const session = await getSessionUser();
+    if (session) return session;
+    const { readGuestActor } = await import("@/lib/classroom-guest");
+    return readGuestActor();
+}
+
+/** True when the actor is a guest cookie (no Supabase auth session). */
+export async function isGuestClassroomActor(): Promise<boolean> {
+    const session = await getSessionUser();
+    if (session) return false;
+    const guest = await (await import("@/lib/classroom-guest")).readGuestActor();
+    return !!guest;
+}
+
 export async function requireSessionUser(): Promise<SessionUser> {
     const user = await getSessionUser();
     if (!user) throw new Error("Unauthorized");

@@ -21,13 +21,15 @@ interface AuthContextType {
     login: (
         email: string,
         password: string,
-        asRole: AccountRole
+        asRole: AccountRole,
+        next?: string
     ) => Promise<{ error?: string; redirectTo?: string }>;
     register: (
         email: string,
         name: string,
         password: string,
-        asRole: AccountRole
+        asRole: AccountRole,
+        next?: string
     ) => Promise<{ error?: string; message?: string; redirectTo?: string }>;
     signInWithGoogle: (asRole: AccountRole, next?: string) => Promise<{ error?: string }>;
     signInWithGoogleMeet: (next?: string) => Promise<{ error?: string }>;
@@ -151,7 +153,7 @@ export function AuthProvider({
         };
     }, [deferAuth, authEnabled]);
 
-    const login = async (email: string, password: string, asRole: AccountRole) => {
+    const login = async (email: string, password: string, asRole: AccountRole, next?: string) => {
         ensureAuth();
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) return { error: error.message };
@@ -169,19 +171,26 @@ export function AuthProvider({
 
         setUser(sessionUser);
         setLoading(false);
-        return { redirectTo: dashboardPathForRole(sessionUser.role) };
+        return { redirectTo: next ?? dashboardPathForRole(sessionUser.role) };
     };
 
-    const register = async (email: string, name: string, password: string, asRole: AccountRole) => {
+    const register = async (
+        email: string,
+        name: string,
+        password: string,
+        asRole: AccountRole,
+        next?: string
+    ) => {
         ensureAuth();
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+        const dest = next ?? dashboardPathForRole(asRole);
 
         const { data, error } = await supabase.auth.signUp({
             email,
             password,
             options: {
                 data: { name, full_name: name, account_role: asRole },
-                emailRedirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent(dashboardPathForRole(asRole))}&role=${asRole}`,
+                emailRedirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent(dest)}&role=${asRole}`,
             },
         });
 
@@ -194,7 +203,7 @@ export function AuthProvider({
         }
 
         await refreshUser();
-        return { redirectTo: dashboardPathForRole(asRole) };
+        return { redirectTo: dest };
     };
 
     const signInWithGoogle = async (asRole: AccountRole, next?: string) => {

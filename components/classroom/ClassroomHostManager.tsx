@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { MAX_CLASS_CAPACITY } from "@/lib/google-meet";
 import { useAuth } from "@/components/AuthContext";
@@ -10,6 +10,7 @@ type HostClass = {
     title: string;
     slug: string;
     topic: string;
+    provider?: "livekit" | "meet";
     meet_url: string;
     starts_at: string;
     capacity: number;
@@ -22,12 +23,13 @@ function toLocalInputValue(d: Date) {
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-export default function ClassroomHostManager() {
+export default function ClassroomHostManager({ guestMode = false }: { guestMode?: boolean }) {
     const { isAuthenticated, loading, signInWithGoogleMeet, ensureAuth, user } = useAuth();
     const [classes, setClasses] = useState<HostClass[]>([]);
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
+    const formRef = useRef<HTMLFormElement>(null);
 
     const [title, setTitle] = useState("");
     const [topic, setTopic] = useState("");
@@ -37,6 +39,10 @@ export default function ClassroomHostManager() {
     const [meetUrl, setMeetUrl] = useState("");
     const [generateMeet, setGenerateMeet] = useState(true);
 
+    const canHost =
+        guestMode ||
+        (isAuthenticated && user && (user.role === "tutor" || user.role === "admin"));
+
     const load = useCallback(async () => {
         const res = await fetch("/api/classrooms/me");
         if (!res.ok) return;
@@ -45,8 +51,13 @@ export default function ClassroomHostManager() {
     }, []);
 
     useEffect(() => {
-        if (isAuthenticated) load();
-    }, [isAuthenticated, load]);
+        if (canHost) void load();
+    }, [canHost, load]);
+
+    const scrollToForm = () => {
+        formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        formRef.current?.querySelector<HTMLInputElement>("input")?.focus();
+    };
 
     const createClass = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -63,7 +74,8 @@ export default function ClassroomHostManager() {
                     description,
                     startsAt: new Date(startsAt).toISOString(),
                     capacity,
-                    meetUrl: generateMeet ? undefined : meetUrl || undefined,
+                    provider: "meet",
+                    meetUrl: !generateMeet ? meetUrl || undefined : undefined,
                     generateMeet,
                 }),
             });
@@ -75,11 +87,12 @@ export default function ClassroomHostManager() {
                 }
                 throw new Error(data.error || "Failed to create class");
             }
-            setMessage("Class created.");
+            setMessage(`Created “${data.class?.title ?? title}”. Open it below, or schedule another.`);
             setTitle("");
             setTopic("");
             setDescription("");
             setMeetUrl("");
+            setStartsAt(toLocalInputValue(new Date(Date.now() + 60 * 60 * 1000)));
             await load();
         } catch (err) {
             setError(err instanceof Error ? err.message : "Failed to create class");
@@ -88,17 +101,35 @@ export default function ClassroomHostManager() {
         }
     };
 
-    const setStatus = async (id: string, status: string) => {
+    const setStatus = async (id: string, status: string, classProvider?: "livekit" | "meet") => {
         setBusy(true);
         setError("");
         try {
-            const res = await fetch(`/api/classrooms/${id}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ status }),
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "Update failed");
+            if (status === "ended" && classProvider === "livekit") {
+                // Tear down LiveKit room so anyone still connected is kicked.
+                const mod = await fetch(`/api/classrooms/${id}/moderate`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: "end" }),
+                });
+                if (!mod.ok) {
+                    const res = await fetch(`/api/classrooms/${id}`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ status: "ended" }),
+                    });
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.error || "Update failed");
+                }
+            } else {
+                const res = await fetch(`/api/classrooms/${id}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ status }),
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || "Update failed");
+            }
             await load();
         } catch (err) {
             setError(err instanceof Error ? err.message : "Update failed");
@@ -107,16 +138,16 @@ export default function ClassroomHostManager() {
         }
     };
 
-    if (loading) {
+    if (loading && !guestMode) {
         return <p className="text-gray-500 font-medium">Loading…</p>;
     }
 
-    if (!isAuthenticated || (user && user.role !== "tutor" && user.role !== "admin")) {
+    if (!canHost) {
         return (
             <div className="rounded-2xl border border-gray-200 bg-white p-8 max-w-lg">
                 <h2 className="text-xl font-bold text-gray-900">Tutor access only</h2>
                 <p className="mt-2 text-gray-500 font-medium text-sm leading-relaxed">
-                    Sign in as a tutor to schedule Google Meet classes for up to {MAX_CLASS_CAPACITY} students.
+                    Sign in as a tutor to schedule classes for up to {MAX_CLASS_CAPACITY} students.
                 </p>
                 <button
                     type="button"
@@ -132,12 +163,145 @@ export default function ClassroomHostManager() {
         );
     }
 
+    const active = classes.filter((c) => ["scheduled", "live", "draft"].includes(c.status));
+    const past = classes.filter((c) => ["ended", "cancelled"].includes(c.status));
+
     return (
-        <div className="grid lg:grid-cols-2 gap-10">
-            <form onSubmit={createClass} className="rounded-2xl border border-gray-200 bg-white p-6 sm:p-8 space-y-4">
-                <h2 className="text-xl font-bold text-gray-900">Schedule a class</h2>
+        <div className="space-y-10">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h2 className="text-xl font-bold text-gray-900">Your classes</h2>
+                    <p className="text-sm font-medium text-gray-500">
+                        Open a room, end a session, or schedule another class anytime.
+                    </p>
+                </div>
+                <button
+                    type="button"
+                    onClick={scrollToForm}
+                    className="rounded-full bg-[#10B981] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#0F9F72]"
+                >
+                    + New class
+                </button>
+            </div>
+
+            {error && <p className="text-sm font-medium text-red-600">{error}</p>}
+            {message && <p className="text-sm font-medium text-emerald-700">{message}</p>}
+
+            {active.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-gray-300 bg-white/70 px-6 py-10 text-center">
+                    <p className="text-sm font-medium text-gray-600">No active classes yet.</p>
+                    <button
+                        type="button"
+                        onClick={scrollToForm}
+                        className="mt-4 text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+                    >
+                        Schedule your first class ↓
+                    </button>
+                </div>
+            ) : (
+                <ul className="space-y-3">
+                    {active.map((c) => {
+                        const provider = c.provider ?? "meet";
+                        return (
+                            <li key={c.id} className="rounded-2xl border border-gray-200 bg-white p-5">
+                                <div className="flex flex-wrap items-start justify-between gap-4">
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            {c.status === "live" ? (
+                                                <span className="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-red-700">
+                                                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" />
+                                                    Live
+                                                </span>
+                                            ) : (
+                                                <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700">
+                                                    {c.status}
+                                                </span>
+                                            )}
+                                            <span className="text-[10px] font-bold uppercase tracking-wide text-gray-400">
+                                                {provider === "livekit" ? "Sturdee Classroom" : "Google Meet"}
+                                            </span>
+                                        </div>
+                                        <Link
+                                            href={`/classroom/${c.slug}`}
+                                            className="mt-1 block truncate text-lg font-bold text-gray-900 hover:text-emerald-700"
+                                        >
+                                            {c.title}
+                                        </Link>
+                                        <p className="mt-1 text-xs font-medium text-gray-500">
+                                            {new Date(c.starts_at).toLocaleString()} · {c.enrolled_count}/
+                                            {c.capacity} enrolled
+                                        </p>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                        <Link
+                                            href={`/classroom/${c.slug}`}
+                                            className="rounded-full bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-700"
+                                        >
+                                            {provider === "livekit" ? "Open room" : "Open class"}
+                                        </Link>
+                                        {c.status === "scheduled" && (
+                                            <button
+                                                type="button"
+                                                disabled={busy}
+                                                onClick={() => void setStatus(c.id, "live", provider)}
+                                                className="rounded-full border border-gray-200 px-4 py-2 text-xs font-semibold text-gray-800 hover:border-gray-300 disabled:opacity-50"
+                                            >
+                                                Go live
+                                            </button>
+                                        )}
+                                        <button
+                                            type="button"
+                                            disabled={busy}
+                                            onClick={() => void setStatus(c.id, "ended", provider)}
+                                            className="rounded-full bg-gray-900 px-4 py-2 text-xs font-semibold text-white hover:bg-black disabled:opacity-50"
+                                        >
+                                            End class
+                                        </button>
+                                    </div>
+                                </div>
+                            </li>
+                        );
+                    })}
+                </ul>
+            )}
+
+            {past.length > 0 && (
+                <div>
+                    <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-gray-400">Past</h3>
+                    <ul className="space-y-2">
+                        {past.map((c) => (
+                            <li
+                                key={c.id}
+                                className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-gray-100 bg-white/60 px-4 py-3"
+                            >
+                                <div>
+                                    <p className="text-sm font-semibold text-gray-700">{c.title}</p>
+                                    <p className="text-xs font-medium text-gray-400">
+                                        {c.status} · {new Date(c.starts_at).toLocaleString()}
+                                    </p>
+                                </div>
+                                <Link
+                                    href={`/classroom/${c.slug}`}
+                                    className="text-xs font-semibold text-emerald-700 hover:text-emerald-800"
+                                >
+                                    View
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+
+            <form
+                id="new-class"
+                ref={formRef}
+                onSubmit={(e) => void createClass(e)}
+                className="scroll-mt-28 rounded-2xl border border-gray-200 bg-white p-6 sm:p-8 space-y-4"
+            >
+                <h2 className="text-xl font-bold text-gray-900">Schedule a new class</h2>
                 <p className="text-sm text-gray-500 font-medium">
-                    Creates a Google Meet room and opens enrollment for up to {MAX_CLASS_CAPACITY} students.
+                    Opens enrollment for up to {MAX_CLASS_CAPACITY} students with live video, screen share,
+                    chat and attendance tracking.
                 </p>
 
                 <label className="block">
@@ -198,8 +362,10 @@ export default function ClassroomHostManager() {
                     </label>
                 </div>
 
-                <fieldset className="space-y-3 pt-2">
-                    <legend className="text-xs font-bold uppercase tracking-wide text-gray-500">Google Meet</legend>
+                <fieldset className="space-y-3 rounded-xl bg-gray-50 p-4">
+                    <legend className="px-1 text-xs font-bold uppercase tracking-wide text-gray-500">
+                        Google Meet link
+                    </legend>
                     <label className="flex items-start gap-3 text-sm font-medium text-gray-700">
                         <input
                             type="radio"
@@ -209,7 +375,7 @@ export default function ClassroomHostManager() {
                         />
                         <span>
                             Create a Meet link automatically
-                            <span className="block text-gray-400 font-normal text-xs mt-0.5">
+                            <span className="mt-0.5 block text-xs font-normal text-gray-400">
                                 Requires Google sign-in with Meet permission
                             </span>
                         </span>
@@ -242,77 +408,14 @@ export default function ClassroomHostManager() {
                     )}
                 </fieldset>
 
-                {error && <p className="text-sm font-medium text-red-600">{error}</p>}
-                {message && <p className="text-sm font-medium text-emerald-700">{message}</p>}
-
                 <button
                     type="submit"
                     disabled={busy}
-                    className="w-full sm:w-auto px-8 py-3 bg-[#10B981] hover:bg-[#0F9F72] disabled:opacity-60 text-white font-semibold text-sm rounded-full"
+                    className="w-full rounded-full bg-[#10B981] px-8 py-3 text-sm font-semibold text-white hover:bg-[#0F9F72] disabled:opacity-60 sm:w-auto"
                 >
                     {busy ? "Creating…" : "Create class"}
                 </button>
             </form>
-
-            <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Your classes</h2>
-                {classes.length === 0 ? (
-                    <p className="text-gray-500 font-medium text-sm">No classes yet.</p>
-                ) : (
-                    <ul className="space-y-3">
-                        {classes.map((c) => (
-                            <li key={c.id} className="rounded-2xl border border-gray-200 bg-white p-5">
-                                <div className="flex flex-wrap items-start justify-between gap-3">
-                                    <div>
-                                        <Link
-                                            href={`/classroom/${c.slug}`}
-                                            className="font-bold text-gray-900 hover:text-emerald-700"
-                                        >
-                                            {c.title}
-                                        </Link>
-                                        <p className="text-xs text-gray-500 font-medium mt-1">
-                                            {new Date(c.starts_at).toLocaleString()} · {c.enrolled_count}/
-                                            {c.capacity} enrolled · {c.status}
-                                        </p>
-                                        {c.meet_url && (
-                                            <a
-                                                href={c.meet_url}
-                                                target="_blank"
-                                                rel="noreferrer"
-                                                className="text-xs font-semibold text-emerald-700 mt-2 inline-block"
-                                            >
-                                                Open Meet
-                                            </a>
-                                        )}
-                                    </div>
-                                    <div className="flex flex-wrap gap-2">
-                                        {c.status === "scheduled" && (
-                                            <button
-                                                type="button"
-                                                disabled={busy}
-                                                onClick={() => setStatus(c.id, "live")}
-                                                className="px-3 py-1.5 text-xs font-semibold rounded-full bg-emerald-600 text-white"
-                                            >
-                                                Go live
-                                            </button>
-                                        )}
-                                        {c.status === "live" && (
-                                            <button
-                                                type="button"
-                                                disabled={busy}
-                                                onClick={() => setStatus(c.id, "ended")}
-                                                className="px-3 py-1.5 text-xs font-semibold rounded-full bg-gray-800 text-white"
-                                            >
-                                                End class
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </div>
         </div>
     );
 }

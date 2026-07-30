@@ -23,6 +23,8 @@ interface AuthModalProps {
     onClose: () => void;
     initialError?: string;
     initialRole?: AccountRole | null;
+    initialView?: AuthView;
+    redirectNext?: string | null;
 }
 
 function GoogleIcon() {
@@ -50,8 +52,15 @@ function GoogleIcon() {
 
 type AuthView = "role" | "login" | "register" | "forgot";
 
-export default function AuthModal({ isOpen, onClose, initialError, initialRole = null }: AuthModalProps) {
-    const [view, setView] = useState<AuthView>(initialRole ? "login" : "role");
+export default function AuthModal({
+    isOpen,
+    onClose,
+    initialError,
+    initialRole = null,
+    initialView,
+    redirectNext = null,
+}: AuthModalProps) {
+    const [view, setView] = useState<AuthView>(initialView ?? (initialRole ? "login" : "role"));
     const [accountRole, setAccountRole] = useState<AccountRole | null>(initialRole);
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
@@ -68,6 +77,11 @@ export default function AuthModal({ isOpen, onClose, initialError, initialRole =
 
     useEffect(() => {
         if (!isOpen) return;
+        if (initialView) {
+            setView(initialView);
+            if (initialRole) setAccountRole(initialRole);
+            return;
+        }
         if (initialRole) {
             setAccountRole(initialRole);
             setView("login");
@@ -75,7 +89,7 @@ export default function AuthModal({ isOpen, onClose, initialError, initialRole =
             setView("role");
             setAccountRole(null);
         }
-    }, [isOpen, initialRole]);
+    }, [isOpen, initialRole, initialView]);
 
     if (!isOpen) return null;
 
@@ -95,7 +109,7 @@ export default function AuthModal({ isOpen, onClose, initialError, initialRole =
         if (!accountRole) return;
         setError("");
         setSubmitting(true);
-        const result = await signInWithGoogle(accountRole);
+        const result = await signInWithGoogle(accountRole, redirectNext ?? undefined);
         setSubmitting(false);
         if (result.error) setError(result.error);
     };
@@ -111,8 +125,8 @@ export default function AuthModal({ isOpen, onClose, initialError, initialRole =
         const result = isForgot
             ? await resetPassword(email)
             : isLogin
-              ? await login(email, password, accountRole!)
-              : await register(email, name, password, accountRole!);
+              ? await login(email, password, accountRole!, redirectNext ?? undefined)
+              : await register(email, name, password, accountRole!, redirectNext ?? undefined);
 
         setSubmitting(false);
 

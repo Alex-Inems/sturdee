@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import TutorialLayout from "@/components/tutorials/TutorialLayout";
+import { assertFeatureEnabled, staticParamsFor } from "@/lib/features";
 import {
     TUTORIAL_TRACKS,
     getAdjacentPages,
@@ -14,12 +15,14 @@ interface Props {
 }
 
 export function generateStaticParams() {
-    return TUTORIAL_TRACKS.flatMap((track) =>
-        track.sections.flatMap((section) =>
-            section.pages.map((page) => ({
-                lang: track.language.id,
-                slug: page.slug,
-            }))
+    return staticParamsFor("tutorials", () =>
+        TUTORIAL_TRACKS.flatMap((track) =>
+            track.sections.flatMap((section) =>
+                section.pages.map((page) => ({
+                    lang: track.language.id,
+                    slug: page.slug,
+                }))
+            )
         )
     );
 }
@@ -33,6 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function TutorialLessonPage({ params }: Props) {
+    assertFeatureEnabled("tutorials");
     const { lang, slug } = await params;
     const track = getTutorialTrack(lang);
     const page = getTutorialPage(lang, slug);

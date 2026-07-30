@@ -8,11 +8,12 @@ const Footer = () => {
     const t = useTranslations("Footer");
     const nav = useTranslations("Nav");
 
-    // Only tutorials is live — every other section is disabled in
-    // lib/feature-flags.ts. Restore these links when the matching flag is on.
+    // Sections live when their flag is on in lib/feature-flags.ts.
     const resourceLinks = [
-        { label: nav("tutorials"), href: "/tutorials" as const },
+        // { label: nav("tutorials"), href: "/tutorials" as const },
+        { label: nav("skills"), href: "/skills" as const },
         { label: nav("classroom"), href: "/classroom" as const },
+        { label: nav("book"), href: "/book" as const },
         // { label: nav("guides"), href: "/guides" as const },
         // { label: nav("blog"), href: "/blog" as const },
         // { label: nav("cheatsheets"), href: "/cheatsheets" as const },

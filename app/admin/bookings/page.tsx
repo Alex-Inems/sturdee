@@ -99,14 +99,39 @@ export default function AdminBookingsPage() {
                             render: (b) => b.service,
                         },
                         {
-                            key: "datetime",
-                            header: "Date & Time",
+                            key: "batch",
+                            header: "Batch / Tutor",
                             render: (b) => (
                                 <div>
-                                    <p>{new Date(b.date + "T00:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}</p>
-                                    <p className="text-[11px] text-gray-400">{b.time}</p>
+                                    {b.tutorName ? (
+                                        <p className="font-medium text-gray-900">{b.tutorName}</p>
+                                    ) : (
+                                        <p className="text-gray-400 text-xs">Awaiting assignment</p>
+                                    )}
+                                    {b.batchId && (
+                                        <p className="text-[11px] text-gray-400 font-mono">{b.batchId.slice(0, 8)}…</p>
+                                    )}
                                 </div>
                             ),
+                        },
+                        {
+                            key: "datetime",
+                            header: "Schedule",
+                            render: (b) =>
+                                b.date && b.time ? (
+                                    <div>
+                                        <p>
+                                            {new Date(b.date + "T00:00:00").toLocaleDateString("en-US", {
+                                                weekday: "short",
+                                                month: "short",
+                                                day: "numeric",
+                                            })}
+                                        </p>
+                                        <p className="text-[11px] text-gray-400">{b.time}</p>
+                                    </div>
+                                ) : (
+                                    <span className="text-gray-400 text-xs">TBD</span>
+                                ),
                         },
                         {
                             key: "status",

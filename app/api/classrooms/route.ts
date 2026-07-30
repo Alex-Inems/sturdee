@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { getSessionUser, requireTutor } from "@/lib/auth";
 import { createLiveClass, listOpenClasses } from "@/lib/classrooms-db";
+import { requireClassroomTutor } from "@/lib/classroom-actor";
 import { featureDisabledResponse, isFeatureEnabled } from "@/lib/features";
 import { createMeetSpace, isValidMeetUrl, MAX_CLASS_CAPACITY } from "@/lib/google-meet";
 import { createClient } from "@/lib/supabase/server";
@@ -22,16 +22,23 @@ export async function GET() {
 export async function POST(request: Request) {
     if (!isFeatureEnabled("classroom")) return featureDisabledResponse();
 
-    let session;
+    let ctx;
     try {
-        session = await requireTutor();
-    } catch {
-        const user = await getSessionUser();
-        if (!user) {
-            return NextResponse.json({ error: "Please sign in as a tutor to host a class" }, { status: 401 });
-        }
-        return NextResponse.json({ error: "Only tutors can create classes" }, { status: 403 });
+        ctx = await requireClassroomTutor();
+    } catch (err) {
+        const message = err instanceof Error ? err.message : "Forbidden";
+        return NextResponse.json(
+            {
+                error:
+                    message === "Unauthorized"
+                        ? "Please sign in as a tutor (or use guest tutor in dev)"
+                        : message,
+            },
+            { status: message === "Unauthorized" ? 401 : 403 }
+        );
     }
+
+    const { actor, bypassRls } = ctx;
 
     try {
         const body = await request.json();
@@ -42,6 +49,7 @@ export async function POST(request: Request) {
             startsAt,
             endsAt,
             capacity,
+            provider,
             meetUrl,
             generateMeet,
         } = body as {
@@ -51,12 +59,34 @@ export async function POST(request: Request) {
             startsAt?: string;
             endsAt?: string | null;
             capacity?: number;
+            provider?: "livekit" | "meet";
             meetUrl?: string;
             generateMeet?: boolean;
         };
 
         if (!title?.trim() || !startsAt) {
             return NextResponse.json({ error: "Title and start time are required" }, { status: 400 });
+        }
+
+        const resolvedProvider: "livekit" | "meet" = provider === "livekit" ? "livekit" : "meet";
+        const opts = { bypassRls };
+
+        // Native LiveKit classroom (legacy / explicit opt-in only).
+        if (resolvedProvider === "livekit") {
+            const liveClass = await createLiveClass(
+                { id: actor.id, name: actor.name, email: actor.email },
+                {
+                    title,
+                    description,
+                    topic,
+                    provider: "livekit",
+                    startsAt,
+                    endsAt: endsAt ?? null,
+                    capacity: Math.min(MAX_CLASS_CAPACITY, capacity ?? MAX_CLASS_CAPACITY),
+                },
+                opts
+            );
+            return NextResponse.json({ class: liveClass }, { status: 201 });
         }
 
         let resolvedMeetUrl = typeof meetUrl === "string" ? meetUrl.trim() : "";
@@ -91,11 +121,12 @@ export async function POST(request: Request) {
         }
 
         const liveClass = await createLiveClass(
-            { id: session.id, name: session.name, email: session.email },
+            { id: actor.id, name: actor.name, email: actor.email },
             {
                 title,
                 description,
                 topic,
+                provider: "meet",
                 startsAt,
                 endsAt: endsAt ?? null,
                 capacity: Math.min(MAX_CLASS_CAPACITY, capacity ?? MAX_CLASS_CAPACITY),
@@ -103,7 +134,8 @@ export async function POST(request: Request) {
                 meetSpaceName,
                 meetCode,
                 status: resolvedMeetUrl ? "scheduled" : "draft",
-            }
+            },
+            opts
         );
 
         return NextResponse.json({ class: liveClass }, { status: 201 });

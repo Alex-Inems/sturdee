@@ -3,18 +3,18 @@ import SectionShell from "@/components/SectionShell";
 const STEPS = [
     {
         n: "01",
-        title: "Read the lesson",
-        body: "Short, focused explanations with real examples — no fluff.",
+        title: "Pick a skill",
+        body: "Choose a path — web, AI, project, product, or virtual assistant — and see every topic you’ll cover.",
     },
     {
         n: "02",
-        title: "Edit the code",
-        body: "Open the try-it editor and change anything. Break it. Fix it.",
+        title: "Register to learn",
+        body: "Share your goals and we'll place you in an available cohort with a tutor for that skill.",
     },
     {
         n: "03",
-        title: "Run it yourself",
-        body: "See the result immediately so the concept sticks.",
+        title: "Practice & apply",
+        body: "Leave with clear next steps you can use at work the same week — not just notes.",
     },
 ] as const;
 
@@ -23,10 +23,10 @@ export default function LandingMethod() {
         <SectionShell className="bg-page-deep/40">
             <div className="max-w-2xl">
                 <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-tight">
-                    How Sturdee teaches
+                    How Sturdee teaches skills
                 </h2>
                 <p className="mt-4 text-base sm:text-lg text-gray-500 font-medium leading-relaxed">
-                    Learning sticks when you write code, not when you watch someone else write it.
+                    Skills stick when you practice with guidance — not when you only watch someone else work.
                 </p>
             </div>
 

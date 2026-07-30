@@ -1,14 +1,19 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { Booking, BookingStatus, PublicUser } from "./types";
 
 interface BookingRow {
     id: string;
-    user_id: string;
+    user_id: string | null;
     user_email: string;
     user_name: string;
     service: string;
-    date: string;
-    time: string;
+    skill_slug: string | null;
+    batch_id: string | null;
+    tutor_user_id: string | null;
+    tutor_name: string | null;
+    date: string | null;
+    time: string | null;
     status: BookingStatus;
     notes: string;
     created_at: string;
@@ -25,10 +30,14 @@ interface ProfileRow {
 function mapBooking(row: BookingRow): Booking {
     return {
         id: row.id,
-        userId: row.user_id,
+        userId: row.user_id ?? null,
         userEmail: row.user_email,
         userName: row.user_name,
         service: row.service,
+        skillSlug: row.skill_slug,
+        batchId: row.batch_id,
+        tutorUserId: row.tutor_user_id,
+        tutorName: row.tutor_name || null,
         date: row.date,
         time: row.time,
         status: row.status,
@@ -82,24 +91,47 @@ export async function getBookingsByUserId(userId: string): Promise<Booking[]> {
 }
 
 export async function createBooking(data: {
-    userId: string;
+    userId?: string | null;
     userEmail: string;
     userName: string;
     service: string;
-    date: string;
-    time: string;
+    skillSlug: string;
     notes: string;
 }): Promise<Booking> {
-    const supabase = await createClient();
+    const email = data.userEmail.trim().toLowerCase();
+    const name = data.userName.trim();
+    if (!email || !name) {
+        throw new Error("Name and email are required");
+    }
+
+    // Guest inserts need service role (RLS requires auth.uid() = user_id).
+    const supabase = data.userId ? await createClient() : createAdminClient();
+
+    let duplicateQuery = supabase
+        .from("bookings")
+        .select("id")
+        .eq("skill_slug", data.skillSlug)
+        .in("status", ["pending", "confirmed"]);
+
+    if (data.userId) {
+        duplicateQuery = duplicateQuery.eq("user_id", data.userId);
+    } else {
+        duplicateQuery = duplicateQuery.ilike("user_email", email);
+    }
+
+    const { data: existing } = await duplicateQuery.maybeSingle();
+    if (existing) {
+        throw new Error("You are already registered for this skill.");
+    }
+
     const { data: row, error } = await supabase
         .from("bookings")
         .insert({
-            user_id: data.userId,
-            user_email: data.userEmail,
-            user_name: data.userName,
+            user_id: data.userId ?? null,
+            user_email: email,
+            user_name: name,
             service: data.service,
-            date: data.date,
-            time: data.time,
+            skill_slug: data.skillSlug,
             notes: data.notes,
             status: "pending",
         })
@@ -107,7 +139,17 @@ export async function createBooking(data: {
         .single();
 
     if (error) throw new Error(error.message);
-    return mapBooking(row as BookingRow);
+
+    const { data: assigned, error: assignError } = await supabase.rpc(
+        "assign_booking_to_batch",
+        { p_booking_id: row.id }
+    );
+
+    if (assignError) {
+        return mapBooking(row as BookingRow);
+    }
+
+    return mapBooking((assigned ?? row) as BookingRow);
 }
 
 export async function updateBookingStatus(

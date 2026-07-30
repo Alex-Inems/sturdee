@@ -14,6 +14,7 @@ export default function robots(): MetadataRoute.Robots {
                     "/book",
                     "/auth/",
                     "/api/",
+                    "/tutorials",
                     "/blog",
                     "/guides",
                     "/cheatsheets",

@@ -20,6 +20,7 @@
     "instructors": "Instructors",
     "tutors": "Tutors",
     "classroom": "Classroom",
+    "skills": "Skills",
     "book": "Book",
     "more": "More",
     "resources": "Resources",
@@ -53,8 +54,8 @@
     "legal": "Legal"
   },
   "Home": {
-    "metaTitle": "Learn to Code — Free Interactive Tutorials",
-    "metaDescription": "Sturdee teaches coding by doing. Free example-driven tutorials for HTML, CSS, JavaScript, Python, SQL, Shopify Liquid, and 20+ languages — read, edit, and run code in the browser.",
+    "metaTitle": "Learn Skills — Book 1:1 Sessions",
+    "metaDescription": "Sturdee teaches practical career skills by doing. Explore web development, AI automation, project management, product management, and virtual assistant paths — then book a 1:1 session.",
     "breadcrumb": "Home"
   },
   "Meta": {

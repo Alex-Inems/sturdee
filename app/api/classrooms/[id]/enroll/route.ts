@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { getSessionUser } from "@/lib/auth";
 import { enrollInClass } from "@/lib/classrooms-db";
+import { requireClassroomActor } from "@/lib/classroom-actor";
 import { featureDisabledResponse, isFeatureEnabled } from "@/lib/features";
 
 interface Props {
@@ -10,13 +10,19 @@ interface Props {
 export async function POST(_request: Request, { params }: Props) {
     if (!isFeatureEnabled("classroom")) return featureDisabledResponse();
 
-    const session = await getSessionUser();
-    if (!session) {
-        return NextResponse.json({ error: "Please sign in to join this class" }, { status: 401 });
-    }
-    if (session.role === "tutor" || session.role === "admin") {
+    let ctx;
+    try {
+        ctx = await requireClassroomActor();
+    } catch {
         return NextResponse.json(
-            { error: "Tutors host classes — sign in as a student to enroll" },
+            { error: "Please sign in (or use guest student in dev) to join this class" },
+            { status: 401 }
+        );
+    }
+
+    if (ctx.actor.role === "tutor" || ctx.actor.role === "admin") {
+        return NextResponse.json(
+            { error: "Tutors host classes — use guest student (or a student account) to enroll" },
             { status: 403 }
         );
     }
@@ -24,11 +30,11 @@ export async function POST(_request: Request, { params }: Props) {
     const { id } = await params;
 
     try {
-        await enrollInClass(id, {
-            id: session.id,
-            name: session.name,
-            email: session.email,
-        });
+        await enrollInClass(
+            id,
+            { id: ctx.actor.id, name: ctx.actor.name, email: ctx.actor.email },
+            { bypassRls: ctx.bypassRls }
+        );
         return NextResponse.json({ ok: true });
     } catch (err) {
         return NextResponse.json(

@@ -2,13 +2,11 @@ import type { MetadataRoute } from "next";
 import type { Locale } from "@/i18n/routing";
 import { LOCALES, localizedUrl } from "@/lib/site";
 import { SITE_URL } from "@/lib/site-core";
-import { TUTORIAL_TRACKS } from "@/lib/tutorials";
+import { SKILLS } from "@/lib/skills";
 
 /**
- * Only the tutorials section (plus the home and legal pages) is live — see
- * lib/feature-flags.ts. Disabled sections must stay out of the sitemap so
- * search engines don't index not-found pages. The original entries are kept
- * commented below so they can be restored with their feature flag.
+ * Live sections only — see lib/feature-flags.ts. Disabled sections stay out of
+ * the sitemap so search engines don't index not-found pages.
  */
 
 type Sitemap = MetadataRoute.Sitemap;
@@ -30,25 +28,15 @@ function localeEntries(
 }
 
 export default async function sitemap(): Promise<Sitemap> {
-    const staticRoutes = localeEntries("/", 1, "weekly").concat(
-        localeEntries("/tutorials", 0.95, "daily"),
+    const skillRoutes = localeEntries("/skills", 0.95, "weekly").concat(
+        ...SKILLS.map((skill) => localeEntries(`/skills/${skill.id}`, 0.9, "weekly"))
+    );
+
+    return localeEntries("/", 1, "weekly").concat(
+        skillRoutes,
         localeEntries("/classroom", 0.9, "daily"),
         localeEntries("/privacy", 0.3, "yearly"),
         localeEntries("/terms", 0.3, "yearly"),
         localeEntries("/legal", 0.3, "yearly")
-        // Disabled sections: /guides, /blog, /cheatsheets, /resources, /courses,
-        // /opensource, /practice, /credentials, /programs, /tutors, /media
     );
-
-    const tutorialRoutes = TUTORIAL_TRACKS.flatMap((track) => {
-        const langHub = localeEntries(`/tutorials/${track.language.id}`, 0.9, "weekly");
-        const lessons = track.sections.flatMap((section) =>
-            section.pages.flatMap((page) =>
-                localeEntries(`/tutorials/${track.language.id}/${page.slug}`, 0.8, "monthly")
-            )
-        );
-        return [...langHub, ...lessons];
-    });
-
-    return [...staticRoutes, ...tutorialRoutes];
 }

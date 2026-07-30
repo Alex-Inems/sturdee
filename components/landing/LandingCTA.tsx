@@ -15,17 +15,26 @@ export default function LandingCTA() {
                 />
                 <div className="relative z-10 max-w-xl">
                     <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight leading-tight">
-                        Your first lesson is waiting.
+                        Register to learn a skill
                     </h2>
                     <p className="mt-4 text-base sm:text-lg text-gray-400 font-medium leading-relaxed">
-                        Jump into HTML, JavaScript, Python, or any of our free tracks — no account required.
+                        Share your details and the skill you want — we&apos;ll assign you to an available cohort
+                        and tutor.
                     </p>
-                    <Link
-                        href="/tutorials"
-                        className="inline-flex mt-9 items-center justify-center px-8 py-3.5 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold text-[15px] rounded-full shadow-md hover:shadow-lg transition-all duration-200"
-                    >
-                        Open tutorials
-                    </Link>
+                    <div className="mt-9 flex flex-wrap gap-3">
+                        <Link
+                            href="/book"
+                            className="inline-flex items-center justify-center px-8 py-3.5 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold text-[15px] rounded-full shadow-md hover:shadow-lg transition-all duration-200"
+                        >
+                            Register now
+                        </Link>
+                        <Link
+                            href="/skills"
+                            className="inline-flex items-center justify-center px-8 py-3.5 border border-white/20 text-white hover:bg-white/10 font-semibold text-[15px] rounded-full transition-colors"
+                        >
+                            View skills
+                        </Link>
+                    </div>
                 </div>
             </div>
         </SectionShell>

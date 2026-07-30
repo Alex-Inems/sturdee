@@ -89,9 +89,30 @@ export default function StudentDashboard() {
             <PageHero
                 highlight="Student"
                 title={`Hi, ${user?.name?.split(" ")[0] || "there"}`}
-                subtitle="Your enrolled classes and open classroom sessions."
+                subtitle="Register for a skill cohort and join live classroom classes."
             />
             <SectionShell compact>
+                <section className="mb-10 rounded-2xl border border-emerald-200 bg-emerald-50/60 px-6 py-6 sm:px-8">
+                    <h2 className="text-xl font-bold text-gray-900">Learn a skill in a cohort</h2>
+                    <p className="mt-2 text-sm text-gray-600 font-medium max-w-2xl">
+                        Register with your goals — we&apos;ll assign you to an available batch and tutor.
+                    </p>
+                    <div className="mt-5 flex flex-wrap gap-3">
+                        <Link
+                            href="/skills"
+                            className="rounded-full bg-[#10B981] hover:bg-[#0F9F72] px-5 py-2.5 text-sm font-semibold text-white"
+                        >
+                            Browse skills
+                        </Link>
+                        <Link
+                            href="/book"
+                            className="rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-800 hover:border-gray-300"
+                        >
+                            Register to learn
+                        </Link>
+                    </div>
+                </section>
+
                 <div className="grid lg:grid-cols-2 gap-10">
                     <section>
                         <h2 className="text-xl font-bold text-gray-900 mb-4">My classes</h2>

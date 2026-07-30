@@ -6,4 +6,4 @@ export const UNAVAILABLE_DESCRIPTION =
     "We're sorry — the page you're looking for isn't accessible from your region right now. It may have been moved, removed, or restricted where you are.";
 
 export const UNAVAILABLE_FOOTNOTE =
-    "You can still browse our free tutorials, practice problems, and learning resources from the home page.";
+    "You can still return home or browse the classroom from the main site.";

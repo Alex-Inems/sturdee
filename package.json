@@ -10,9 +10,13 @@
     "monitor:inkamototours": "node scripts/monitor-inkamototours.mjs"
   },
   "dependencies": {
+    "@livekit/components-react": "^2.9.23",
+    "@livekit/components-styles": "^1.2.0",
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.1",
     "acorn": "^8.17.0",
+    "livekit-client": "^2.21.0",
+    "livekit-server-sdk": "^2.17.0",
     "lucide-react": "^0.562.0",
     "next": "16.1.1",
     "next-intl": "^4.13.2",

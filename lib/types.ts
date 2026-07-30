@@ -13,15 +13,32 @@ export interface PublicUser {
 
 export interface Booking {
     id: string;
-    userId: string;
+    userId: string | null;
     userEmail: string;
     userName: string;
     service: string;
-    date: string;
-    time: string;
+    skillSlug: string | null;
+    batchId: string | null;
+    tutorUserId: string | null;
+    tutorName: string | null;
+    date: string | null;
+    time: string | null;
     status: BookingStatus;
     notes: string;
     createdAt: string;
+}
+
+export interface LearningBatch {
+    id: string;
+    skillSlug: string;
+    tutorUserId: string;
+    tutorName: string;
+    title: string;
+    capacity: number;
+    startsAt: string | null;
+    status: "open" | "full" | "closed";
+    createdAt: string;
+    enrolledCount?: number;
 }
 
 export interface SessionUser {
@@ -41,12 +58,16 @@ export interface ProfileRow {
 
 export interface BookingRow {
     id: string;
-    user_id: string;
+    user_id: string | null;
     user_email: string;
     user_name: string;
     service: string;
-    date: string;
-    time: string;
+    skill_slug: string | null;
+    batch_id: string | null;
+    tutor_user_id: string | null;
+    tutor_name: string | null;
+    date: string | null;
+    time: string | null;
     status: BookingStatus;
     notes: string;
     created_at: string;

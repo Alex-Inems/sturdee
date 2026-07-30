@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { getSessionUser } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
+import { requireClassroomActor } from "@/lib/classroom-actor";
 import { isEnrolled, markJoined } from "@/lib/classrooms-db";
 import { featureDisabledResponse, isFeatureEnabled } from "@/lib/features";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 
 interface Props {
     params: Promise<{ id: string }>;
@@ -12,13 +13,15 @@ interface Props {
 export async function POST(_request: Request, { params }: Props) {
     if (!isFeatureEnabled("classroom")) return featureDisabledResponse();
 
-    const session = await getSessionUser();
-    if (!session) {
+    let ctx;
+    try {
+        ctx = await requireClassroomActor();
+    } catch {
         return NextResponse.json({ error: "Please sign in to enter class" }, { status: 401 });
     }
 
     const { id } = await params;
-    const supabase = await createClient();
+    const supabase = ctx.bypassRls ? createAdminClient() : await createClient();
     const { data: cls, error } = await supabase
         .from("live_classes")
         .select("id, host_user_id, meet_url, status, title")
@@ -29,9 +32,9 @@ export async function POST(_request: Request, { params }: Props) {
         return NextResponse.json({ error: "Class not found" }, { status: 404 });
     }
 
-    const isHost = cls.host_user_id === session.id;
+    const isHost = cls.host_user_id === ctx.actor.id;
     if (!isHost) {
-        const enrolled = await isEnrolled(id, session.id);
+        const enrolled = await isEnrolled(id, ctx.actor.id, { bypassRls: ctx.bypassRls });
         if (!enrolled) {
             return NextResponse.json({ error: "Enroll in this class first" }, { status: 403 });
         }
@@ -46,7 +49,7 @@ export async function POST(_request: Request, { params }: Props) {
     }
 
     if (!isHost) {
-        await markJoined(id, session.id).catch(() => undefined);
+        await markJoined(id, ctx.actor.id, { bypassRls: ctx.bypassRls }).catch(() => undefined);
     }
 
     return NextResponse.json({

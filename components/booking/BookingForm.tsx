@@ -2,49 +2,64 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Calendar, Clock, CheckCircle2, ArrowRight } from "lucide-react";
-import { BOOKING_SERVICES, TIME_SLOTS } from "@/lib/constants";
+import { CheckCircle2, User, Mail, BookOpen } from "lucide-react";
+import { BOOKING_SERVICES } from "@/lib/constants";
 import { useAuth } from "@/components/AuthContext";
-import type { Tutor } from "@/lib/tutors";
+import { getSkill } from "@/lib/skills";
+import type { Booking } from "@/lib/types";
+
+const EXPERIENCE_LEVELS = ["Beginner", "Some experience", "Intermediate", "Advanced"] as const;
 
 export default function BookingForm() {
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, user } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
-    const tutorSlug = searchParams.get("tutor");
-    const [tutor, setTutor] = useState<Tutor | null>(null);
-    const [step, setStep] = useState(1);
-    const [service, setService] = useState("");
-    const [date, setDate] = useState("");
-    const [time, setTime] = useState("");
+    const skillSlug = searchParams.get("skill");
+    const preselectedSkill = skillSlug ? getSkill(skillSlug) : undefined;
+
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [skill, setSkill] = useState(preselectedSkill?.id ?? "");
+    const [experienceLevel, setExperienceLevel] = useState("");
     const [notes, setNotes] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [success, setSuccess] = useState(false);
+    const [result, setResult] = useState<Booking | null>(null);
+    const [wasGuest, setWasGuest] = useState(false);
 
     useEffect(() => {
-        if (!tutorSlug) return;
-        (async () => {
-            const res = await fetch(`/api/tutors/${tutorSlug}`);
-            if (res.ok) {
-                const data = await res.json();
-                setTutor(data.tutor);
-            }
-        })();
-    }, [tutorSlug]);
-
-    useEffect(() => {
-        if (tutor) {
-            setNotes((prev) => prev || `Requesting session with ${tutor.name} (@${tutor.slug}) — ${tutor.title}`);
+        if (user) {
+            setName(user.name);
+            setEmail(user.email);
         }
-    }, [tutor]);
+    }, [user]);
 
-    const selectedService = BOOKING_SERVICES.find((s) => s.id === service);
-    const minDate = new Date().toISOString().split("T")[0];
+    useEffect(() => {
+        if (!preselectedSkill) return;
+        setSkill(preselectedSkill.id);
+        setNotes((prev) =>
+            prev || `I want to learn ${preselectedSkill.title}. My goals: `
+        );
+    }, [preselectedSkill]);
 
-    const handleSubmit = async () => {
-        if (!isAuthenticated) {
-            router.push("/?auth=login");
+    const activeSkill = skill ? getSkill(skill) : undefined;
+    const assigned = result?.status === "confirmed" && result.batchId;
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (user?.role === "tutor") {
+            setError("Tutors host sessions — register as a student instead.");
+            return;
+        }
+
+        if (!skill) {
+            setError("Choose a skill to learn.");
+            return;
+        }
+
+        if (!name.trim() || !email.trim()) {
+            setError("Name and email are required.");
             return;
         }
 
@@ -56,17 +71,19 @@ export default function BookingForm() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    service: selectedService?.name || service,
-                    date,
-                    time,
-                    notes,
+                    skillSlug: skill,
+                    experienceLevel,
+                    notes: notes.trim(),
+                    name: name.trim(),
+                    email: email.trim(),
                 }),
             });
 
             const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "Booking failed");
+            if (!res.ok) throw new Error(data.error || "Registration failed");
 
-            setSuccess(true);
+            setWasGuest(Boolean(data.guest));
+            setResult(data.booking as Booking);
         } catch (err) {
             setError(err instanceof Error ? err.message : "Something went wrong");
         } finally {
@@ -74,35 +91,75 @@ export default function BookingForm() {
         }
     };
 
-    if (success) {
+    if (result) {
         return (
             <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-xl">
                 <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50">
                     <CheckCircle2 className="h-8 w-8 text-emerald-600" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900">Booking Confirmed!</h2>
-                <p className="mt-3 text-gray-500 font-medium">
-                    Your {selectedService?.name} session on {date} at {time} has been submitted.
+                <h2 className="text-2xl font-bold text-gray-900">
+                    {assigned ? "You're in a cohort" : "Registration received"}
+                </h2>
+                <p className="mt-3 text-gray-500 font-medium max-w-md mx-auto">
+                    {assigned ? (
+                        <>
+                            You&apos;ve been placed in a batch for{" "}
+                            <strong className="text-gray-800">{activeSkill?.title ?? result.service}</strong>
+                            {result.tutorName ? (
+                                <> with tutor <strong className="text-gray-800">{result.tutorName}</strong></>
+                            ) : null}
+                            {result.date && result.time ? (
+                                <> — starts {result.date} at {result.time}</>
+                            ) : null}
+                            .
+                        </>
+                    ) : (
+                        <>
+                            You&apos;re registered for{" "}
+                            <strong className="text-gray-800">{activeSkill?.title ?? result.service}</strong>.
+                            We&apos;ll assign you to the next available batch and tutor shortly.
+                        </>
+                    )}
                 </p>
+                {wasGuest && (
+                    <p className="mt-4 text-sm text-gray-500 max-w-md mx-auto">
+                        Create a free student account anytime to track your cohort in the dashboard.
+                    </p>
+                )}
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+                    {wasGuest ? (
+                        <button
+                            type="button"
+                            onClick={() =>
+                                router.push(
+                                    `/?auth=register&role=student&next=${encodeURIComponent("/dashboard/student")}`
+                                )
+                            }
+                            className="px-6 py-3 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold rounded-full text-sm transition-all"
+                        >
+                            Create account (optional)
+                        </button>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={() => router.push("/dashboard/student")}
+                            className="px-6 py-3 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold rounded-full text-sm transition-all"
+                        >
+                            Student dashboard
+                        </button>
+                    )}
                     <button
-                        onClick={() => router.push("/dashboard")}
-                        className="px-6 py-3 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold rounded-full text-sm transition-all"
-                    >
-                        View My Bookings
-                    </button>
-                    <button
+                        type="button"
                         onClick={() => {
-                            setSuccess(false);
-                            setStep(1);
-                            setService("");
-                            setDate("");
-                            setTime("");
+                            setResult(null);
+                            setWasGuest(false);
+                            if (!preselectedSkill) setSkill("");
+                            setExperienceLevel("");
                             setNotes("");
                         }}
                         className="px-6 py-3 border border-gray-200 text-gray-700 font-semibold rounded-full text-sm hover:bg-gray-50"
                     >
-                        Book Another
+                        Register for another skill
                     </button>
                 </div>
             </div>
@@ -111,175 +168,120 @@ export default function BookingForm() {
 
     return (
         <div className="rounded-2xl border border-gray-100 bg-white shadow-xl overflow-hidden">
-            <div className="flex border-b border-gray-100">
-                {[1, 2, 3].map((s) => (
-                    <div
-                        key={s}
-                        className={`flex-1 py-4 text-center text-sm font-semibold ${
-                            step >= s ? "text-emerald-600 bg-emerald-50/50" : "text-gray-400"
-                        }`}
-                    >
-                        Step {s}
-                    </div>
-                ))}
+            <div className="border-b border-gray-100 bg-emerald-50/40 px-8 py-5">
+                <h2 className="text-lg font-bold text-gray-900">Student registration</h2>
+                <p className="mt-1 text-sm text-gray-600">
+                    Enter your details and the skill you want to learn. No account required — we&apos;ll
+                    place you in an available batch with a tutor.
+                </p>
             </div>
 
-            <div className="p-8">
+            <form onSubmit={(e) => void handleSubmit(e)} className="p-8 space-y-8">
                 {error && (
-                    <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+                    <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
                         {error}
                     </div>
                 )}
 
-                {tutor && (
-                    <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50/50 px-4 py-3 text-sm">
-                        <p className="font-bold text-gray-900">Hiring: {tutor.name}</p>
-                        <p className="text-gray-600 mt-0.5">{tutor.title} · ${tutor.hourlyRate}/hr</p>
-                    </div>
-                )}
-
-                {step === 1 && (
+                <div className="grid gap-6 md:grid-cols-2">
                     <div>
-                        <h2 className="text-xl font-bold text-gray-900 mb-2">Select a Service</h2>
-                        <p className="text-gray-500 text-sm mb-6">Choose the session type you&apos;d like to book.</p>
-                        <div className="grid gap-3 sm:grid-cols-2">
-                            {BOOKING_SERVICES.map((s) => (
-                                <button
-                                    key={s.id}
-                                    onClick={() => setService(s.id)}
-                                    className={`rounded-xl border p-5 text-left transition-all ${
-                                        service === s.id
-                                            ? "border-emerald-500 bg-emerald-50 ring-1 ring-emerald-500"
-                                            : "border-gray-200 hover:border-gray-300"
-                                    }`}
-                                >
-                                    <p className="font-bold text-gray-900">{s.name}</p>
-                                    <p className="text-xs text-emerald-600 font-medium mt-1">{s.duration}</p>
-                                    <p className="text-xs text-gray-500 mt-2 leading-relaxed">{s.description}</p>
-                                </button>
-                            ))}
-                        </div>
-                        <button
-                            disabled={!service}
-                            onClick={() => setStep(2)}
-                            className="mt-8 flex items-center gap-2 px-8 py-3 bg-[#10B981] hover:bg-[#0F9F72] disabled:opacity-40 text-white font-semibold rounded-full text-sm transition-all ml-auto"
-                        >
-                            Continue <ArrowRight className="h-4 w-4" />
-                        </button>
+                        <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-700">
+                            <User className="h-4 w-4 text-emerald-600" /> Full name
+                        </label>
+                        <input
+                            type="text"
+                            required
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            disabled={isAuthenticated}
+                            placeholder="Your name"
+                            className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 disabled:bg-gray-50 disabled:text-gray-600"
+                        />
                     </div>
-                )}
-
-                {step === 2 && (
                     <div>
-                        <h2 className="text-xl font-bold text-gray-900 mb-2">Pick Date & Time</h2>
-                        <p className="text-gray-500 text-sm mb-6">Select your preferred appointment slot.</p>
-                        <div className="grid gap-6 md:grid-cols-2">
-                            <div>
-                                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
-                                    <Calendar className="h-4 w-4 text-emerald-600" /> Date
-                                </label>
-                                <input
-                                    type="date"
-                                    min={minDate}
-                                    value={date}
-                                    onChange={(e) => setDate(e.target.value)}
-                                    className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
-                                    <Clock className="h-4 w-4 text-emerald-600" /> Time Slot
-                                </label>
-                                <div className="grid grid-cols-2 gap-2">
-                                    {TIME_SLOTS.map((slot) => (
-                                        <button
-                                            key={slot}
-                                            onClick={() => setTime(slot)}
-                                            className={`rounded-lg border px-3 py-2 text-xs font-semibold transition-all ${
-                                                time === slot
-                                                    ? "border-emerald-500 bg-emerald-50 text-emerald-700"
-                                                    : "border-gray-200 text-gray-600 hover:border-gray-300"
-                                            }`}
-                                        >
-                                            {slot}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                        <div className="mt-8 flex gap-3 justify-end">
-                            <button onClick={() => setStep(1)} className="px-6 py-3 text-gray-600 font-semibold text-sm">
-                                Back
-                            </button>
+                        <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-700">
+                            <Mail className="h-4 w-4 text-emerald-600" /> Email
+                        </label>
+                        <input
+                            type="email"
+                            required
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            disabled={isAuthenticated}
+                            placeholder="you@example.com"
+                            className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 disabled:bg-gray-50 disabled:text-gray-600"
+                        />
+                    </div>
+                </div>
+
+                <div>
+                    <label className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-700">
+                        <BookOpen className="h-4 w-4 text-emerald-600" /> Skill you want to learn
+                    </label>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                        {BOOKING_SERVICES.map((s) => (
                             <button
-                                disabled={!date || !time}
-                                onClick={() => setStep(3)}
-                                className="flex items-center gap-2 px-8 py-3 bg-[#10B981] hover:bg-[#0F9F72] disabled:opacity-40 text-white font-semibold rounded-full text-sm"
+                                key={s.id}
+                                type="button"
+                                onClick={() => setSkill(s.id)}
+                                className={`rounded-xl border p-4 text-left transition-all ${
+                                    skill === s.id
+                                        ? "border-emerald-500 bg-emerald-50 ring-1 ring-emerald-500"
+                                        : "border-gray-200 hover:border-gray-300"
+                                }`}
                             >
-                                Continue <ArrowRight className="h-4 w-4" />
+                                <p className="text-sm font-bold text-gray-900">
+                                    {getSkill(s.id)?.title ?? s.name}
+                                </p>
+                                <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-gray-500">
+                                    {s.description}
+                                </p>
                             </button>
-                        </div>
+                        ))}
                     </div>
-                )}
+                </div>
 
-                {step === 3 && (
-                    <div>
-                        <h2 className="text-xl font-bold text-gray-900 mb-2">Review & Confirm</h2>
-                        <p className="text-gray-500 text-sm mb-6">Double-check your booking details.</p>
+                <div>
+                    <label className="mb-2 block text-sm font-semibold text-gray-700">
+                        Experience level
+                    </label>
+                    <select
+                        value={experienceLevel}
+                        onChange={(e) => setExperienceLevel(e.target.value)}
+                        className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    >
+                        <option value="">Select your level</option>
+                        {EXPERIENCE_LEVELS.map((level) => (
+                            <option key={level} value={level}>
+                                {level}
+                            </option>
+                        ))}
+                    </select>
+                </div>
 
-                        <div className="rounded-xl bg-gray-50 border border-gray-100 p-6 space-y-4 mb-6">
-                            <div className="flex justify-between text-sm">
-                                <span className="text-gray-500">Service</span>
-                                <span className="font-semibold text-gray-900">{selectedService?.name}</span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-gray-500">Duration</span>
-                                <span className="font-semibold text-gray-900">{selectedService?.duration}</span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-gray-500">Date</span>
-                                <span className="font-semibold text-gray-900">{date}</span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-gray-500">Time</span>
-                                <span className="font-semibold text-gray-900">{time}</span>
-                            </div>
-                        </div>
+                <div>
+                    <label className="mb-2 block text-sm font-semibold text-gray-700">
+                        Goals & background (optional)
+                    </label>
+                    <textarea
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        rows={4}
+                        placeholder="What do you want to achieve? Any projects, job goals, or topics you're curious about…"
+                        className="w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    />
+                </div>
 
-                        <div className="mb-6">
-                            <label className="text-sm font-semibold text-gray-700 mb-2 block">
-                                Additional notes (optional)
-                            </label>
-                            <textarea
-                                value={notes}
-                                onChange={(e) => setNotes(e.target.value)}
-                                rows={3}
-                                placeholder="Anything you'd like us to know before your session..."
-                                className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 resize-none"
-                            />
-                        </div>
-
-                        {!isAuthenticated && (
-                            <p className="mb-4 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
-                                You&apos;ll need to sign in to complete your booking.
-                            </p>
-                        )}
-
-                        <div className="flex gap-3 justify-end">
-                            <button onClick={() => setStep(2)} className="px-6 py-3 text-gray-600 font-semibold text-sm">
-                                Back
-                            </button>
-                            <button
-                                onClick={handleSubmit}
-                                disabled={loading}
-                                className="px-8 py-3 bg-[#10B981] hover:bg-[#0F9F72] disabled:opacity-60 text-white font-semibold rounded-full text-sm transition-all"
-                            >
-                                {loading ? "Submitting..." : isAuthenticated ? "Confirm Booking" : "Sign In & Book"}
-                            </button>
-                        </div>
-                    </div>
-                )}
-            </div>
+                <div className="flex justify-end">
+                    <button
+                        type="submit"
+                        disabled={loading || !skill}
+                        className="rounded-full bg-[#10B981] px-8 py-3 text-sm font-semibold text-white transition-all hover:bg-[#0F9F72] disabled:opacity-60"
+                    >
+                        {loading ? "Registering…" : "Register & get assigned"}
+                    </button>
+                </div>
+            </form>
         </div>
     );
 }

@@ -15,9 +15,9 @@ export default function BookPage() {
     return (
         <div className="font-jakarta bg-page min-h-screen">
             <PageHero
-                highlight="Book a Session"
-                title="Schedule Your Consultation"
-                subtitle="Book a personalized session with our team — consultations, tours, admissions, and tutoring."
+                highlight="Register to learn"
+                title="Join a skill cohort"
+                subtitle="Share your details and the skill you want to learn. We'll place you in an available batch with a tutor — no scheduling required."
             />
             <SectionShell compact>
                 <Suspense fallback={<SectionPlaceholder />}>

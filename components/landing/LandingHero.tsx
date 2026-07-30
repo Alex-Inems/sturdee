@@ -9,17 +9,17 @@ type HeroTag = {
 };
 
 const leftTags: HeroTag[] = [
-    { label: "Full-Stack Web", top: "14%", offset: "left-[-2%]", highlight: true },
-    { label: "Python", top: "32%", offset: "left-[-6%]" },
-    { label: "TypeScript", top: "50%", offset: "left-[-4%]" },
-    { label: "System Design", top: "68%", offset: "left-[-2%]" },
+    { label: "Web Development", top: "14%", offset: "left-[-2%]", highlight: true },
+    { label: "AI Automation", top: "32%", offset: "left-[-6%]" },
+    { label: "Project Mgmt", top: "50%", offset: "left-[-4%]" },
+    { label: "Product Mgmt", top: "68%", offset: "left-[-2%]" },
 ];
 
 const rightTags: HeroTag[] = [
-    { label: "React & Next.js", top: "14%", offset: "right-[-2%]", highlight: true },
-    { label: "Solidity", top: "32%", offset: "right-[-6%]" },
-    { label: "DeFi", top: "50%", offset: "right-[-4%]" },
-    { label: "Blockchain", top: "68%", offset: "right-[-2%]" },
+    { label: "Virtual Assistant", top: "14%", offset: "right-[-2%]", highlight: true },
+    { label: "1:1 Coaching", top: "32%", offset: "right-[-6%]" },
+    { label: "Live Classroom", top: "50%", offset: "right-[-4%]" },
+    { label: "Career Skills", top: "68%", offset: "right-[-2%]" },
 ];
 
 const tagClass = (highlight?: boolean) =>
@@ -40,23 +40,23 @@ export default function LandingHero() {
                             {SITE_NAME}
                         </p>
                         <h1 className="mt-6 text-3xl sm:text-4xl xl:text-[2.75rem] font-bold text-gray-900 leading-[1.15] tracking-tight max-w-md">
-                            Learn to code by doing.
+                            Learn skills by doing.
                         </h1>
                         <p className="mt-5 text-base sm:text-lg text-gray-500 font-medium leading-relaxed max-w-sm">
-                            Free, example-driven tutorials you can read, edit, and run in the browser.
+                            Practical career skills with clear topics — then book 1:1 time to learn with a tutor.
                         </p>
                         <div className="mt-10 flex flex-wrap items-center gap-3">
                             <Link
-                                href="/tutorials"
+                                href="/?auth=login"
                                 className="inline-flex items-center justify-center px-8 py-3.5 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold text-[15px] rounded-full shadow-md hover:shadow-lg transition-all duration-200"
                             >
-                                Start tutorials
+                                Get started
                             </Link>
                             <Link
-                                href="/tutorials/html"
+                                href="/skills"
                                 className="inline-flex items-center justify-center px-7 py-3.5 text-gray-700 hover:text-gray-900 font-semibold text-[15px] transition-colors"
                             >
-                                Begin with HTML →
+                                Browse skills →
                             </Link>
                         </div>
                     </div>
@@ -70,7 +70,7 @@ export default function LandingHero() {
 
                             <img
                                 src="/student.png"
-                                alt="Student learning to code"
+                                alt="Student learning career skills"
                                 className="relative h-[108%] w-auto max-w-none object-contain z-10 pointer-events-none drop-shadow-[0_20px_40px_rgba(0,0,0,0.08)]"
                             />
 

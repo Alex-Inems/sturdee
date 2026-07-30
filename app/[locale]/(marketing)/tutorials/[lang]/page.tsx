@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Breadcrumbs from "@/components/seo/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
+import { assertFeatureEnabled, staticParamsFor } from "@/lib/features";
 import { breadcrumbJsonLd, tutorialLanguageMetadata } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import { getAllTutorialPages, getTutorialTrack } from "@/lib/tutorials";
@@ -12,7 +13,7 @@ interface Props {
 }
 
 export function generateStaticParams() {
-    return [
+    return staticParamsFor("tutorials", () => [
         { lang: "html" },
         { lang: "css" },
         { lang: "javascript" },
@@ -35,7 +36,7 @@ export function generateStaticParams() {
         { lang: "xml" },
         { lang: "nodejs" },
         { lang: "liquid" },
-    ];
+    ]);
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -46,6 +47,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function TutorialLanguagePage({ params }: Props) {
+    assertFeatureEnabled("tutorials");
     const { lang } = await params;
     const track = getTutorialTrack(lang);
     if (!track) notFound();

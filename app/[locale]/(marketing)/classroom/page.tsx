@@ -36,17 +36,19 @@ export default async function ClassroomHubPage() {
             <PageHero
                 highlight="Live Classroom"
                 title="Learn together, live"
-                subtitle={`Real-time classes on Google Meet — up to ${MAX_CLASS_CAPACITY} students per session. Enroll, then join when class starts.`}
+                subtitle={`Real-time Google Meet classes for up to ${MAX_CLASS_CAPACITY} students — enroll, join the Meet room, and learn together.`}
             />
             <SectionShell compact>
-                <div className="flex flex-wrap items-center justify-between gap-4 mb-10">
+                <div className="mb-10 flex flex-wrap items-center justify-between gap-4">
                     <h2 className="text-2xl font-bold text-gray-900">Upcoming & live sessions</h2>
-                    <Link
-                        href="/dashboard/tutor"
-                        className="px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white font-semibold text-sm rounded-full"
-                    >
-                        Tutor dashboard
-                    </Link>
+                    <div className="flex flex-wrap gap-2">
+                        <Link
+                            href="/dashboard/tutor"
+                            className="rounded-full bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-800"
+                        >
+                            Tutor dashboard
+                        </Link>
+                    </div>
                 </div>
 
                 {classes.length === 0 ? (

@@ -1,13 +1,11 @@
 /**
  * Site-wide feature switches (pure module — safe to import from middleware).
  *
- * Only the tutorials experience is live right now. Every other section is
- * disabled: its routes return the not-found page, its APIs return 404, and its
- * navigation entries are hidden. The underlying code is untouched — flip a flag
- * back to `true` to restore that section.
+ * Flip a flag back to `true` to restore that section. Disabled routes return
+ * not-found; navigation entries for them stay hidden.
  */
 export const FEATURES = {
-    tutorials: true,
+    tutorials: false,
     classroom: true,
 
     blog: false,
@@ -22,7 +20,7 @@ export const FEATURES = {
     tutors: false,
     media: false,
     resources: false,
-    booking: false,
+    booking: true,
     dashboard: true,
     admin: false,
     auth: true,

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireTutor } from "@/lib/auth";
+import { requireClassroomTutor } from "@/lib/classroom-actor";
 import { updateLiveClass, type LiveClassStatus } from "@/lib/classrooms-db";
 import { featureDisabledResponse, isFeatureEnabled } from "@/lib/features";
 import { createMeetSpace, isValidMeetUrl, type MeetSpace } from "@/lib/google-meet";
@@ -12,9 +12,9 @@ interface Props {
 export async function PATCH(request: Request, { params }: Props) {
     if (!isFeatureEnabled("classroom")) return featureDisabledResponse();
 
-    let session;
+    let ctx;
     try {
-        session = await requireTutor();
+        ctx = await requireClassroomTutor();
     } catch (err) {
         const message = err instanceof Error ? err.message : "Forbidden";
         return NextResponse.json(
@@ -24,6 +24,7 @@ export async function PATCH(request: Request, { params }: Props) {
     }
 
     const { id } = await params;
+    const { actor, bypassRls } = ctx;
 
     try {
         const body = await request.json();
@@ -77,20 +78,25 @@ export async function PATCH(request: Request, { params }: Props) {
             return NextResponse.json({ error: "Invalid Google Meet URL" }, { status: 400 });
         }
 
-        const updated = await updateLiveClass(id, session.id, {
-            title,
-            description,
-            topic,
-            startsAt,
-            endsAt,
-            capacity,
-            status,
-            meetUrl: resolvedMeet,
-            meetSpaceName,
-            meetCode,
-        });
+        const updated = await updateLiveClass(
+            id,
+            actor.id,
+            {
+                title,
+                description,
+                topic,
+                startsAt,
+                endsAt,
+                capacity,
+                status,
+                meetUrl: resolvedMeet,
+                meetSpaceName,
+                meetCode,
+            },
+            { bypassRls }
+        );
 
-        if (status === "live" && !updated.meet_url) {
+        if (status === "live" && updated.provider === "meet" && !updated.meet_url) {
             return NextResponse.json(
                 { error: "Add a Google Meet link before going live" },
                 { status: 400 }

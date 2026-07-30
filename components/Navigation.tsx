@@ -12,7 +12,7 @@ import { dashboardPathForRole } from "@/lib/types";
 const AuthModal = dynamic(() => import("./AuthModal"), { ssr: false });
 
 const PRIMARY_LINKS = [
-    { key: "tutorials", href: "/tutorials" },
+    { key: "skills", href: "/skills" },
     { key: "classroom", href: "/classroom" },
 ] as const;
 
@@ -27,7 +27,14 @@ function NavigationInner() {
     const searchParams = useSearchParams();
     const authParam = searchParams.get("auth");
     const authReason = searchParams.get("reason");
-    const authFromUrl = authParam === "login" || authParam === "error";
+    const roleParam = searchParams.get("role");
+    const redirectNext = searchParams.get("next");
+    const authFromUrl =
+        authParam === "login" || authParam === "register" || authParam === "error";
+    const initialRole =
+        roleParam === "student" || roleParam === "tutor" ? roleParam : null;
+    const initialView =
+        authParam === "register" ? ("register" as const) : authParam === "login" ? ("login" as const) : undefined;
     const authError =
         authParam === "error"
             ? authReason || "Sign in failed. Please try again."
@@ -173,7 +180,14 @@ function NavigationInner() {
                     </div>
                 )}
             </nav>
-            <AuthModal isOpen={authOpen || authFromUrl} onClose={closeAuth} initialError={authError} />
+            <AuthModal
+                isOpen={authOpen || authFromUrl}
+                onClose={closeAuth}
+                initialError={authError}
+                initialRole={initialRole}
+                initialView={initialView}
+                redirectNext={redirectNext}
+            />
         </>
     );
 }

@@ -1,29 +1,17 @@
-export const BOOKING_SERVICES = [
-    {
-        id: "consultation",
-        name: "Course Consultation",
-        duration: "30 min",
-        description: "Discuss programs and find the right learning path for your goals.",
-    },
-    {
-        id: "campus-tour",
-        name: "Virtual Campus Tour",
-        duration: "45 min",
-        description: "Explore our platform, faculty, and student experience with a guide.",
-    },
-    {
-        id: "admissions",
-        name: "Admissions Interview",
-        duration: "60 min",
-        description: "Formal admissions session with our enrollment team.",
-    },
-    {
-        id: "tutoring",
-        name: "One-on-One Tutoring",
-        duration: "60 min",
-        description: "Personalized session with an expert instructor in your subject area.",
-    },
-] as const;
+import { SKILLS, skillBookingServiceName } from "@/lib/skills";
+
+/** Booking options — each skill is a bookable 1:1 session. */
+export const BOOKING_SERVICES = SKILLS.map((skill) => ({
+    id: skill.id,
+    name: skillBookingServiceName(skill),
+    duration: "60 min",
+    description: skill.blurb,
+})) as readonly {
+    id: string;
+    name: string;
+    duration: string;
+    description: string;
+}[];
 
 export const TIME_SLOTS = [
     "09:00 AM",

@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import JsonLd from "@/components/seo/JsonLd";
 import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
+import { assertFeatureEnabled, staticParamsFor } from "@/lib/features";
 import { getLocalizedHubMeta } from "@/lib/i18n/metadata";
 import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 import { SITE_NAME } from "@/lib/site";
@@ -11,7 +12,7 @@ import { TUTORIAL_LANGUAGES, TUTORIAL_TRACKS } from "@/lib/tutorials";
 type Props = { params: Promise<{ locale: string }> };
 
 export function generateStaticParams() {
-    return routing.locales.map((locale) => ({ locale }));
+    return staticParamsFor("tutorials", () => routing.locales.map((locale) => ({ locale })));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -32,6 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default function TutorialsPage() {
+    assertFeatureEnabled("tutorials");
     const popular = ["html", "css", "javascript", "liquid", "python", "sql", "java", "typescript"];
 
     return (
