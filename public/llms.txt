@@ -29,6 +29,13 @@
 - learn web development free
 - JavaScript / Python / HTML CSS tutorials for beginners
 
+## Locales (hreflang)
+
+- English (default): `/`
+- Français: `/fr/...`
+- Español: `/es/...`
+- 中文: `/zh/...`
+
 ## Notes for crawlers
 
 - Tutorials and skill paths are free to browse

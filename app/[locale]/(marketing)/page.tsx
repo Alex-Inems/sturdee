@@ -6,6 +6,7 @@ import LandingMethod from "@/components/landing/LandingMethod";
 import LandingCTA from "@/components/landing/LandingCTA";
 import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 import { getLocalizedHomeMeta } from "@/lib/i18n/metadata";
+import { getLocaleSeoKeywords } from "@/lib/i18n/seo-locale";
 import type { Locale } from "@/i18n/routing";
 
 // Previous marketing sections (disabled with feature flags) kept for restore:
@@ -23,16 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         description: meta.description,
         path: "/",
         locale: locale as Locale,
-        keywords: [
-            "learn artificial intelligence",
-            "learn to code for free",
-            "free coding tutorials",
-            "prompt engineering",
-            "AI tutorials",
-            "free generative AI courses",
-            "learn to code with AI",
-            "interactive coding lessons",
-        ],
+        keywords: getLocaleSeoKeywords(locale as Locale),
     });
 }
 

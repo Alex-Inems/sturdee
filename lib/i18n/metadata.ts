@@ -13,6 +13,12 @@ const DIFFICULTY_ES: Record<string, string> = {
     Hard: "Difícil",
 };
 
+const DIFFICULTY_ZH: Record<string, string> = {
+    Easy: "简单",
+    Medium: "中等",
+    Hard: "困难",
+};
+
 export async function getLocalizedPracticeMeta(
     locale: Locale,
     problem: {
@@ -29,7 +35,9 @@ export async function getLocalizedPracticeMeta(
             ? DIFFICULTY_FR[problem.difficulty] ?? problem.difficulty
             : locale === "es"
               ? DIFFICULTY_ES[problem.difficulty] ?? problem.difficulty
-              : problem.difficulty;
+              : locale === "zh"
+                ? DIFFICULTY_ZH[problem.difficulty] ?? problem.difficulty
+                : problem.difficulty;
 
     if (locale === "en") {
         return {
@@ -62,7 +70,18 @@ export async function getLocalizedHomeMeta(locale: Locale) {
 
 export async function getLocalizedHubMeta(
     locale: Locale,
-    key: "tutorials" | "blog" | "courses" | "practice" | "openSource"
+    key:
+        | "tutorials"
+        | "blog"
+        | "courses"
+        | "practice"
+        | "openSource"
+        | "skills"
+        | "ai"
+        | "pricing"
+        | "classroom"
+        | "book"
+        | "learn"
 ) {
     const t = await getTranslations({ locale, namespace: "Meta" });
     return {

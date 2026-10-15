@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { SITE_NAME } from "@/lib/site-core";
 
@@ -8,26 +11,28 @@ type HeroTag = {
     highlight?: boolean;
 };
 
-const leftTags: HeroTag[] = [
-    { label: "AI Automation", top: "14%", offset: "left-[-2%]", highlight: true },
-    { label: "Prompt Engineering", top: "32%", offset: "left-[-6%]" },
-    { label: "AI Agents", top: "50%", offset: "left-[-4%]" },
-    { label: "Web Dev with AI", top: "68%", offset: "left-[-2%]" },
-];
-
-const rightTags: HeroTag[] = [
-    { label: "AI Tutor", top: "14%", offset: "right-[-2%]", highlight: true },
-    { label: "Practice Coach", top: "32%", offset: "right-[-6%]" },
-    { label: "Live Classroom", top: "50%", offset: "right-[-4%]" },
-    { label: "Smart Matching", top: "68%", offset: "right-[-2%]" },
-];
-
 const tagClass = (highlight?: boolean) =>
     highlight
         ? "px-5 py-2.5 bg-[#FFE55E] rounded-full font-bold text-black text-xs sm:text-sm tracking-wide shadow-md"
         : "px-5 py-2.5 bg-white border border-gray-100 rounded-full font-semibold text-gray-700 text-xs sm:text-sm tracking-wide shadow-md";
 
 export default function LandingHero() {
+    const t = useTranslations("Landing");
+
+    const leftTags: HeroTag[] = [
+        { label: "AI Automation", top: "14%", offset: "left-[-2%]", highlight: true },
+        { label: "Prompt Engineering", top: "32%", offset: "left-[-6%]" },
+        { label: "AI Agents", top: "50%", offset: "left-[-4%]" },
+        { label: "Web Dev with AI", top: "68%", offset: "left-[-2%]" },
+    ];
+
+    const rightTags: HeroTag[] = [
+        { label: "AI Tutor", top: "14%", offset: "right-[-2%]", highlight: true },
+        { label: "Practice Coach", top: "32%", offset: "right-[-6%]" },
+        { label: "Live Classroom", top: "50%", offset: "right-[-4%]" },
+        { label: "Smart Matching", top: "68%", offset: "right-[-2%]" },
+    ];
+
     return (
         <section className="relative min-h-[100svh] overflow-hidden font-jakarta bg-landing-hero flex items-center pt-28 pb-16 md:pt-32 md:pb-20">
             <div className="absolute inset-0 opacity-[0.03] pointer-events-none dot-pattern" aria-hidden />
@@ -40,24 +45,23 @@ export default function LandingHero() {
                             {SITE_NAME}
                         </p>
                         <h1 className="mt-6 text-3xl sm:text-4xl xl:text-[2.75rem] font-bold text-gray-900 leading-[1.15] tracking-tight max-w-md">
-                            Learn AI and code for free
+                            {t("heroTitle")}
                         </h1>
                         <p className="mt-5 text-base sm:text-lg text-gray-500 font-medium leading-relaxed max-w-sm">
-                            Free tutorials and AI skill paths — prompt engineering, automation, agents — then practice
-                            with AI Tutor or join a live cohort.
+                            {t("heroSubtitle")}
                         </p>
                         <div className="mt-10 flex flex-wrap items-center gap-3">
                             <Link
                                 href="/learn"
                                 className="inline-flex items-center justify-center px-8 py-3.5 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold text-[15px] rounded-full shadow-md hover:shadow-lg transition-all duration-200"
                             >
-                                Start learning free
+                                {t("heroCta")}
                             </Link>
                             <Link
                                 href="/ai"
                                 className="inline-flex items-center justify-center px-7 py-3.5 text-gray-700 hover:text-gray-900 font-semibold text-[15px] transition-colors"
                             >
-                                Try AI Tutor →
+                                {t("heroSecondary")}
                             </Link>
                         </div>
                     </div>
@@ -71,7 +75,7 @@ export default function LandingHero() {
 
                             <img
                                 src="/student.png"
-                                alt="Student learning AI skills with Sturdee"
+                                alt={t("heroTitle")}
                                 className="relative h-[108%] w-auto max-w-none object-contain z-10 pointer-events-none drop-shadow-[0_20px_40px_rgba(0,0,0,0.08)]"
                             />
 

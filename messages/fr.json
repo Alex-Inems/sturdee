@@ -3,7 +3,8 @@
     "label": "Langue",
     "en": "English",
     "fr": "Français",
-    "es": "Español"
+    "es": "Español",
+    "zh": "中文"
   },
   "Nav": {
     "home": "Accueil",
@@ -30,7 +31,8 @@
     "dashboard": "Tableau de bord",
     "signUp": "S'inscrire",
     "login": "Connexion",
-    "logout": "Déconnexion"
+    "logout": "Déconnexion",
+    "learn": "Apprendre"
   },
   "Footer": {
     "tagline": "Une entreprise d'apprentissage IA — maîtrisez l'IA et apprenez plus vite avec des tuteurs IA",
@@ -53,26 +55,62 @@
     "company": "Entreprise",
     "privacy": "Politique de confidentialité",
     "terms": "Conditions d'utilisation",
-    "legal": "Mentions légales"
+    "legal": "Mentions légales",
+    "learn": "Apprendre",
+    "learnAi": "Apprendre l'IA"
   },
   "Home": {
     "metaTitle": "Apprendre l'IA et coder gratuitement — Tutoriels, prompts et cohortes",
-    "metaDescription": "Apprenez l'intelligence artificielle et le code gratuitement. Tutoriels, prompt engineering, tuteur IA en Pro et cohortes en direct — Sturdee.",
+    "metaDescription": "Apprenez l'intelligence artificielle et à coder gratuitement. Tutoriels gratuits, prompt engineering, tuteur IA Pro et cohortes en direct — Sturdee.",
     "breadcrumb": "Accueil"
+  },
+  "Landing": {
+    "heroTitle": "Apprendre l'IA et coder gratuitement",
+    "heroSubtitle": "Tutoriels gratuits et parcours IA — prompt engineering, automatisation, agents — puis pratiquez avec le tuteur IA ou rejoignez une cohorte.",
+    "heroCta": "Commencer gratuitement",
+    "heroSecondary": "Essayer le tuteur IA →",
+    "skillsEyebrow": "Compétences IA",
+    "skillsTitle": "Choisissez un parcours IA. Apprenez en pratiquant.",
+    "skillsSubtitle": "Parcours natifs IA et carrières augmentées par l'IA — explorez, pratiquez avec le tuteur IA, puis rejoignez une cohorte.",
+    "methodTitle": "Comment Sturdee enseigne l'IA",
+    "methodSubtitle": "Maîtrisez l'IA et apprenez plus vite avec l'IA — pratique guidée et cohortes en direct.",
+    "step1Title": "Parcourir les tutoriels gratuits",
+    "step1Body": "Commencez par des leçons interactives — HTML, CSS, JavaScript, Python et plus — sans compte pour lire.",
+    "step2Title": "Apprendre avec le tuteur IA",
+    "step2Body": "Posez des questions et pratiquez à tout moment. Connectez-vous par e-mail pour une cohorte.",
+    "step3Title": "Rejoindre une cohorte en direct",
+    "step3Body": "Inscrivez-vous avec vos objectifs — nous vous associons à un parcours et un tuteur.",
+    "ctaTitle": "Tutoriels, tuteur IA ou cohorte en direct",
+    "ctaSubtitle": "Tout est ouvert avec une connexion e-mail — tutoriels gratuits, tuteur IA, ou inscription à une cohorte.",
+    "ctaPrimary": "Apprendre l'IA gratuitement",
+    "ctaSecondary": "Tutoriels de code gratuits"
   },
   "Meta": {
     "tutorialsTitle": "Apprendre à coder gratuitement — Tutoriels interactifs",
     "tutorialsDescription": "Tutoriels de programmation gratuits pour débutants : HTML, CSS, JavaScript, Python, SQL, Shopify Liquid et plus de 20 langages avec éditeurs interactifs.",
-    "blogTitle": "Blog développeur — Tutoriels, carrière et tech",
-    "blogDescription": "Lisez le blog Sturdee pour des guides web, conseils de carrière, préparation aux entretiens et bonnes pratiques.",
+    "blogTitle": "Blog IA & code — Tutoriels gratuits, prompts et carrière",
+    "blogDescription": "Guides pour apprendre l'IA gratuitement, tutoriels de prompt engineering, leçons de code et conseils carrière — liés à la pratique Sturdee.",
     "coursesTitle": "Cours de programmation en ligne — En direct et à votre rythme",
     "coursesDescription": "Parcourez des cours professionnels avec cohortes en direct, parcours autonomes et certificats vérifiés.",
     "practiceTitle": "Pratique du code — Plus de 1000 problèmes style LeetCode avec solutions",
     "practiceDescription": "Entraînez-vous aux algorithmes dans un environnement style LeetCode. Exécutez du code, soumettez des solutions et étudiez les réponses.",
     "openSourceTitle": "Outils open source & IA gratuits — Intégration et points",
-    "openSourceDescription": "Intégrez plus de 35 outils open source — frameworks, IA (Ollama, LangChain, Whisper), DevOps, bases de données et utilitaires. Poussez sur GitHub et gagnez des points.",
+    "openSourceDescription": "Intégrez plus de 35 outils open source — frameworks, IA (Ollama, LangChain, Whisper), DevOps, bases de données et utilitaires.",
+    "skillsTitle": "Compétences IA — Automatisation, prompts, agents et plus",
+    "skillsDescription": "Explorez les parcours IA Sturdee : automatisation, prompt engineering, agents et carrières augmentées par l'IA. Pratiquez puis rejoignez une cohorte.",
+    "aiTitle": "Tuteur IA — Apprendre l'intelligence artificielle avec l'IA",
+    "aiDescription": "Apprenez l'IA avec le tuteur Sturdee : prompt engineering, automatisation et agents. Tutoriels gratuits — chat tuteur IA en Pro (20 $/mois).",
+    "pricingTitle": "Tarifs — Sturdee Pro 20 $/mois",
+    "pricingDescription": "Tutoriels et cohortes gratuits pour tous. Sturdee Pro débloque le tuteur IA, le Coach pratique et le matching intelligent pour 20 $/mois.",
+    "classroomTitle": "Classe en direct — Apprenez avec un tuteur sur Google Meet",
+    "classroomDescription": "Rejoignez les sessions de classe Sturdee en direct avec votre cohorte et votre tuteur via Google Meet.",
+    "bookTitle": "S'inscrire à une cohorte de compétences",
+    "bookDescription": "Indiquez vos objectifs — soyez associé à un parcours IA et inscrivez-vous à une cohorte en direct.",
+    "learnTitle": "Apprendre l'IA et coder gratuitement — Guides et parcours",
+    "learnDescription": "Hubs gratuits pour l'intelligence artificielle, le prompt engineering, les tutoriels de code et le développement web. Commencez gratuitement sur Sturdee.",
     "suffixFr": "— Sturdee (Français)",
-    "suffixEs": "— Sturdee (Español)"
+    "suffixEs": "— Sturdee (Español)",
+    "suffixZh": "— Sturdee（中文）"
   },
   "Auto": {
     "practiceTitle": "{title} — Problème {difficulty} #{number}",

@@ -6,6 +6,7 @@ import { routing } from "@/i18n/routing";
 import { getLocalizedHubMeta } from "@/lib/i18n/metadata";
 import { BLOG_POSTS, BLOG_POST_COUNT, getCategorySlug } from "@/lib/blog";
 import { assertFeatureEnabled } from "@/lib/features";
+import { getLocaleSeoKeywords } from "@/lib/i18n/seo-locale";
 import { blogListJsonLd, pageMetadata } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -26,41 +27,58 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         description,
         path: "/blog",
         locale: locale as Locale,
-        keywords: [
-            "AI learning blog",
-            "learn artificial intelligence free",
-            "prompt engineering tutorial",
-            "free coding tutorials blog",
-            "programming blog",
-            "web development blog",
-            "learn to code with AI",
-        ],
+        keywords: getLocaleSeoKeywords(locale as Locale),
     });
 }
 
 const CATEGORIES = [...new Set(BLOG_POSTS.map((p) => p.category))];
 
-export default function BlogIndexPage() {
+export default async function BlogIndexPage({ params }: Props) {
     assertFeatureEnabled("blog");
+    const { locale } = await params;
 
     const sorted = [...BLOG_POSTS].sort(
         (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
     );
+
+    const heading =
+        locale === "fr"
+            ? {
+                  badge: `${BLOG_POST_COUNT} articles`,
+                  title: "Apprendre l'IA & coder — Blog Sturdee",
+                  subtitle:
+                      "Guides approfondis sur l'intelligence artificielle, le prompt engineering, les tutoriels de code gratuits et le développement web.",
+              }
+            : locale === "es"
+              ? {
+                    badge: `${BLOG_POST_COUNT} artículos`,
+                    title: "Aprende IA y código — Blog Sturdee",
+                    subtitle:
+                        "Guías profundas sobre inteligencia artificial, ingeniería de prompts, tutoriales de código gratis y desarrollo web.",
+                }
+              : locale === "zh"
+                ? {
+                      badge: `${BLOG_POST_COUNT} 篇文章`,
+                      title: "学 AI 与编程 — Sturdee 博客",
+                      subtitle:
+                          "深入指南：人工智能、提示词工程、免费编程教程与网页开发 — 每篇都链接到互动练习。",
+                  }
+                : {
+                      badge: `${BLOG_POST_COUNT} Articles`,
+                      title: "Learn AI & Code — Sturdee Blog",
+                      subtitle:
+                          "In-depth guides on artificial intelligence, prompt engineering, free coding tutorials, and web development — each article links to free interactive lessons and skill paths.",
+                  };
 
     return (
         <div className="font-jakarta bg-page min-h-screen pt-28 pb-20">
             <JsonLd data={blogListJsonLd(BLOG_POST_COUNT)} />
             <div className="max-w-4xl mx-auto px-6 md:px-12">
                 <span className="inline-flex px-4 py-1.5 bg-[#FFE55E] rounded-full font-bold text-black text-xs mb-4">
-                    {BLOG_POST_COUNT} Articles
+                    {heading.badge}
                 </span>
-                <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                    Learn AI &amp; Code — Sturdee Blog
-                </h1>
-                <p className="text-lg text-gray-500 font-medium mb-8 leading-relaxed">
-                    In-depth guides on artificial intelligence, prompt engineering, free coding tutorials, and web
-                    development — each article links to free interactive lessons and skill paths.
-                </p>
+                <h1 className="text-4xl font-bold text-gray-900 mb-4">{heading.title}</h1>
+                <p className="text-lg text-gray-500 font-medium mb-8 leading-relaxed">{heading.subtitle}</p>
 
                 <div className="flex flex-wrap gap-2 mb-10">
                     <Link

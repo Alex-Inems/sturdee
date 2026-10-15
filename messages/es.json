@@ -3,7 +3,8 @@
     "label": "Idioma",
     "en": "English",
     "fr": "Français",
-    "es": "Español"
+    "es": "Español",
+    "zh": "中文"
   },
   "Nav": {
     "home": "Inicio",
@@ -30,7 +31,8 @@
     "dashboard": "Panel",
     "signUp": "Registrarse",
     "login": "Iniciar sesión",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "learn": "Aprender"
   },
   "Footer": {
     "tagline": "Empresa de aprendizaje con IA — domina habilidades de IA y aprende más rápido con tutores IA",
@@ -53,26 +55,62 @@
     "company": "Empresa",
     "privacy": "Política de privacidad",
     "terms": "Términos de servicio",
-    "legal": "Legal"
+    "legal": "Legal",
+    "learn": "Aprender",
+    "learnAi": "Aprender IA"
   },
   "Home": {
     "metaTitle": "Aprende IA y a programar gratis — Tutoriales, prompts y cohortes",
-    "metaDescription": "Aprende inteligencia artificial y programación gratis. Tutoriales, ingeniería de prompts, tutor IA en Pro y cohortes en vivo — Sturdee.",
+    "metaDescription": "Aprende inteligencia artificial y programación gratis. Tutoriales gratis, ingeniería de prompts, tutor IA en Pro y cohortes en vivo — Sturdee.",
     "breadcrumb": "Inicio"
+  },
+  "Landing": {
+    "heroTitle": "Aprende IA y a programar gratis",
+    "heroSubtitle": "Tutoriales gratis y rutas de IA — ingeniería de prompts, automatización, agentes — luego practica con el tutor IA o únete a una cohorte.",
+    "heroCta": "Empezar gratis",
+    "heroSecondary": "Probar tutor IA →",
+    "skillsEyebrow": "Habilidades de IA",
+    "skillsTitle": "Elige una ruta de IA. Aprende haciendo.",
+    "skillsSubtitle": "Rutas nativas de IA y carreras aumentadas con IA — explora, practica con el tutor IA y únete a una cohorte.",
+    "methodTitle": "Cómo Sturdee enseña IA",
+    "methodSubtitle": "Domina la IA y aprende más rápido con IA — práctica guiada y cohortes en vivo con tutores.",
+    "step1Title": "Explorar tutoriales gratis",
+    "step1Body": "Empieza con lecciones interactivas — HTML, CSS, JavaScript, Python y más — sin cuenta para leer.",
+    "step2Title": "Aprender con el tutor IA",
+    "step2Body": "Haz preguntas y practica cuando quieras. Inicia sesión con email cuando estés listo para una cohorte.",
+    "step3Title": "Unirse a una cohorte en vivo",
+    "step3Body": "Regístrate con tus objetivos — te emparejamos con una ruta y un tutor.",
+    "ctaTitle": "Tutoriales, tutor IA o cohorte en vivo",
+    "ctaSubtitle": "Todo está abierto con inicio de sesión por email — tutoriales gratis, tutor IA o registro a una cohorte.",
+    "ctaPrimary": "Aprender IA gratis",
+    "ctaSecondary": "Tutoriales de código gratis"
   },
   "Meta": {
     "tutorialsTitle": "Aprende a programar gratis — Tutoriales interactivos",
     "tutorialsDescription": "Tutoriales de programación gratis para principiantes: HTML, CSS, JavaScript, Python, SQL, Shopify Liquid y más de 20 lenguajes con editores interactivos.",
-    "blogTitle": "Blog para desarrolladores — Tutoriales, carrera y tecnología",
-    "blogDescription": "Lee el blog de Sturdee con guías web, consejos de carrera, preparación para entrevistas y buenas prácticas.",
+    "blogTitle": "Blog de IA y código — Tutoriales gratis, prompts y carrera",
+    "blogDescription": "Guías para aprender IA gratis, tutoriales de ingeniería de prompts, lecciones de código y consejos de carrera — con práctica en Sturdee.",
     "coursesTitle": "Cursos de programación online — En vivo y a tu ritmo",
     "coursesDescription": "Explora cursos profesionales con cohortes en vivo, rutas autodirigidas y certificados verificados.",
     "practiceTitle": "Práctica de código — Más de 1000 problemas estilo LeetCode con soluciones",
     "practiceDescription": "Practica algoritmos en un entorno estilo LeetCode. Ejecuta código, envía soluciones y estudia las respuestas.",
     "openSourceTitle": "Herramientas open source e IA gratis — Integración y puntos",
-    "openSourceDescription": "Integra más de 35 herramientas open source — frameworks, IA (Ollama, LangChain, Whisper), DevOps, bases de datos y utilidades. Sube a GitHub y gana puntos.",
+    "openSourceDescription": "Integra más de 35 herramientas open source — frameworks, IA (Ollama, LangChain, Whisper), DevOps, bases de datos y utilidades.",
+    "skillsTitle": "Habilidades de IA — Automatización, prompts, agentes y más",
+    "skillsDescription": "Explora rutas de IA en Sturdee: automatización, ingeniería de prompts, agentes y carreras aumentadas con IA. Practica y únete a una cohorte.",
+    "aiTitle": "Tutor IA — Aprende inteligencia artificial con IA",
+    "aiDescription": "Aprende IA con el tutor de Sturdee: ingeniería de prompts, automatización y agentes. Tutoriales gratis — chat del tutor IA en Pro (20 $/mes).",
+    "pricingTitle": "Precios — Sturdee Pro 20 $/mes",
+    "pricingDescription": "Tutoriales y cohortes gratis para todos. Sturdee Pro desbloquea tutor IA, Coach de práctica y matching inteligente por 20 $/mes.",
+    "classroomTitle": "Aula en vivo — Aprende con un tutor en Google Meet",
+    "classroomDescription": "Únete a las sesiones de aula Sturdee en vivo con tu cohorte y tutor vía Google Meet.",
+    "bookTitle": "Registrarse en una cohorte de habilidades",
+    "bookDescription": "Cuéntanos tus objetivos — te emparejamos con una ruta de IA y te registramos en una cohorte en vivo.",
+    "learnTitle": "Aprende IA y a programar gratis — Guías y rutas",
+    "learnDescription": "Hubs gratis de inteligencia artificial, ingeniería de prompts, tutoriales de código y desarrollo web. Empieza gratis en Sturdee.",
     "suffixFr": "— Sturdee (Français)",
-    "suffixEs": "— Sturdee (Español)"
+    "suffixEs": "— Sturdee (Español)",
+    "suffixZh": "— Sturdee（中文）"
   },
   "Auto": {
     "practiceTitle": "{title} — Problema {difficulty} #{number}",

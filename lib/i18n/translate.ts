@@ -26,7 +26,10 @@ function hashKey(text: string): string {
 }
 
 export function schemaLanguage(locale: Locale): string {
-    return htmlLang[locale] === "en" ? "en-US" : htmlLang[locale] === "fr" ? "fr-FR" : "es-ES";
+    if (locale === "fr") return "fr-FR";
+    if (locale === "es") return "es-ES";
+    if (locale === "zh") return "zh-CN";
+    return "en-US";
 }
 
 export function openGraphLocale(locale: Locale): string {

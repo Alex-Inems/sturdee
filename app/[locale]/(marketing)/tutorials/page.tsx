@@ -5,6 +5,7 @@ import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
 import { assertFeatureEnabled, staticParamsFor } from "@/lib/features";
 import { getLocalizedHubMeta } from "@/lib/i18n/metadata";
+import { getLocaleSeoKeywords } from "@/lib/i18n/seo-locale";
 import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 import { SITE_NAME } from "@/lib/site";
 import { TUTORIAL_LANGUAGES, TUTORIAL_TRACKS } from "@/lib/tutorials";
@@ -23,15 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         description: meta.description,
         path: "/tutorials",
         locale: locale as Locale,
-        keywords: [
-            "learn to code for free",
-            "free coding tutorials",
-            "learn programming online free",
-            "interactive coding lessons",
-            "coding for beginners",
-            "free web development courses",
-            "HTML CSS JavaScript free course",
-        ],
+        keywords: getLocaleSeoKeywords(locale as Locale),
     });
 }
 

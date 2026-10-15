@@ -1,8 +1,13 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import SectionShell from "@/components/SectionShell";
 import { SKILLS } from "@/lib/skills";
 
 export default function LandingLanguages() {
+    const t = useTranslations("Landing");
+
     return (
         <section className="relative overflow-hidden font-jakarta">
             <div
@@ -14,14 +19,13 @@ export default function LandingLanguages() {
             <SectionShell className="relative z-10">
                 <div className="max-w-2xl landing-fade-up">
                     <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700/80">
-                        AI skills
+                        {t("skillsEyebrow")}
                     </p>
                     <h2 className="mt-3 text-3xl sm:text-4xl lg:text-[2.75rem] font-bold text-gray-900 tracking-tight leading-[1.1]">
-                        Pick an AI path. Learn by doing.
+                        {t("skillsTitle")}
                     </h2>
                     <p className="mt-4 text-base sm:text-lg text-gray-500 font-medium leading-relaxed">
-                        AI-native tracks and AI-augmented careers — explore a skill, practice with AI Tutor, then
-                        join a cohort.
+                        {t("skillsSubtitle")}
                     </p>
                 </div>
 
@@ -48,18 +52,12 @@ export default function LandingLanguages() {
                                             {skill.blurb}
                                         </p>
                                         <p className="mt-2 text-xs font-semibold text-gray-400">
-                                            {skill.topics.length} topics · Bookable sessions
+                                            {skill.topics.length} topics
                                         </p>
                                     </div>
                                 </div>
                                 <span className="relative ml-10 sm:ml-0 shrink-0 inline-flex items-center gap-2 text-sm font-semibold text-gray-400 group-hover:text-emerald-700 transition-colors">
-                                    View topics
-                                    <span
-                                        className="inline-block transition-transform duration-200 group-hover:translate-x-1"
-                                        aria-hidden
-                                    >
-                                        →
-                                    </span>
+                                    →
                                 </span>
                             </Link>
                         </li>

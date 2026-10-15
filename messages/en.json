@@ -3,7 +3,8 @@
     "label": "Language",
     "en": "English",
     "fr": "Français",
-    "es": "Español"
+    "es": "Español",
+    "zh": "中文"
   },
   "Nav": {
     "home": "Home",
@@ -30,7 +31,8 @@
     "dashboard": "Dashboard",
     "signUp": "Sign Up",
     "login": "Login",
-    "logout": "Log Out"
+    "logout": "Log Out",
+    "learn": "Learn"
   },
   "Footer": {
     "tagline": "An AI learning company — master AI skills and learn faster with AI tutors",
@@ -53,12 +55,35 @@
     "company": "Company",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
-    "legal": "Legal"
+    "legal": "Legal",
+    "learn": "Learn",
+    "learnAi": "Learn AI"
   },
   "Home": {
     "metaTitle": "Learn AI & Code Free — Tutorials, Prompts & Cohorts",
     "metaDescription": "Learn artificial intelligence and coding for free. Free tutorials, prompt engineering paths, AI Tutor on Pro, and live cohorts with a human tutor — Sturdee.",
     "breadcrumb": "Home"
+  },
+  "Landing": {
+    "heroTitle": "Learn AI and code for free",
+    "heroSubtitle": "Free tutorials and AI skill paths — prompt engineering, automation, agents — then practice with AI Tutor or join a live cohort.",
+    "heroCta": "Start learning free",
+    "heroSecondary": "Try AI Tutor →",
+    "skillsEyebrow": "AI skills",
+    "skillsTitle": "Pick an AI path. Learn by doing.",
+    "skillsSubtitle": "AI-native tracks and AI-augmented careers — explore a skill, practice with AI Tutor, then join a cohort.",
+    "methodTitle": "How Sturdee teaches AI",
+    "methodSubtitle": "Learn AI skills, and learn faster with AI — guided practice plus live cohorts with tutors.",
+    "step1Title": "Browse free tutorials",
+    "step1Body": "Start with interactive lessons — HTML, CSS, JavaScript, Python, and more — no account required to read.",
+    "step2Title": "Learn with AI Tutor",
+    "step2Body": "Ask questions and practice exercises anytime. Sign in with email when you're ready for a cohort.",
+    "step3Title": "Join a live cohort",
+    "step3Body": "Register with your goals — we'll match a skill path and place you with a tutor.",
+    "ctaTitle": "Tutorials, AI Tutor, or a live cohort",
+    "ctaSubtitle": "Everything is open with email sign-in — browse free tutorials, chat with AI Tutor, or register for a skill cohort.",
+    "ctaPrimary": "Learn AI free",
+    "ctaSecondary": "Free coding tutorials"
   },
   "Meta": {
     "tutorialsTitle": "Learn to Code for Free — Interactive Tutorials",
@@ -71,8 +96,21 @@
     "practiceDescription": "Practice algorithm and data structure problems in a LeetCode-standard environment. Run code, submit solutions, and study answers.",
     "openSourceTitle": "Free Open Source & AI Tools — Practice Integration & Earn Points",
     "openSourceDescription": "Integrate 39+ free open-source tools from GitHub — frameworks, AI (Ollama, LangChain, Whisper), DevOps, databases, and utilities. Push to GitHub and earn integration points.",
+    "skillsTitle": "AI Skills — Automation, Prompts, Agents & More",
+    "skillsDescription": "Explore Sturdee AI skill paths: automation, prompt engineering, agents, and AI-augmented careers. Practice with AI Tutor, then join a live cohort.",
+    "aiTitle": "AI Tutor — Learn Artificial Intelligence with AI",
+    "aiDescription": "Learn AI with Sturdee’s AI Tutor: prompt engineering, automation, and agents. Free tutorials for everyone — AI Tutor chat on Sturdee Pro ($20/mo).",
+    "pricingTitle": "Pricing — Sturdee Pro $20/month",
+    "pricingDescription": "Free tutorials and cohorts for everyone. Sturdee Pro unlocks AI Tutor, Practice Coach, and smart skill matching for $20/month.",
+    "classroomTitle": "Live Classroom — Learn with a Tutor on Google Meet",
+    "classroomDescription": "Join live Sturdee classroom sessions with your cohort and tutor via Google Meet.",
+    "bookTitle": "Register for a Skill Cohort",
+    "bookDescription": "Tell us your goals — get matched to an AI skill path and register for a live cohort.",
+    "learnTitle": "Learn AI & Code Free — Guides & Paths",
+    "learnDescription": "Free learning hubs for artificial intelligence, prompt engineering, coding tutorials, and web development. Start free on Sturdee.",
     "suffixFr": "— Sturdee (Français)",
-    "suffixEs": "— Sturdee (Español)"
+    "suffixEs": "— Sturdee (Español)",
+    "suffixZh": "— Sturdee（中文）"
   },
   "Auto": {
     "practiceTitle": "{title} — {difficulty} Coding Problem #{number}",
