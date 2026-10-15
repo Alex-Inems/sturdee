@@ -1,0 +1,35 @@
+# Sturdee — AI learning & free coding tutorials
+
+> Learn artificial intelligence and coding for free. Interactive tutorials, prompt engineering paths, AI Tutor (Pro), and live cohorts.
+
+## Priority pages
+
+- [Home](/): Learn AI & code free
+- [Learn hubs](/learn): Topic landing pages for SEO
+- [Learn AI](/learn/ai): Learn artificial intelligence free
+- [Prompt engineering](/learn/prompt-engineering): Prompt engineering course free
+- [Learn to code free](/learn/coding-free): Free coding tutorials hub
+- [Web development](/learn/web-development): Learn web development free
+- [Tutorials](/tutorials): Interactive programming tutorials
+- [AI skills](/skills): Automation, prompts, agents
+- [AI Tutor](/ai): Chat tutor (Sturdee Pro)
+- [Pricing](/pricing): Free tier + Pro $20/mo
+- [Classroom](/classroom): Live Google Meet cohorts
+- [Book / register](/book): Join a skill cohort
+
+## Primary keywords we target
+
+- learn artificial intelligence
+- learn to code for free
+- free coding tutorials
+- prompt engineering / prompt engineering course free
+- free generative AI courses
+- learn web development free
+- JavaScript / Python / HTML CSS tutorials for beginners
+
+## Notes for crawlers
+
+- Tutorials and skill paths are free to browse
+- Sturdee Pro ($20/month) unlocks AI Tutor and Practice Coach
+- Sitemap: /sitemap.xml
+- Robots: /robots.txt

@@ -1,20 +1,28 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site";
 
+/**
+ * Allow public marketing content to be crawled.
+ * Disallow only auth, dashboards, APIs, and disabled feature areas.
+ */
 export default function robots(): MetadataRoute.Robots {
     return {
         rules: [
             {
                 userAgent: "*",
                 allow: "/",
-                // Everything except tutorials and legal pages is disabled — see lib/feature-flags.ts
                 disallow: [
                     "/admin/",
                     "/dashboard",
-                    "/book",
                     "/auth/",
                     "/api/",
-                    "/tutorials",
+                    "/verify",
+                    "/integrate",
+                    "/my-credentials",
+                    "/workspace",
+                    "/classroom/host",
+                    "/classroom/demo",
+                    // Flagged-off sections (see lib/feature-flags.ts)
                     "/blog",
                     "/guides",
                     "/cheatsheets",
@@ -27,11 +35,6 @@ export default function robots(): MetadataRoute.Robots {
                     "/tutors",
                     "/media",
                     "/resources",
-                    "/verify",
-                    "/integrate",
-                    "/my-credentials",
-                    "/workspace",
-                    "/classroom/host",
                 ],
             },
         ],

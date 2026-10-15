@@ -22,6 +22,7 @@
     "classroom": "Classroom",
     "skills": "Skills",
     "ai": "AI Tutor",
+    "pricing": "Pricing",
     "book": "Book",
     "more": "More",
     "resources": "Resources",
@@ -55,13 +56,13 @@
     "legal": "Legal"
   },
   "Home": {
-    "metaTitle": "AI Learning Company — Tutor, Practice & Cohorts",
-    "metaDescription": "Sturdee is an AI learning company. Master automation, prompts, and agents — practice with an AI tutor, then join a live cohort with a human tutor.",
+    "metaTitle": "Learn AI & Code Free — Tutorials, Prompts & Cohorts",
+    "metaDescription": "Learn artificial intelligence and coding for free. Free tutorials, prompt engineering paths, AI Tutor on Pro, and live cohorts with a human tutor — Sturdee.",
     "breadcrumb": "Home"
   },
   "Meta": {
-    "tutorialsTitle": "Free Coding Tutorials — HTML, CSS, JavaScript, Python & More",
-    "tutorialsDescription": "Browse free interactive programming tutorials. Learn HTML, CSS, JavaScript, Python, SQL, and 20+ languages with code examples and try-it-yourself editors.",
+    "tutorialsTitle": "Learn to Code for Free — Interactive Tutorials",
+    "tutorialsDescription": "Free coding tutorials for beginners: HTML, CSS, JavaScript, Python, SQL, Shopify Liquid, and 20+ languages. Interactive lessons with try-it-yourself editors.",
     "blogTitle": "Developer Blog — Tutorials, Career Tips & Tech Insights",
     "blogDescription": "Read the Sturdee blog for web development guides, career advice, interview prep, and programming best practices.",
     "coursesTitle": "Online Coding Courses — Live & Self-Paced",

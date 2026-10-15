@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
+import { getSessionUser, userHasPro } from "@/lib/auth";
 import { isFeatureEnabled } from "@/lib/features";
 import { TUTOR_SYSTEM, getAiModel, isAiConfigured } from "@/lib/ai/client";
 import { buildContextBlock, type AiPageContext } from "@/lib/ai/context";
@@ -12,6 +13,20 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "AI is disabled" }, { status: 404 });
     }
 
+    const session = await getSessionUser();
+    if (!session) {
+        return NextResponse.json(
+            { error: "Sign in to use AI Tutor", code: "AUTH_REQUIRED" },
+            { status: 401 }
+        );
+    }
+    if (!userHasPro(session)) {
+        return NextResponse.json(
+            { error: "Sturdee Pro ($20/mo) is required for AI Tutor", code: "PRO_REQUIRED" },
+            { status: 402 }
+        );
+    }
+
     if (!isAiConfigured()) {
         return NextResponse.json(
             { error: "AI is not configured. Set OPENAI_API_KEY." },
@@ -19,7 +34,7 @@ export async function POST(request: Request) {
         );
     }
 
-    const limited = checkAiRateLimit(`chat:${clientKeyFromRequest(request)}`);
+    const limited = checkAiRateLimit(`chat:${session.id}`);
     if (!limited.ok) {
         return NextResponse.json(
             { error: "Too many requests. Try again shortly." },

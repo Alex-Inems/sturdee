@@ -30,6 +30,8 @@ export function guestPayloadToUser(payload: GuestPayload): SessionUser {
         email: payload.email,
         name: payload.name,
         role: payload.role,
+        plan: "free",
+        planStatus: "inactive",
     };
 }
 

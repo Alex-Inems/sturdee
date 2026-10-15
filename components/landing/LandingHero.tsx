@@ -40,18 +40,18 @@ export default function LandingHero() {
                             {SITE_NAME}
                         </p>
                         <h1 className="mt-6 text-3xl sm:text-4xl xl:text-[2.75rem] font-bold text-gray-900 leading-[1.15] tracking-tight max-w-md">
-                            Learn AI. Learn with AI.
+                            Learn AI and code for free
                         </h1>
                         <p className="mt-5 text-base sm:text-lg text-gray-500 font-medium leading-relaxed max-w-sm">
-                            An AI learning company — master automation, prompts, and agents, then practice with an AI
-                            tutor and join a live cohort.
+                            Free tutorials and AI skill paths — prompt engineering, automation, agents — then practice
+                            with AI Tutor or join a live cohort.
                         </p>
                         <div className="mt-10 flex flex-wrap items-center gap-3">
                             <Link
-                                href="/tutorials"
+                                href="/learn"
                                 className="inline-flex items-center justify-center px-8 py-3.5 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold text-[15px] rounded-full shadow-md hover:shadow-lg transition-all duration-200"
                             >
-                                Browse tutorials
+                                Start learning free
                             </Link>
                             <Link
                                 href="/ai"

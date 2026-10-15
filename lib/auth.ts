@@ -1,11 +1,42 @@
 import { createClient } from "@/lib/supabase/server";
-import type { SessionUser, UserRole } from "./types";
+import { isProEntitled } from "@/lib/billing";
+import type { PlanStatus, PlanTier, SessionUser, UserRole } from "./types";
 
 interface ProfileRow {
     id: string;
     email: string;
     name: string;
     role: UserRole;
+    plan: PlanTier | null;
+    plan_status: PlanStatus | null;
+}
+
+function normalizePlan(plan: string | null | undefined): PlanTier {
+    return plan === "pro" ? "pro" : "free";
+}
+
+function normalizePlanStatus(status: string | null | undefined): PlanStatus {
+    if (
+        status === "active" ||
+        status === "past_due" ||
+        status === "canceled" ||
+        status === "trialing"
+    ) {
+        return status;
+    }
+    return "inactive";
+}
+
+function mapProfile(profile: ProfileRow): SessionUser {
+    const role = (profile.role as string) === "user" ? "student" : profile.role;
+    return {
+        id: profile.id,
+        email: profile.email,
+        name: profile.name,
+        role,
+        plan: normalizePlan(profile.plan),
+        planStatus: normalizePlanStatus(profile.plan_status),
+    };
 }
 
 export async function getSessionUser(): Promise<SessionUser | null> {
@@ -20,7 +51,7 @@ export async function getSessionUser(): Promise<SessionUser | null> {
 
     const { data: profile, error: profileError } = await supabase
         .from("profiles")
-        .select("id, email, name, role")
+        .select("id, email, name, role, plan, plan_status")
         .eq("id", user.id)
         .single<ProfileRow>();
 
@@ -34,15 +65,12 @@ export async function getSessionUser(): Promise<SessionUser | null> {
                 user.email?.split("@")[0] ||
                 "User",
             role: "student",
+            plan: "free",
+            planStatus: "inactive",
         };
     }
 
-    // Legacy "user" rows → treat as student until migration runs
-    if ((profile.role as string) === "user") {
-        return { ...profile, role: "student" };
-    }
-
-    return profile;
+    return mapProfile(profile);
 }
 
 /** Real session, or sticky guest tutor/student when guest classroom mode is on. */
@@ -79,6 +107,19 @@ export async function requireTutor(): Promise<SessionUser> {
         throw new Error("Only tutors can do this");
     }
     return user;
+}
+
+export async function requireProUser(): Promise<SessionUser> {
+    const user = await requireSessionUser();
+    if (!isProEntitled(user)) {
+        throw new Error("Pro plan required");
+    }
+    return user;
+}
+
+export function userHasPro(user: SessionUser | null | undefined): boolean {
+    if (!user) return false;
+    return isProEntitled(user);
 }
 
 export function getSiteUrl() {

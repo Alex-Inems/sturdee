@@ -7,11 +7,19 @@ import { assertFeatureEnabled } from "@/lib/features";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
-    title: "AI Tutor — Learn with Sturdee",
+    title: "AI Tutor — Learn Artificial Intelligence with AI",
     description:
-        "Chat with Sturdee’s AI tutor about automation, prompts, agents, and AI-augmented career skills. Practice anytime, then join a live cohort.",
+        "Learn AI with Sturdee’s AI Tutor: prompt engineering, automation, and agents. Free tutorials for everyone — AI Tutor chat on Sturdee Pro ($20/mo).",
     path: "/ai",
-    keywords: ["AI tutor", "AI learning", "prompt engineering", "AI automation", "Sturdee"],
+    keywords: [
+        "AI tutor",
+        "learn artificial intelligence",
+        "prompt engineering",
+        "AI learning",
+        "AI automation",
+        "learn to code with AI",
+        "Sturdee Pro",
+    ],
 });
 
 export default function AiHubPage() {

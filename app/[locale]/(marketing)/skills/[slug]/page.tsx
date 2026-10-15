@@ -23,10 +23,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const skill = getSkill(slug);
     if (!skill) return { title: "Skill not found" };
     return pageMetadata({
-        title: `${skill.title} — Topics & Register`,
-        description: skill.summary,
+        title: `${skill.title} — Learn Free & Register`,
+        description: `${skill.summary} Free skill path on Sturdee — practice with AI Tutor on Pro, or register for a live cohort.`,
         path: `/skills/${skill.id}`,
-        keywords: [skill.title, ...skill.topics.map((t) => t.title), "AI skill", "register skill cohort"],
+        keywords: [
+            skill.title,
+            `learn ${skill.title.toLowerCase()}`,
+            `${skill.title.toLowerCase()} course`,
+            ...skill.topics.map((t) => t.title),
+            "AI skill path",
+            "learn AI free",
+            "live cohort",
+        ],
     });
 }
 

@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { Dumbbell, Loader2, RefreshCw } from "lucide-react";
 import type { AiPageContext } from "@/lib/ai/context";
+import { useAuth } from "@/components/AuthContext";
+import { isProEntitled } from "@/lib/billing";
+import ProUpgradeCard from "@/components/billing/ProUpgradeCard";
 
 type Exercise = {
     title: string;
@@ -16,17 +19,25 @@ type Props = {
 };
 
 export default function PracticeCoach({ context }: Props) {
+    const { user, isAuthenticated } = useAuth();
+    const isPro = Boolean(user && isAuthenticated && isProEntitled(user));
     const [exercise, setExercise] = useState<Exercise | null>(null);
     const [answer, setAnswer] = useState("");
     const [feedback, setFeedback] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [needsPro, setNeedsPro] = useState(false);
+
+    if (!isPro) {
+        return <ProUpgradeCard compact featureLabel="Practice Coach" />;
+    }
 
     const generate = async () => {
         setLoading(true);
         setError("");
         setFeedback("");
         setAnswer("");
+        setNeedsPro(false);
         try {
             const res = await fetch("/api/ai/practice", {
                 method: "POST",
@@ -34,6 +45,10 @@ export default function PracticeCoach({ context }: Props) {
                 body: JSON.stringify({ action: "generate", context }),
             });
             const data = await res.json();
+            if (data.code === "PRO_REQUIRED" || res.status === 402) {
+                setNeedsPro(true);
+                return;
+            }
             if (!res.ok) throw new Error(data.error || "Could not generate exercise");
             setExercise(data.exercise as Exercise);
         } catch (err) {
@@ -59,6 +74,10 @@ export default function PracticeCoach({ context }: Props) {
                 }),
             });
             const data = await res.json();
+            if (data.code === "PRO_REQUIRED" || res.status === 402) {
+                setNeedsPro(true);
+                return;
+            }
             if (!res.ok) throw new Error(data.error || "Could not grade answer");
             setFeedback(data.feedback as string);
         } catch (err) {
@@ -67,6 +86,10 @@ export default function PracticeCoach({ context }: Props) {
             setLoading(false);
         }
     };
+
+    if (needsPro) {
+        return <ProUpgradeCard compact featureLabel="Practice Coach" />;
+    }
 
     return (
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50/40 p-5 sm:p-6">

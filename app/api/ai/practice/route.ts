@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { generateObject, generateText } from "ai";
 import { z } from "zod";
+import { getSessionUser, userHasPro } from "@/lib/auth";
 import { isFeatureEnabled } from "@/lib/features";
 import { PRACTICE_SYSTEM, getAiModel, isAiConfigured } from "@/lib/ai/client";
 import { buildContextBlock, type AiPageContext } from "@/lib/ai/context";
-import { checkAiRateLimit, clientKeyFromRequest } from "@/lib/ai/rate-limit";
+import { checkAiRateLimit } from "@/lib/ai/rate-limit";
 
 export const maxDuration = 60;
 
@@ -20,6 +21,20 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "AI is disabled" }, { status: 404 });
     }
 
+    const session = await getSessionUser();
+    if (!session) {
+        return NextResponse.json(
+            { error: "Sign in to use Practice Coach", code: "AUTH_REQUIRED" },
+            { status: 401 }
+        );
+    }
+    if (!userHasPro(session)) {
+        return NextResponse.json(
+            { error: "Sturdee Pro ($20/mo) is required for Practice Coach", code: "PRO_REQUIRED" },
+            { status: 402 }
+        );
+    }
+
     if (!isAiConfigured()) {
         return NextResponse.json(
             { error: "AI is not configured. Set OPENAI_API_KEY." },
@@ -27,7 +42,7 @@ export async function POST(request: Request) {
         );
     }
 
-    const limited = checkAiRateLimit(`practice:${clientKeyFromRequest(request)}`);
+    const limited = checkAiRateLimit(`practice:${session.id}`);
     if (!limited.ok) {
         return NextResponse.json(
             { error: "Too many requests. Try again shortly." },

@@ -52,14 +52,32 @@ function coerceRole(role: string | undefined): UserRole {
 async function fetchProfile(supabase: SupabaseClient, userId: string): Promise<SessionUser | null> {
     const { data, error } = await supabase
         .from("profiles")
-        .select("id, email, name, role")
+        .select("id, email, name, role, plan, plan_status")
         .eq("id", userId)
         .single();
 
     if (error || !data) return null;
+    const row = data as {
+        id: string;
+        email: string;
+        name: string;
+        role: string;
+        plan?: string;
+        plan_status?: string;
+    };
     return {
-        ...(data as SessionUser),
-        role: coerceRole((data as SessionUser).role),
+        id: row.id,
+        email: row.email,
+        name: row.name,
+        role: coerceRole(row.role),
+        plan: row.plan === "pro" ? "pro" : "free",
+        planStatus:
+            row.plan_status === "active" ||
+            row.plan_status === "past_due" ||
+            row.plan_status === "canceled" ||
+            row.plan_status === "trialing"
+                ? row.plan_status
+                : "inactive",
     };
 }
 
@@ -76,6 +94,8 @@ function sessionUserFromAuth(authUser: User, profile: SessionUser | null): Sessi
             authUser.email?.split("@")[0] ||
             "User",
         role: metaRole ?? "student",
+        plan: "free",
+        planStatus: "inactive",
     };
 }
 

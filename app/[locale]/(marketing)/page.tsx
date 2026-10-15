@@ -24,12 +24,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         path: "/",
         locale: locale as Locale,
         keywords: [
-            "learn skills online",
-            "book tutoring session",
-            "career skills training",
-            "web development coaching",
-            "AI automation training",
-            "project management mentorship",
+            "learn artificial intelligence",
+            "learn to code for free",
+            "free coding tutorials",
+            "prompt engineering",
+            "AI tutorials",
+            "free generative AI courses",
+            "learn to code with AI",
+            "interactive coding lessons",
         ],
     });
 }

@@ -23,16 +23,16 @@ export default function LandingCTA() {
                     </p>
                     <div className="mt-9 flex flex-wrap gap-3">
                         <Link
-                            href="/tutorials"
+                            href="/learn/ai"
                             className="inline-flex items-center justify-center px-8 py-3.5 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold text-[15px] rounded-full shadow-md hover:shadow-lg transition-all duration-200"
                         >
-                            Browse tutorials
+                            Learn AI free
                         </Link>
                         <Link
-                            href="/book"
+                            href="/tutorials"
                             className="inline-flex items-center justify-center px-8 py-3.5 border border-white/20 text-white hover:bg-white/10 font-semibold text-[15px] rounded-full transition-colors"
                         >
-                            Register for a cohort
+                            Free coding tutorials
                         </Link>
                     </div>
                 </div>

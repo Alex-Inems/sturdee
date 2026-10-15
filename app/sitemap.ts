@@ -4,6 +4,7 @@ import { LOCALES, localizedUrl } from "@/lib/site";
 import { SITE_URL } from "@/lib/site-core";
 import { SKILLS } from "@/lib/skills";
 import { TUTORIAL_LANGUAGES } from "@/lib/tutorials";
+import { LEARN_HUBS } from "@/lib/seo-keywords";
 
 /**
  * Live sections only — see lib/feature-flags.ts. Disabled sections stay out of
@@ -33,16 +34,22 @@ export default async function sitemap(): Promise<Sitemap> {
         ...SKILLS.map((skill) => localeEntries(`/skills/${skill.id}`, 0.9, "weekly"))
     );
 
-    const tutorialRoutes = localeEntries("/tutorials", 0.95, "weekly").concat(
-        ...TUTORIAL_LANGUAGES.map((lang) => localeEntries(`/tutorials/${lang.id}`, 0.85, "weekly"))
+    const tutorialRoutes = localeEntries("/tutorials", 0.98, "weekly").concat(
+        ...TUTORIAL_LANGUAGES.map((lang) => localeEntries(`/tutorials/${lang.id}`, 0.9, "weekly"))
+    );
+
+    const learnRoutes = localeEntries("/learn", 0.97, "weekly").concat(
+        ...LEARN_HUBS.map((hub) => localeEntries(`/learn/${hub.slug}`, 0.95, "weekly"))
     );
 
     return localeEntries("/", 1, "weekly").concat(
-        localeEntries("/ai", 0.98, "weekly"),
+        learnRoutes,
         tutorialRoutes,
         skillRoutes,
-        localeEntries("/classroom", 0.9, "daily"),
-        localeEntries("/book", 0.85, "weekly"),
+        localeEntries("/ai", 0.9, "weekly"),
+        localeEntries("/pricing", 0.9, "weekly"),
+        localeEntries("/classroom", 0.85, "daily"),
+        localeEntries("/book", 0.8, "weekly"),
         localeEntries("/privacy", 0.3, "yearly"),
         localeEntries("/terms", 0.3, "yearly"),
         localeEntries("/legal", 0.3, "yearly")

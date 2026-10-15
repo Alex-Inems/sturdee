@@ -3,11 +3,16 @@ export type UserRole = AccountRole | "admin";
 
 export type BookingStatus = "pending" | "confirmed" | "cancelled" | "completed";
 
+export type PlanTier = "free" | "pro";
+export type PlanStatus = "inactive" | "active" | "past_due" | "canceled" | "trialing";
+
 export interface PublicUser {
     id: string;
     email: string;
     name: string;
     role: UserRole;
+    plan: PlanTier;
+    planStatus: PlanStatus;
     createdAt: string;
 }
 
@@ -46,6 +51,8 @@ export interface SessionUser {
     email: string;
     name: string;
     role: UserRole;
+    plan: PlanTier;
+    planStatus: PlanStatus;
 }
 
 export interface ProfileRow {
@@ -53,6 +60,8 @@ export interface ProfileRow {
     email: string;
     name: string;
     role: UserRole;
+    plan?: PlanTier;
+    plan_status?: PlanStatus;
     created_at: string;
 }
 

@@ -22,6 +22,7 @@
     "classroom": "Classe",
     "skills": "Compétences",
     "ai": "Tuteur IA",
+    "pricing": "Tarifs",
     "book": "Réserver",
     "more": "Plus",
     "resources": "Ressources",
@@ -55,13 +56,13 @@
     "legal": "Mentions légales"
   },
   "Home": {
-    "metaTitle": "Apprendre à coder — Tutoriels interactifs gratuits",
-    "metaDescription": "Sturdee enseigne le code en pratiquant. Tutoriels gratuits pour HTML, CSS, JavaScript, Python, SQL, Shopify Liquid et plus de 20 langages — lisez, modifiez et exécutez du code dans le navigateur.",
+    "metaTitle": "Apprendre l'IA et coder gratuitement — Tutoriels, prompts et cohortes",
+    "metaDescription": "Apprenez l'intelligence artificielle et le code gratuitement. Tutoriels, prompt engineering, tuteur IA en Pro et cohortes en direct — Sturdee.",
     "breadcrumb": "Accueil"
   },
   "Meta": {
-    "tutorialsTitle": "Tutoriels de programmation gratuits — HTML, CSS, JavaScript, Python et plus",
-    "tutorialsDescription": "Parcourez des tutoriels interactifs gratuits. Apprenez HTML, CSS, JavaScript, Python, SQL et plus de 20 langages avec des exemples de code.",
+    "tutorialsTitle": "Apprendre à coder gratuitement — Tutoriels interactifs",
+    "tutorialsDescription": "Tutoriels de programmation gratuits pour débutants : HTML, CSS, JavaScript, Python, SQL, Shopify Liquid et plus de 20 langages avec éditeurs interactifs.",
     "blogTitle": "Blog développeur — Tutoriels, carrière et tech",
     "blogDescription": "Lisez le blog Sturdee pour des guides web, conseils de carrière, préparation aux entretiens et bonnes pratiques.",
     "coursesTitle": "Cours de programmation en ligne — En direct et à votre rythme",

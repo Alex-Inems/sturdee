@@ -6,18 +6,9 @@ import { DEFAULT_LOCALE, hreflangAlternates, localizedUrl } from "@/lib/site";
 import type { Course, LearningPath } from "@/lib/courses";
 import type { MediaAsset } from "@/lib/media";
 import type { TutorialPage, TutorialTrack } from "@/lib/tutorials/types";
+import { DEFAULT_SITE_KEYWORDS } from "@/lib/seo-keywords";
 
-const DEFAULT_KEYWORDS = [
-    "learn to code",
-    "free programming tutorials",
-    "web development courses",
-    "HTML CSS JavaScript tutorial",
-    "Python tutorial",
-    "Shopify Liquid tutorial",
-    "coding for beginners",
-    "interactive coding lessons",
-    SITE_NAME.toLowerCase(),
-];
+const DEFAULT_KEYWORDS = DEFAULT_SITE_KEYWORDS;
 
 export const NOINDEX_ROBOTS: Metadata["robots"] = {
     index: false,
@@ -28,11 +19,11 @@ export const NOINDEX_ROBOTS: Metadata["robots"] = {
 export const rootMetadata: Metadata = {
     metadataBase: new URL(SITE_URL),
     title: {
-        default: `${SITE_NAME} — Free Coding Tutorials, Courses & Study Resources`,
+        default: `${SITE_NAME} — Learn AI & Code Free | Tutorials, Prompts & Cohorts`,
         template: `%s | ${SITE_NAME}`,
     },
     description:
-        "Master web development, programming, and Shopify Liquid with free interactive tutorials. Read lessons, copy code, watch videos, and run examples — the Sturdee way.",
+        "Learn artificial intelligence and coding for free. Interactive tutorials, prompt engineering paths, AI Tutor (Pro), and live cohorts — the Sturdee way.",
     keywords: DEFAULT_KEYWORDS,
     applicationName: SITE_NAME,
     authors: [{ name: SITE_NAME, url: SITE_URL }],
@@ -44,14 +35,15 @@ export const rootMetadata: Metadata = {
         locale: "en_US",
         url: SITE_URL,
         siteName: SITE_NAME,
-        title: `${SITE_NAME} — Free Coding Tutorials & Courses`,
+        title: `${SITE_NAME} — Learn AI & Code Free`,
         description:
-            "Free interactive tutorials for HTML, CSS, JavaScript, Python, SQL, Java, Shopify Liquid, and 20+ languages. Learn by doing on Sturdee.",
+            "Free AI and coding tutorials: prompt engineering, HTML, CSS, JavaScript, Python, SQL, Shopify Liquid, and live cohorts. Practice with AI Tutor on Pro.",
     },
     twitter: {
         card: "summary_large_image",
-        title: `${SITE_NAME} — Free Coding Tutorials`,
-        description: "Interactive programming tutorials with code examples, videos, and try-it-yourself editors.",
+        title: `${SITE_NAME} — Learn AI & Code Free`,
+        description:
+            "Free interactive tutorials and AI skill paths. Upgrade to Pro for AI Tutor and Practice Coach.",
     },
     robots: {
         index: true,
@@ -162,17 +154,22 @@ export function tutorialLessonMetadata(
 
 export function tutorialLanguageMetadata(track: TutorialTrack): Metadata {
     const pageCount = track.sections.reduce((total, section) => total + section.pages.length, 0);
-    const title = `Learn ${track.language.name} — Free Tutorial`;
-    const description = `${track.language.tagline} Free ${track.language.name} tutorial with ${pageCount} interactive lessons, code examples, and video guides. Start learning on ${SITE_NAME}.`;
+    const name = track.language.name;
+    const title = `Learn ${name} Free — Interactive Tutorial`;
+    const description = `${track.language.tagline} Free ${name} tutorial with ${pageCount} interactive lessons, code examples, and try-it-yourself editors. Learn ${name} for free on ${SITE_NAME}.`;
 
     return pageMetadata({
         title,
         description,
         path: `/tutorials/${track.language.id}`,
         keywords: [
-            track.language.name.toLowerCase(),
-            `learn ${track.language.name.toLowerCase()}`,
-            `${track.language.name.toLowerCase()} tutorial for beginners`,
+            name.toLowerCase(),
+            `learn ${name.toLowerCase()}`,
+            `learn ${name.toLowerCase()} free`,
+            `${name.toLowerCase()} tutorial for beginners`,
+            `${name.toLowerCase()} tutorial free`,
+            "free coding tutorials",
+            "learn to code for free",
         ],
     });
 }
@@ -186,6 +183,13 @@ export function organizationJsonLd() {
         logo: `${SITE_URL}/icon.svg`,
         sameAs: [SITE_URL],
         description: rootMetadata.description,
+        knowsAbout: [
+            "Artificial intelligence",
+            "Prompt engineering",
+            "Web development",
+            "Programming tutorials",
+            "Online tutoring",
+        ],
     };
 }
 
@@ -205,6 +209,31 @@ export function websiteJsonLd() {
             "query-input": "required name=search_term_string",
         },
     };
+}
+
+export function learnHubJsonLd(hub: {
+    title: string;
+    description: string;
+    path: string;
+    faqs: { question: string; answer: string }[];
+}) {
+    return [
+        {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            name: hub.title,
+            description: hub.description,
+            url: `${SITE_URL}${hub.path}`,
+            isAccessibleForFree: true,
+            provider: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+        },
+        faqJsonLd(hub.faqs),
+        breadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "Learn", path: "/learn" },
+            { name: hub.title, path: hub.path },
+        ]),
+    ];
 }
 
 export function breadcrumbJsonLd(items: { name: string; path: string }[]) {

@@ -24,6 +24,8 @@ interface ProfileRow {
     email: string;
     name: string;
     role: "student" | "tutor" | "admin";
+    plan?: "free" | "pro" | null;
+    plan_status?: string | null;
     created_at: string;
 }
 
@@ -47,11 +49,20 @@ function mapBooking(row: BookingRow): Booking {
 }
 
 function mapProfile(row: ProfileRow): PublicUser {
+    const planStatus =
+        row.plan_status === "active" ||
+        row.plan_status === "past_due" ||
+        row.plan_status === "canceled" ||
+        row.plan_status === "trialing"
+            ? row.plan_status
+            : "inactive";
     return {
         id: row.id,
         email: row.email,
         name: row.name,
         role: row.role,
+        plan: row.plan === "pro" ? "pro" : "free",
+        planStatus,
         createdAt: row.created_at,
     };
 }
@@ -60,7 +71,7 @@ export async function getAllUsers(): Promise<PublicUser[]> {
     const supabase = await createClient();
     const { data, error } = await supabase
         .from("profiles")
-        .select("id, email, name, role, created_at")
+        .select("id, email, name, role, plan, plan_status, created_at")
         .order("created_at", { ascending: false });
 
     if (error) throw new Error(error.message);

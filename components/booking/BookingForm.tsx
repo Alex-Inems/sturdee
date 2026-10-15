@@ -7,6 +7,8 @@ import { BOOKING_SERVICES } from "@/lib/constants";
 import { useAuth } from "@/components/AuthContext";
 import { getSkill } from "@/lib/skills";
 import { isFeatureEnabled } from "@/lib/feature-flags";
+import { isProEntitled } from "@/lib/billing";
+import ProUpgradeCard from "@/components/billing/ProUpgradeCard";
 import type { Booking } from "@/lib/types";
 
 const EXPERIENCE_LEVELS = ["Beginner", "Some experience", "Intermediate", "Advanced"] as const;
@@ -35,8 +37,10 @@ export default function BookingForm() {
     const [matching, setMatching] = useState(false);
     const [match, setMatch] = useState<MatchResult | null>(null);
     const [error, setError] = useState("");
+    const [needsPro, setNeedsPro] = useState(false);
     const [result, setResult] = useState<Booking | null>(null);
     const [wasGuest, setWasGuest] = useState(false);
+    const isPro = Boolean(user && isProEntitled(user));
 
     useEffect(() => {
         if (user) {
@@ -58,12 +62,17 @@ export default function BookingForm() {
 
     const runMatch = async () => {
         if (!aiOn) return;
+        if (!isPro) {
+            setNeedsPro(true);
+            return;
+        }
         if (!notes.trim() && !skill) {
             setError("Add your goals or pick a skill so we can recommend a path.");
             return;
         }
         setMatching(true);
         setError("");
+        setNeedsPro(false);
         try {
             const res = await fetch("/api/ai/match", {
                 method: "POST",
@@ -75,6 +84,14 @@ export default function BookingForm() {
                 }),
             });
             const data = await res.json();
+            if (data.code === "PRO_REQUIRED" || res.status === 402) {
+                setNeedsPro(true);
+                return;
+            }
+            if (data.code === "AUTH_REQUIRED" || res.status === 401) {
+                router.push(`/?auth=login&role=student&next=${encodeURIComponent("/book")}`);
+                return;
+            }
             if (!res.ok) throw new Error(data.error || "Could not match a skill");
             setMatch(data as MatchResult);
             setSkill(data.skillSlug);
@@ -291,7 +308,7 @@ export default function BookingForm() {
                 </div>
 
                 {aiOn && (
-                    <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-4 sm:p-5">
+                    <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-4 sm:p-5 space-y-3">
                         <div className="flex flex-wrap items-center justify-between gap-3">
                             <div>
                                 <p className="text-sm font-bold text-gray-900 flex items-center gap-2">
@@ -299,7 +316,7 @@ export default function BookingForm() {
                                     AI skill match
                                 </p>
                                 <p className="mt-1 text-xs text-gray-600 font-medium">
-                                    Recommend the best path from your goals — you can still change it below.
+                                    Pro feature — recommend the best path from your goals.
                                 </p>
                             </div>
                             <button
@@ -309,11 +326,12 @@ export default function BookingForm() {
                                 className="inline-flex items-center gap-2 rounded-full bg-gray-900 hover:bg-black disabled:opacity-60 px-4 py-2 text-xs font-semibold text-white"
                             >
                                 {matching ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
-                                {matching ? "Matching…" : "Recommend skill"}
+                                {matching ? "Matching…" : isPro ? "Recommend skill" : "Unlock with Pro"}
                             </button>
                         </div>
+                        {needsPro && <ProUpgradeCard compact featureLabel="AI skill matching" />}
                         {match && (
-                            <div className="mt-4 rounded-lg border border-emerald-200 bg-white px-4 py-3 text-sm">
+                            <div className="rounded-lg border border-emerald-200 bg-white px-4 py-3 text-sm">
                                 <p className="font-bold text-gray-900">
                                     Suggested: {match.skillTitle ?? getSkill(match.skillSlug)?.title}
                                 </p>

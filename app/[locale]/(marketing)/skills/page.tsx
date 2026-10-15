@@ -10,11 +10,13 @@ export const metadata: Metadata = pageMetadata({
         "Explore Sturdee AI skill paths: automation, prompt engineering, agents, and AI-augmented careers. Practice with AI Tutor, then join a live cohort.",
     path: "/skills",
     keywords: [
+        "learn artificial intelligence",
         "AI skills",
+        "prompt engineering course free",
         "AI automation training",
-        "prompt engineering",
         "AI agents course",
-        "learn AI online",
+        "learn AI free",
+        "free generative AI courses",
         "AI tutor",
     ],
 });

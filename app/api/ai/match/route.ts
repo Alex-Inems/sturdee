@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { generateObject } from "ai";
 import { z } from "zod";
+import { getSessionUser, userHasPro } from "@/lib/auth";
 import { isFeatureEnabled } from "@/lib/features";
 import { MATCH_SYSTEM, getAiModel, isAiConfigured } from "@/lib/ai/client";
 import { skillCatalogForPrompt } from "@/lib/ai/context";
-import { checkAiRateLimit, clientKeyFromRequest } from "@/lib/ai/rate-limit";
+import { checkAiRateLimit } from "@/lib/ai/rate-limit";
 import { getSkill, skillIds } from "@/lib/skills";
 
 export const maxDuration = 30;
@@ -14,6 +15,20 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "AI is disabled" }, { status: 404 });
     }
 
+    const session = await getSessionUser();
+    if (!session) {
+        return NextResponse.json(
+            { error: "Sign in to use AI skill matching", code: "AUTH_REQUIRED" },
+            { status: 401 }
+        );
+    }
+    if (!userHasPro(session)) {
+        return NextResponse.json(
+            { error: "Sturdee Pro ($20/mo) is required for AI matching", code: "PRO_REQUIRED" },
+            { status: 402 }
+        );
+    }
+
     if (!isAiConfigured()) {
         return NextResponse.json(
             { error: "AI is not configured. Set OPENAI_API_KEY." },
@@ -21,7 +36,7 @@ export async function POST(request: Request) {
         );
     }
 
-    const limited = checkAiRateLimit(`match:${clientKeyFromRequest(request)}`);
+    const limited = checkAiRateLimit(`match:${session.id}`);
     if (!limited.ok) {
         return NextResponse.json(
             { error: "Too many requests. Try again shortly." },
