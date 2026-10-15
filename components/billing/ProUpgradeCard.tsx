@@ -5,7 +5,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Sparkles, Loader2 } from "lucide-react";
 import { useAuth } from "@/components/AuthContext";
-import { isProEntitled, PRO_PRICE_LABEL, PRO_PLAN_NAME } from "@/lib/billing";
+import {
+    isProEntitled,
+    PRO_CHECKOUT_ENABLED,
+    PRO_CHECKOUT_UNAVAILABLE_MESSAGE,
+    PRO_PRICE_LABEL,
+    PRO_PLAN_NAME,
+} from "@/lib/billing";
 
 type Props = {
     compact?: boolean;
@@ -20,11 +26,17 @@ export default function ProUpgradeCard({
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [unavailable, setUnavailable] = useState(false);
 
     if (user && isProEntitled(user)) return null;
 
     const startCheckout = async () => {
         setError("");
+        setUnavailable(false);
+        if (!PRO_CHECKOUT_ENABLED) {
+            setUnavailable(true);
+            return;
+        }
         if (!isAuthenticated) {
             router.push(`/?auth=login&role=student&next=${encodeURIComponent("/pricing")}`);
             return;
@@ -65,6 +77,9 @@ export default function ProUpgradeCard({
                         See plans
                     </Link>
                 </div>
+                {unavailable && (
+                    <p className="mt-2 text-xs font-medium text-amber-900">{PRO_CHECKOUT_UNAVAILABLE_MESSAGE}</p>
+                )}
                 {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
             </div>
         );
@@ -89,6 +104,9 @@ export default function ProUpgradeCard({
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 {isAuthenticated ? `Upgrade — ${PRO_PRICE_LABEL}` : "Sign in to upgrade"}
             </button>
+            {unavailable && (
+                <p className="mt-3 text-sm font-medium text-amber-900">{PRO_CHECKOUT_UNAVAILABLE_MESSAGE}</p>
+            )}
             {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
         </div>
     );

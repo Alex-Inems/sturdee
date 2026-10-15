@@ -7,6 +7,8 @@ import { useAuth } from "@/components/AuthContext";
 import {
     FREE_FEATURES,
     isProEntitled,
+    PRO_CHECKOUT_ENABLED,
+    PRO_CHECKOUT_UNAVAILABLE_MESSAGE,
     PRO_FEATURES,
     PRO_PLAN_NAME,
     PRO_PRICE_LABEL,
@@ -21,10 +23,15 @@ export default function PricingCards() {
     const canceled = searchParams.get("canceled") === "1";
     const [loading, setLoading] = useState<"checkout" | "portal" | null>(null);
     const [error, setError] = useState("");
+    const [unavailable, setUnavailable] = useState(!PRO_CHECKOUT_ENABLED);
     const isPro = user ? isProEntitled(user) : false;
 
     const checkout = async () => {
         setError("");
+        if (!PRO_CHECKOUT_ENABLED) {
+            setUnavailable(true);
+            return;
+        }
         if (!isAuthenticated) {
             router.push(`/?auth=login&role=student&next=${encodeURIComponent("/pricing")}`);
             return;
@@ -65,6 +72,11 @@ export default function PricingCards() {
             {canceled && (
                 <p className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-600">
                     Checkout canceled. You can upgrade anytime.
+                </p>
+            )}
+            {unavailable && (
+                <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-950">
+                    {PRO_CHECKOUT_UNAVAILABLE_MESSAGE}
                 </p>
             )}
             {error && (

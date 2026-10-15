@@ -4,6 +4,16 @@ export const PRO_PRICE_USD = 20;
 export const PRO_PRICE_LABEL = "$20/month";
 export const PRO_PLAN_NAME = "Sturdee Pro";
 
+/**
+ * Flip to `true` once Stripe keys + webhook are live.
+ * While false, upgrade CTAs show a soft “not available” message instead of checkout.
+ */
+export const PRO_CHECKOUT_ENABLED = false;
+
+export const PRO_CHECKOUT_UNAVAILABLE_MESSAGE =
+    "Sturdee Pro isn’t available in your country yet. We’re expanding checkout soon — please check back.";
+
+
 export type PlanTier = "free" | "pro";
 export type PlanStatus = "inactive" | "active" | "past_due" | "canceled" | "trialing";
 

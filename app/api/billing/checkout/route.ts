@@ -1,13 +1,17 @@
 import { NextResponse } from "next/server";
 import { getSessionUser, getSiteUrl } from "@/lib/auth";
-import { isProEntitled } from "@/lib/billing";
+import {
+    isProEntitled,
+    PRO_CHECKOUT_ENABLED,
+    PRO_CHECKOUT_UNAVAILABLE_MESSAGE,
+} from "@/lib/billing";
 import { getProfileBilling, setStripeCustomerId } from "@/lib/billing-db";
 import { getProPriceId, getStripe, isStripeConfigured } from "@/lib/stripe";
 
 export async function POST() {
-    if (!isStripeConfigured()) {
+    if (!PRO_CHECKOUT_ENABLED || !isStripeConfigured()) {
         return NextResponse.json(
-            { error: "Billing is not configured. Set STRIPE_SECRET_KEY." },
+            { error: PRO_CHECKOUT_UNAVAILABLE_MESSAGE, code: "CHECKOUT_UNAVAILABLE" },
             { status: 503 }
         );
     }
