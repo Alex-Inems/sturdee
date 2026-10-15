@@ -10,7 +10,8 @@ const Footer = () => {
 
     // Sections live when their flag is on in lib/feature-flags.ts.
     const resourceLinks = [
-        // { label: nav("tutorials"), href: "/tutorials" as const },
+        { label: nav("ai"), href: "/ai" as const },
+        { label: nav("tutorials"), href: "/tutorials" as const },
         { label: nav("skills"), href: "/skills" as const },
         { label: nav("classroom"), href: "/classroom" as const },
         { label: nav("book"), href: "/book" as const },

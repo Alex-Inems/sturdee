@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { MAX_CLASS_CAPACITY } from "@/lib/google-meet";
 import { useAuth } from "@/components/AuthContext";
 
@@ -24,7 +25,8 @@ function toLocalInputValue(d: Date) {
 }
 
 export default function ClassroomHostManager({ guestMode = false }: { guestMode?: boolean }) {
-    const { isAuthenticated, loading, signInWithGoogleMeet, ensureAuth, user } = useAuth();
+    const { isAuthenticated, loading, user } = useAuth();
+    const router = useRouter();
     const [classes, setClasses] = useState<HostClass[]>([]);
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState("");
@@ -37,7 +39,6 @@ export default function ClassroomHostManager({ guestMode = false }: { guestMode?
     const [startsAt, setStartsAt] = useState(() => toLocalInputValue(new Date(Date.now() + 60 * 60 * 1000)));
     const [capacity, setCapacity] = useState(MAX_CLASS_CAPACITY);
     const [meetUrl, setMeetUrl] = useState("");
-    const [generateMeet, setGenerateMeet] = useState(true);
 
     const canHost =
         guestMode ||
@@ -75,8 +76,8 @@ export default function ClassroomHostManager({ guestMode = false }: { guestMode?
                     startsAt: new Date(startsAt).toISOString(),
                     capacity,
                     provider: "meet",
-                    meetUrl: !generateMeet ? meetUrl || undefined : undefined,
-                    generateMeet,
+                    meetUrl: meetUrl || undefined,
+                    generateMeet: false,
                 }),
             });
             const data = await res.json();
@@ -151,13 +152,14 @@ export default function ClassroomHostManager({ guestMode = false }: { guestMode?
                 </p>
                 <button
                     type="button"
-                    onClick={() => {
-                        ensureAuth();
-                        void signInWithGoogleMeet("/dashboard/tutor");
-                    }}
+                    onClick={() =>
+                        router.push(
+                            `/?auth=login&role=tutor&next=${encodeURIComponent("/dashboard/tutor")}`
+                        )
+                    }
                     className="mt-6 px-6 py-3 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold text-sm rounded-full"
                 >
-                    Sign in as tutor with Google
+                    Sign in as tutor with email
                 </button>
             </div>
         );
@@ -362,51 +364,20 @@ export default function ClassroomHostManager({ guestMode = false }: { guestMode?
                     </label>
                 </div>
 
-                <fieldset className="space-y-3 rounded-xl bg-gray-50 p-4">
-                    <legend className="px-1 text-xs font-bold uppercase tracking-wide text-gray-500">
+                <div className="rounded-xl bg-gray-50 p-4 space-y-2">
+                    <label className="block text-xs font-bold uppercase tracking-wide text-gray-500">
                         Google Meet link
-                    </legend>
-                    <label className="flex items-start gap-3 text-sm font-medium text-gray-700">
-                        <input
-                            type="radio"
-                            checked={generateMeet}
-                            onChange={() => setGenerateMeet(true)}
-                            className="mt-1"
-                        />
-                        <span>
-                            Create a Meet link automatically
-                            <span className="mt-0.5 block text-xs font-normal text-gray-400">
-                                Requires Google sign-in with Meet permission
-                            </span>
-                        </span>
                     </label>
-                    <label className="flex items-start gap-3 text-sm font-medium text-gray-700">
-                        <input
-                            type="radio"
-                            checked={!generateMeet}
-                            onChange={() => setGenerateMeet(false)}
-                            className="mt-1"
-                        />
-                        <span>Paste an existing Meet link</span>
-                    </label>
-                    {!generateMeet && (
-                        <input
-                            value={meetUrl}
-                            onChange={(e) => setMeetUrl(e.target.value)}
-                            placeholder="https://meet.google.com/abc-defg-hij"
-                            className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium"
-                        />
-                    )}
-                    {generateMeet && (
-                        <button
-                            type="button"
-                            onClick={() => void signInWithGoogleMeet("/dashboard/tutor")}
-                            className="text-sm font-semibold text-emerald-700 hover:text-emerald-800"
-                        >
-                            Reconnect Google for Meet access →
-                        </button>
-                    )}
-                </fieldset>
+                    <p className="text-xs text-gray-500 font-medium">
+                        Paste a meet.google.com link from your calendar or Meet app. No Google OAuth required.
+                    </p>
+                    <input
+                        value={meetUrl}
+                        onChange={(e) => setMeetUrl(e.target.value)}
+                        placeholder="https://meet.google.com/abc-defg-hij"
+                        className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium bg-white"
+                    />
+                </div>
 
                 <button
                     type="submit"

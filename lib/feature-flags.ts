@@ -5,8 +5,9 @@
  * not-found; navigation entries for them stay hidden.
  */
 export const FEATURES = {
-    tutorials: false,
+    tutorials: true,
     classroom: true,
+    ai: true,
 
     blog: false,
     guides: false,
@@ -35,6 +36,7 @@ export function isFeatureEnabled(feature: FeatureKey): boolean {
 /** Route prefixes owned by a feature, used to block APIs and auth handlers. */
 const PATH_FEATURES: ReadonlyArray<readonly [string, FeatureKey]> = [
     ["/api/admin", "admin"],
+    ["/api/ai", "ai"],
     ["/api/bookings", "booking"],
     ["/api/certificates", "credentials"],
     ["/api/workspaces", "credentials"],

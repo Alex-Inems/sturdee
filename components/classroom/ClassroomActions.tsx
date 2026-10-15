@@ -39,7 +39,7 @@ export default function ClassroomActions({
     isHost,
     initiallyEnrolled,
 }: Props) {
-    const { isAuthenticated, ensureAuth, signInWithGoogle } = useAuth();
+    const { isAuthenticated } = useAuth();
     const router = useRouter();
     const [enrolled, setEnrolled] = useState(initiallyEnrolled);
     const [busy, setBusy] = useState(false);
@@ -47,6 +47,11 @@ export default function ClassroomActions({
     const guestMode = isClassroomGuestAllowed();
 
     const full = enrolledCount >= capacity;
+
+    const requireStudentLogin = () => {
+        const next = `/classroom/${slug}`;
+        router.push(`/?auth=login&role=student&next=${encodeURIComponent(next)}`);
+    };
 
     const enroll = async () => {
         setBusy(true);
@@ -56,8 +61,7 @@ export default function ClassroomActions({
                 if (guestMode) {
                     await ensureGuestStudent();
                 } else {
-                    ensureAuth();
-                    await signInWithGoogle("student", `/classroom/${slug}`);
+                    requireStudentLogin();
                     return;
                 }
             }
@@ -81,8 +85,7 @@ export default function ClassroomActions({
                 if (guestMode) {
                     await ensureGuestStudent();
                 } else {
-                    ensureAuth();
-                    await signInWithGoogle("student", `/classroom/${slug}`);
+                    requireStudentLogin();
                     return;
                 }
             }

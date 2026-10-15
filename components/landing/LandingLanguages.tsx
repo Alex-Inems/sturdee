@@ -14,14 +14,14 @@ export default function LandingLanguages() {
             <SectionShell className="relative z-10">
                 <div className="max-w-2xl landing-fade-up">
                     <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700/80">
-                        Skills
+                        AI skills
                     </p>
                     <h2 className="mt-3 text-3xl sm:text-4xl lg:text-[2.75rem] font-bold text-gray-900 tracking-tight leading-[1.1]">
-                        Pick a skill. Register to learn.
+                        Pick an AI path. Learn by doing.
                     </h2>
                     <p className="mt-4 text-base sm:text-lg text-gray-500 font-medium leading-relaxed">
-                        Five practical paths with detailed topics — explore a skill, then register and get
-                        assigned to a cohort.
+                        AI-native tracks and AI-augmented careers — explore a skill, practice with AI Tutor, then
+                        join a cohort.
                     </p>
                 </div>
 

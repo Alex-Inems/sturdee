@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Navigation from "./Navigation";
 import Footer from "./Footer";
+import AiTutorFab from "@/components/ai/AiTutorFab";
 
 function LocaleHtmlLang({ lang }: { lang?: string }) {
     useEffect(() => {
@@ -15,6 +16,7 @@ function LocaleHtmlLang({ lang }: { lang?: string }) {
 export default function SiteShell({ children, lang }: { children: React.ReactNode; lang?: string }) {
     const pathname = usePathname();
     const isAdmin = pathname.startsWith("/admin");
+    const hideFab = isAdmin || pathname === "/ai" || pathname.endsWith("/ai");
 
     if (isAdmin) {
         return <>{children}</>;
@@ -26,6 +28,7 @@ export default function SiteShell({ children, lang }: { children: React.ReactNod
             <Navigation />
             {children}
             <Footer />
+            {!hideFab && <AiTutorFab />}
         </>
     );
 }

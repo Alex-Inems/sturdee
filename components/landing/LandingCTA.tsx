@@ -15,24 +15,24 @@ export default function LandingCTA() {
                 />
                 <div className="relative z-10 max-w-xl">
                     <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight leading-tight">
-                        Register to learn a skill
+                        Tutorials, AI Tutor, or a live cohort
                     </h2>
                     <p className="mt-4 text-base sm:text-lg text-gray-400 font-medium leading-relaxed">
-                        Share your details and the skill you want — we&apos;ll assign you to an available cohort
-                        and tutor.
+                        Everything is open with email sign-in — browse free tutorials, chat with AI Tutor, or register
+                        for a skill cohort.
                     </p>
                     <div className="mt-9 flex flex-wrap gap-3">
                         <Link
-                            href="/book"
+                            href="/tutorials"
                             className="inline-flex items-center justify-center px-8 py-3.5 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold text-[15px] rounded-full shadow-md hover:shadow-lg transition-all duration-200"
                         >
-                            Register now
+                            Browse tutorials
                         </Link>
                         <Link
-                            href="/skills"
+                            href="/book"
                             className="inline-flex items-center justify-center px-8 py-3.5 border border-white/20 text-white hover:bg-white/10 font-semibold text-[15px] rounded-full transition-colors"
                         >
-                            View skills
+                            Register for a cohort
                         </Link>
                     </div>
                 </div>

@@ -12,6 +12,8 @@ import { dashboardPathForRole } from "@/lib/types";
 const AuthModal = dynamic(() => import("./AuthModal"), { ssr: false });
 
 const PRIMARY_LINKS = [
+    { key: "ai", href: "/ai" },
+    { key: "tutorials", href: "/tutorials" },
     { key: "skills", href: "/skills" },
     { key: "classroom", href: "/classroom" },
 ] as const;

@@ -5,6 +5,8 @@ import JsonLd from "@/components/seo/JsonLd";
 import TutorialSidebar from "./TutorialSidebar";
 import TutorialPageContent from "./TutorialPageContent";
 import TutorialVideo from "./TutorialVideo";
+import PracticeCoach from "@/components/ai/PracticeCoach";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 import { breadcrumbJsonLd, faqJsonLd, tutorialLessonJsonLd } from "@/lib/seo";
 import type { TutorialBlock, TutorialPage, TutorialTrack } from "@/lib/tutorials";
 
@@ -33,6 +35,11 @@ export default function TutorialLayout({ track, page, prev, next }: TutorialLayo
     ];
 
     const faqItems = extractFaqItems(page.sections);
+    const practiceContext = {
+        tutorialPath: `${base}/${page.slug}`,
+        pageTitle: page.title,
+        extra: `${track.language.name} tutorial`,
+    };
 
     return (
         <div className="font-jakarta bg-page min-h-screen pt-24 pb-16">
@@ -56,6 +63,12 @@ export default function TutorialLayout({ track, page, prev, next }: TutorialLayo
                             <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-8">{page.title}</h1>
                             {page.video && <TutorialVideo video={page.video} title={page.title} />}
                             <TutorialPageContent sections={page.sections} />
+
+                            {isFeatureEnabled("ai") && (
+                                <div className="mt-10">
+                                    <PracticeCoach context={practiceContext} />
+                                </div>
+                            )}
 
                             <div className="flex flex-col sm:flex-row justify-between gap-4 mt-12 pt-8 border-t border-gray-100">
                                 {prev ? (

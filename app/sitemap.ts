@@ -3,6 +3,7 @@ import type { Locale } from "@/i18n/routing";
 import { LOCALES, localizedUrl } from "@/lib/site";
 import { SITE_URL } from "@/lib/site-core";
 import { SKILLS } from "@/lib/skills";
+import { TUTORIAL_LANGUAGES } from "@/lib/tutorials";
 
 /**
  * Live sections only — see lib/feature-flags.ts. Disabled sections stay out of
@@ -32,9 +33,16 @@ export default async function sitemap(): Promise<Sitemap> {
         ...SKILLS.map((skill) => localeEntries(`/skills/${skill.id}`, 0.9, "weekly"))
     );
 
+    const tutorialRoutes = localeEntries("/tutorials", 0.95, "weekly").concat(
+        ...TUTORIAL_LANGUAGES.map((lang) => localeEntries(`/tutorials/${lang.id}`, 0.85, "weekly"))
+    );
+
     return localeEntries("/", 1, "weekly").concat(
+        localeEntries("/ai", 0.98, "weekly"),
+        tutorialRoutes,
         skillRoutes,
         localeEntries("/classroom", 0.9, "daily"),
+        localeEntries("/book", 0.85, "weekly"),
         localeEntries("/privacy", 0.3, "yearly"),
         localeEntries("/terms", 0.3, "yearly"),
         localeEntries("/legal", 0.3, "yearly")

@@ -3,18 +3,18 @@ import SectionShell from "@/components/SectionShell";
 const STEPS = [
     {
         n: "01",
-        title: "Pick a skill",
-        body: "Choose a path — web, AI, project, product, or virtual assistant — and see every topic you’ll cover.",
+        title: "Browse free tutorials",
+        body: "Start with interactive lessons — HTML, CSS, JavaScript, Python, and more — no account required to read.",
     },
     {
         n: "02",
-        title: "Register to learn",
-        body: "Share your goals and we'll place you in an available cohort with a tutor for that skill.",
+        title: "Learn with AI Tutor",
+        body: "Ask questions and practice exercises anytime. Sign in with email when you're ready for a cohort.",
     },
     {
         n: "03",
-        title: "Practice & apply",
-        body: "Leave with clear next steps you can use at work the same week — not just notes.",
+        title: "Join a live cohort",
+        body: "Register with your goals — we'll match a skill path and place you with a tutor.",
     },
 ] as const;
 
@@ -23,10 +23,10 @@ export default function LandingMethod() {
         <SectionShell className="bg-page-deep/40">
             <div className="max-w-2xl">
                 <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight leading-tight">
-                    How Sturdee teaches skills
+                    How Sturdee teaches AI
                 </h2>
                 <p className="mt-4 text-base sm:text-lg text-gray-500 font-medium leading-relaxed">
-                    Skills stick when you practice with guidance — not when you only watch someone else work.
+                    Learn AI skills, and learn faster with AI — guided practice plus live cohorts with tutors.
                 </p>
             </div>
 

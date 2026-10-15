@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import SectionShell from "@/components/SectionShell";
+import PracticeCoach from "@/components/ai/PracticeCoach";
 import { pageMetadata } from "@/lib/seo";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 import { getSkill, SKILLS } from "@/lib/skills";
 import { routing } from "@/i18n/routing";
 
@@ -24,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title: `${skill.title} — Topics & Register`,
         description: skill.summary,
         path: `/skills/${skill.id}`,
-        keywords: [skill.title, ...skill.topics.map((t) => t.title), "register skill cohort"],
+        keywords: [skill.title, ...skill.topics.map((t) => t.title), "AI skill", "register skill cohort"],
     });
 }
 
@@ -43,7 +45,7 @@ export default async function SkillDetailPage({ params }: Props) {
                 <div className="mt-8 grid lg:grid-cols-12 gap-10 items-start">
                     <div className="lg:col-span-7">
                         <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700/80">
-                            Skill path
+                            AI skill path
                         </p>
                         <h1 className="mt-3 text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
                             {skill.title}
@@ -72,19 +74,31 @@ export default async function SkillDetailPage({ params }: Props) {
                                 </li>
                             ))}
                         </ol>
+
+                        {isFeatureEnabled("ai") && (
+                            <div className="mt-10">
+                                <PracticeCoach
+                                    context={{
+                                        skillSlug: skill.id,
+                                        pageTitle: skill.title,
+                                        extra: skill.summary,
+                                    }}
+                                />
+                            </div>
+                        )}
                     </div>
 
                     <aside className="lg:col-span-5 lg:sticky lg:top-28">
                         <div className="rounded-2xl border border-gray-200 bg-white p-6 sm:p-8 shadow-sm">
-                            <h2 className="text-lg font-bold text-gray-900">Book this skill</h2>
+                            <h2 className="text-lg font-bold text-gray-900">Join this cohort</h2>
                             <p className="mt-2 text-sm text-gray-500 font-medium leading-relaxed">
                                 Register for {skill.title} and we&apos;ll place you in an available cohort with a
                                 tutor — no need to pick a date or time.
                             </p>
                             <ul className="mt-5 space-y-2 text-sm font-medium text-gray-600">
                                 <li>· {skill.topics.length} structured topics</li>
-                                <li>· Live cohort with a tutor</li>
-                                <li>· Bring your own goals or project</li>
+                                <li>· Practice with AI Tutor anytime</li>
+                                <li>· Live cohort with a human tutor</li>
                             </ul>
                             <Link
                                 href={`/book?skill=${skill.id}`}
@@ -93,10 +107,10 @@ export default async function SkillDetailPage({ params }: Props) {
                                 Register to learn
                             </Link>
                             <Link
-                                href="/?auth=login"
+                                href="/ai"
                                 className="mt-3 flex w-full items-center justify-center rounded-full border border-gray-200 px-6 py-3 text-sm font-semibold text-gray-800 hover:border-gray-300 transition-colors"
                             >
-                                Sign in as student first
+                                Try AI Tutor first
                             </Link>
                         </div>
                     </aside>

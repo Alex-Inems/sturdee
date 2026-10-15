@@ -21,6 +21,7 @@
     "tutors": "Tutores",
     "classroom": "Aula",
     "skills": "Habilidades",
+    "ai": "Tutor IA",
     "book": "Reservar",
     "more": "Más",
     "resources": "Recursos",
@@ -31,7 +32,7 @@
     "logout": "Cerrar sesión"
   },
   "Footer": {
-    "tagline": "Formando desarrolladores con educación rigurosa alineada a la industria",
+    "tagline": "Empresa de aprendizaje con IA — domina habilidades de IA y aprende más rápido con tutores IA",
     "programs": "Programas",
     "webDev": "Desarrollo web",
     "programming": "Programación",
