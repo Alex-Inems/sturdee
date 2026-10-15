@@ -23,7 +23,6 @@ export default function robots(): MetadataRoute.Robots {
                     "/classroom/host",
                     "/classroom/demo",
                     // Flagged-off sections (see lib/feature-flags.ts)
-                    "/blog",
                     "/guides",
                     "/cheatsheets",
                     "/courses",

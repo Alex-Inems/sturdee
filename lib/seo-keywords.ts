@@ -92,7 +92,7 @@ export const LEARN_HUBS: LearnHub[] = [
             },
         ],
         ctaPrimary: { href: "/skills", label: "Browse AI skills" },
-        ctaSecondary: { href: "/tutorials", label: "Free coding tutorials" },
+        ctaSecondary: { href: "/blog/category/ai", label: "Read AI blog guides" },
     },
     {
         slug: "prompt-engineering",
@@ -131,7 +131,10 @@ export const LEARN_HUBS: LearnHub[] = [
             },
         ],
         ctaPrimary: { href: "/skills/prompt-engineering", label: "Open prompt engineering path" },
-        ctaSecondary: { href: "/pricing", label: "See Pro pricing" },
+        ctaSecondary: {
+            href: "/blog/prompt-engineering-course-free-complete-tutorial",
+            label: "Free prompt engineering tutorial",
+        },
     },
     {
         slug: "coding-free",

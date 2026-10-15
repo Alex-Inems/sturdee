@@ -26,7 +26,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         description,
         path: "/blog",
         locale: locale as Locale,
-        keywords: ["programming blog", "web development blog", "coding tutorials blog", "tech lessons"],
+        keywords: [
+            "AI learning blog",
+            "learn artificial intelligence free",
+            "prompt engineering tutorial",
+            "free coding tutorials blog",
+            "programming blog",
+            "web development blog",
+            "learn to code with AI",
+        ],
     });
 }
 
@@ -46,9 +54,12 @@ export default function BlogIndexPage() {
                 <span className="inline-flex px-4 py-1.5 bg-[#FFE55E] rounded-full font-bold text-black text-xs mb-4">
                     {BLOG_POST_COUNT} Articles
                 </span>
-                <h1 className="text-4xl font-bold text-gray-900 mb-4">Sturdee Tech Blog</h1>
+                <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                    Learn AI &amp; Code — Sturdee Blog
+                </h1>
                 <p className="text-lg text-gray-500 font-medium mb-8 leading-relaxed">
-                    In-depth lessons on web development, programming, and Shopify — each article links to free interactive tutorials.
+                    In-depth guides on artificial intelligence, prompt engineering, free coding tutorials, and web
+                    development — each article links to free interactive lessons and skill paths.
                 </p>
 
                 <div className="flex flex-wrap gap-2 mb-10">

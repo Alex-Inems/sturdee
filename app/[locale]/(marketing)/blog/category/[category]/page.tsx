@@ -22,11 +22,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { category } = await params;
     const cat = SLUG_TO_CATEGORY[category];
     if (!cat) return {};
+    const isAi = cat === "AI";
     return pageMetadata({
-        title: `${cat} Blog — Programming Articles & Tutorials`,
-        description: `Free ${cat.toLowerCase()} articles, guides, and lessons. Learn ${cat.toLowerCase()} with Sturdee tutorials and blog posts.`,
+        title: isAi
+            ? "AI Blog — Learn Artificial Intelligence Free"
+            : `${cat} Blog — Programming Articles & Tutorials`,
+        description: isAi
+            ? "Free AI articles: learn artificial intelligence, prompt engineering, generative AI courses, and coding with AI — linked to Sturdee practice."
+            : `Free ${cat.toLowerCase()} articles, guides, and lessons. Learn ${cat.toLowerCase()} with Sturdee tutorials and blog posts.`,
         path: `/blog/category/${category}`,
-        keywords: [`${cat.toLowerCase()} blog`, `${cat.toLowerCase()} tutorial`, "programming articles"],
+        keywords: isAi
+            ? [
+                  "AI blog",
+                  "learn artificial intelligence free",
+                  "prompt engineering tutorial",
+                  "free generative AI courses",
+                  "AI tutorials",
+              ]
+            : [`${cat.toLowerCase()} blog`, `${cat.toLowerCase()} tutorial`, "programming articles"],
         type: "website",
     });
 }

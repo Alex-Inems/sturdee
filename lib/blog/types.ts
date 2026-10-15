@@ -1,6 +1,7 @@
 import type { TutorialBlock } from "@/lib/tutorials/types";
 
 export type BlogCategory =
+    | "AI"
     | "JavaScript"
     | "Python"
     | "CSS"

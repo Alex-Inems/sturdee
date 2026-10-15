@@ -9,7 +9,7 @@ export const FEATURES = {
     classroom: true,
     ai: true,
 
-    blog: false,
+    blog: true,
     guides: false,
     cheatsheets: false,
     courses: false,

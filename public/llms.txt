@@ -10,6 +10,8 @@
 - [Prompt engineering](/learn/prompt-engineering): Prompt engineering course free
 - [Learn to code free](/learn/coding-free): Free coding tutorials hub
 - [Web development](/learn/web-development): Learn web development free
+- [Blog](/blog): SEO guides on AI, prompting, and coding
+- [AI category](/blog/category/ai): Learn AI free articles
 - [Tutorials](/tutorials): Interactive programming tutorials
 - [AI skills](/skills): Automation, prompts, agents
 - [AI Tutor](/ai): Chat tutor (Sturdee Pro)

@@ -1,10 +1,12 @@
 import type { MetadataRoute } from "next";
 import type { Locale } from "@/i18n/routing";
+import { BLOG_POSTS, getCategorySlug, BLOG_CATEGORIES } from "@/lib/blog";
 import { LOCALES, localizedUrl } from "@/lib/site";
 import { SITE_URL } from "@/lib/site-core";
 import { SKILLS } from "@/lib/skills";
 import { TUTORIAL_LANGUAGES } from "@/lib/tutorials";
 import { LEARN_HUBS } from "@/lib/seo-keywords";
+import { FEATURES } from "@/lib/feature-flags";
 
 /**
  * Live sections only — see lib/feature-flags.ts. Disabled sections stay out of
@@ -42,9 +44,21 @@ export default async function sitemap(): Promise<Sitemap> {
         ...LEARN_HUBS.map((hub) => localeEntries(`/learn/${hub.slug}`, 0.95, "weekly"))
     );
 
+    const blogRoutes = FEATURES.blog
+        ? localeEntries("/blog", 0.96, "daily").concat(
+              ...BLOG_CATEGORIES.map((cat) =>
+                  localeEntries(`/blog/category/${getCategorySlug(cat)}`, 0.85, "weekly")
+              ),
+              ...BLOG_POSTS.map((post) =>
+                  localeEntries(`/blog/${post.slug}`, 0.88, "monthly", undefined, post.updatedAt)
+              )
+          )
+        : [];
+
     return localeEntries("/", 1, "weekly").concat(
         learnRoutes,
         tutorialRoutes,
+        blogRoutes,
         skillRoutes,
         localeEntries("/ai", 0.9, "weekly"),
         localeEntries("/pricing", 0.9, "weekly"),

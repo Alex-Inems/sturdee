@@ -1,5 +1,6 @@
 import { buildBlogPost, categorySlug, scoreRelatedPosts } from "./factory";
 import { validateBlogPosts } from "./validate";
+import { AI_TOPICS } from "./topics/ai-learning";
 import { HTML_TOPICS, CSS_TOPICS } from "./topics/html-css";
 import { JAVASCRIPT_TOPICS } from "./topics/javascript";
 import { PYTHON_TOPICS, SHOPIFY_TOPICS } from "./topics/python-shopify";
@@ -9,6 +10,7 @@ import type { BlogCategory, BlogPost, BlogTopic } from "./types";
 export type { BlogCategory, BlogPost };
 
 const ALL_TOPICS: BlogTopic[] = [
+    ...AI_TOPICS,
     ...HTML_TOPICS,
     ...CSS_TOPICS,
     ...JAVASCRIPT_TOPICS,
@@ -32,6 +34,7 @@ export const BLOG_POSTS: BlogPost[] = ALL_TOPICS_ENRICHED.map((topic) =>
 validateBlogPosts(BLOG_POSTS);
 
 export const BLOG_CATEGORIES: BlogCategory[] = [
+    "AI",
     "HTML",
     "CSS",
     "JavaScript",

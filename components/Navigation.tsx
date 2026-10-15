@@ -13,6 +13,7 @@ const AuthModal = dynamic(() => import("./AuthModal"), { ssr: false });
 
 const PRIMARY_LINKS = [
     { key: "tutorials", href: "/tutorials" },
+    { key: "blog", href: "/blog" },
     { key: "skills", href: "/skills" },
     { key: "ai", href: "/ai" },
     { key: "pricing", href: "/pricing" },

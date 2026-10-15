@@ -364,10 +364,11 @@ export function blogListJsonLd(count: number) {
     return {
         "@context": "https://schema.org",
         "@type": "Blog",
-        name: `${SITE_NAME} Tech Blog`,
+        name: `${SITE_NAME} AI & Coding Blog`,
         url: `${SITE_URL}/blog`,
-        description: "Free programming tutorials, web development guides, and tech lessons.",
-        blogPost: `${count} articles on HTML, CSS, JavaScript, Python, Shopify, and more.`,
+        description:
+            "Free guides on learning AI, prompt engineering, coding tutorials, and web development.",
+        blogPost: `${count} articles on AI, HTML, CSS, JavaScript, Python, Shopify, and careers.`,
     };
 }
 
