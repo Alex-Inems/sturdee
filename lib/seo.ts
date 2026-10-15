@@ -352,6 +352,15 @@ export function blogPostJsonLd(post: import("@/lib/blog/types").BlogPost) {
             url: SITE_URL,
             logo: { "@type": "ImageObject", url: `${SITE_URL}/icon.svg` },
         },
+        ...(post.coverImage
+            ? {
+                  image: [
+                      post.coverImage.startsWith("http")
+                          ? post.coverImage
+                          : `${SITE_URL}${post.coverImage}`,
+                  ],
+              }
+            : {}),
         articleSection: post.category,
         keywords: post.keywords.join(", "),
         about: { "@type": "Thing", name: post.focusKeyword },

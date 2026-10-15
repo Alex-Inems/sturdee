@@ -4,7 +4,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
 import { getLocalizedHubMeta } from "@/lib/i18n/metadata";
-import { BLOG_POSTS, BLOG_POST_COUNT, getCategorySlug } from "@/lib/blog";
+import { BLOG_POST_COUNT, getBlogPosts, getCategorySlug } from "@/lib/blog";
 import { assertFeatureEnabled } from "@/lib/features";
 import { getLocaleSeoKeywords } from "@/lib/i18n/seo-locale";
 import { blogListJsonLd, pageMetadata } from "@/lib/seo";
@@ -31,13 +31,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     });
 }
 
-const CATEGORIES = [...new Set(BLOG_POSTS.map((p) => p.category))];
-
 export default async function BlogIndexPage({ params }: Props) {
     assertFeatureEnabled("blog");
     const { locale } = await params;
+    const posts = getBlogPosts(locale as Locale);
+    const CATEGORIES = [...new Set(posts.map((p) => p.category))];
 
-    const sorted = [...BLOG_POSTS].sort(
+    const sorted = [...posts].sort(
         (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
     );
 
@@ -103,23 +103,36 @@ export default async function BlogIndexPage({ params }: Props) {
                         <Link
                             key={post.slug}
                             href={`/blog/${post.slug}`}
-                            className="block rounded-2xl border border-gray-200 bg-white p-6 shadow-lg hover:border-emerald-200 hover:shadow-xl transition-all"
+                            className="group flex flex-col sm:flex-row gap-4 rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 shadow-lg hover:border-emerald-200 hover:shadow-xl transition-all"
                         >
-                            <div className="flex flex-wrap items-center gap-2 mb-2">
-                                <span className="text-xs font-bold text-emerald-600">{post.category}</span>
-                                <span className="text-xs text-gray-400">
-                                    {new Date(post.publishedAt).toLocaleDateString("en-US", {
-                                        month: "short",
-                                        day: "numeric",
-                                        year: "numeric",
-                                    })}
-                                </span>
-                                <span className="text-xs text-gray-400">{post.readTime}</span>
+                            {post.coverImage ? (
+                                <div className="sm:w-44 shrink-0 overflow-hidden rounded-xl border border-gray-100 bg-emerald-50/40">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img
+                                        src={post.coverImage}
+                                        alt={post.coverAlt ?? post.title}
+                                        className="h-40 sm:h-full w-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
+                                        loading="lazy"
+                                    />
+                                </div>
+                            ) : null}
+                            <div className="min-w-0 flex-1 py-1">
+                                <div className="flex flex-wrap items-center gap-2 mb-2">
+                                    <span className="text-xs font-bold text-emerald-600">{post.category}</span>
+                                    <span className="text-xs text-gray-400">
+                                        {new Date(post.publishedAt).toLocaleDateString("en-US", {
+                                            month: "short",
+                                            day: "numeric",
+                                            year: "numeric",
+                                        })}
+                                    </span>
+                                    <span className="text-xs text-gray-400">{post.readTime}</span>
+                                </div>
+                                <h2 className="text-xl font-bold text-gray-900">{post.title}</h2>
+                                <p className="text-gray-500 font-medium mt-2 text-sm leading-relaxed line-clamp-2">
+                                    {post.description}
+                                </p>
                             </div>
-                            <h2 className="text-xl font-bold text-gray-900">{post.title}</h2>
-                            <p className="text-gray-500 font-medium mt-2 text-sm leading-relaxed line-clamp-2">
-                                {post.description}
-                            </p>
                         </Link>
                     ))}
                 </div>

@@ -11,6 +11,14 @@ export type BlogCategory =
     | "Backend"
     | "Tools";
 
+export interface BlogChapter {
+    title: string;
+    paragraphs: string[];
+    figure?: { src: string; alt: string; caption?: string };
+    list?: string[];
+    tip?: string;
+}
+
 export interface BlogPost {
     slug: string;
     title: string;
@@ -26,6 +34,8 @@ export interface BlogPost {
     canonicalPath: string;
     relatedSlugs: string[];
     sections: TutorialBlock[];
+    coverImage?: string;
+    coverAlt?: string;
 }
 
 export interface BlogTopic {
@@ -39,6 +49,9 @@ export interface BlogTopic {
     tutorialPath?: string;
     focusKeyword?: string;
     seoTitle?: string;
+    /** Hero illustration under the title */
+    coverImage?: string;
+    coverAlt?: string;
     headings?: {
         intro?: string;
         concepts?: string;
@@ -47,7 +60,11 @@ export interface BlogTopic {
         mistakes?: string;
         practice?: string;
         faq?: string;
+        story?: string;
+        takeaway?: string;
     };
+    /** Opening hook — first narrative beat */
+    hook?: string;
     intro: string;
     concepts?: string[];
     steps?: string[];
@@ -58,4 +75,8 @@ export interface BlogTopic {
     /** Optional extra paragraphs — unique per article */
     deepDive?: string;
     whyItMatters?: string;
+    /** Long-form storyline chapters (preferred for pillar posts) */
+    chapters?: BlogChapter[];
+    /** Closing takeaway / next step narrative */
+    takeaway?: string;
 }

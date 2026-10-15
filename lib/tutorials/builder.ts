@@ -40,6 +40,10 @@ export function faq(items: { question: string; answer: string }[]): TutorialBloc
     return { type: "faq", items };
 }
 
+export function figure(src: string, alt: string, caption?: string): TutorialBlock {
+    return { type: "figure", src, alt, caption };
+}
+
 export function code(language: string, code: string, title?: string): TutorialBlock {
     return { type: "code", language, code, title };
 }

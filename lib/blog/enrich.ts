@@ -63,6 +63,8 @@ export function deriveHeadings(topic: BlogTopic): Record<string, string> {
         mistakes: topic.headings?.mistakes ?? `Common ${focus} Mistakes`,
         practice: topic.headings?.practice ?? `Practice ${focus} with Free Lessons`,
         faq: topic.headings?.faq ?? `${short} — FAQ`,
+        story: topic.headings?.story ?? `The Story Behind ${focus}`,
+        takeaway: topic.headings?.takeaway ?? `Takeaways — What to Do Next`,
     };
 }
 

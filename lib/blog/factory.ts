@@ -1,18 +1,65 @@
-import { code, faq, h2, list, p, steps, tip } from "@/lib/tutorials/builder";
+import { code, faq, figure, h2, h3, list, p, steps, tip } from "@/lib/tutorials/builder";
 import { deriveHeadings, enrichTopic } from "./enrich";
 import type { BlogPost, BlogTopic } from "./types";
+
+function estimateReadTime(topic: BlogTopic): string {
+    const words = [
+        topic.hook,
+        topic.intro,
+        topic.whyItMatters,
+        topic.deepDive,
+        topic.practice,
+        topic.takeaway,
+        ...(topic.concepts ?? []),
+        ...(topic.steps ?? []),
+        ...(topic.mistakes ?? []),
+        ...(topic.faq ?? []).flatMap((f) => [f.question, f.answer]),
+        ...(topic.chapters ?? []).flatMap((c) => [c.title, ...c.paragraphs, ...(c.list ?? []), c.tip ?? ""]),
+    ]
+        .filter(Boolean)
+        .join(" ")
+        .split(/\s+/).length;
+
+    const minutes = Math.max(8, Math.min(28, Math.round(words / 200)));
+    return `${minutes} min read`;
+}
 
 export function buildBlogPost(topic: BlogTopic, relatedSlugs: string[]): BlogPost {
     const enriched = enrichTopic(topic);
     const headings = deriveHeadings(enriched);
+    const hasChapters = Boolean(enriched.chapters?.length);
 
     const sections = [
+        ...(enriched.coverImage
+            ? [
+                  figure(
+                      enriched.coverImage,
+                      enriched.coverAlt ?? enriched.title,
+                      enriched.focusKeyword ? `Illustration: ${enriched.focusKeyword}` : undefined
+                  ),
+              ]
+            : []),
         h2(headings.intro),
+        ...(enriched.hook ? [p(enriched.hook)] : []),
         p(enriched.intro),
         ...(enriched.whyItMatters
             ? [h2(`Why ${enriched.focusKeyword} Matters`), p(enriched.whyItMatters)]
             : []),
-        ...(enriched.deepDive ? [p(enriched.deepDive)] : []),
+        ...(enriched.deepDive && !hasChapters ? [p(enriched.deepDive)] : []),
+        ...(hasChapters
+            ? [
+                  h2(headings.story ?? "The Story — Step by Step"),
+                  ...enriched.chapters!.flatMap((chapter) => [
+                      h3(chapter.title),
+                      ...chapter.paragraphs.map((para) => p(para)),
+                      ...(chapter.figure
+                          ? [figure(chapter.figure.src, chapter.figure.alt, chapter.figure.caption)]
+                          : []),
+                      ...(chapter.list?.length ? [list(chapter.list)] : []),
+                      ...(chapter.tip ? [tip(chapter.tip)] : []),
+                  ]),
+              ]
+            : []),
         ...(enriched.concepts?.length
             ? [h2(headings.concepts), list(enriched.concepts)]
             : []),
@@ -30,6 +77,9 @@ export function buildBlogPost(topic: BlogTopic, relatedSlugs: string[]): BlogPos
             : []),
         h2(headings.practice),
         p(enriched.practice),
+        ...(enriched.takeaway
+            ? [h2(headings.takeaway ?? "What to Remember"), p(enriched.takeaway)]
+            : []),
         ...(enriched.tutorialPath
             ? [
                   tip(
@@ -49,13 +99,15 @@ export function buildBlogPost(topic: BlogTopic, relatedSlugs: string[]): BlogPos
         focusKeyword: enriched.focusKeyword!,
         keywords: enriched.keywords,
         category: enriched.category,
-        readTime: enriched.readTime,
+        readTime: hasChapters ? estimateReadTime(enriched) : enriched.readTime,
         publishedAt: enriched.publishedAt,
         updatedAt: enriched.publishedAt,
         tutorialPath: enriched.tutorialPath,
         canonicalPath: `/blog/${enriched.slug}`,
         relatedSlugs,
         sections,
+        coverImage: enriched.coverImage,
+        coverAlt: enriched.coverAlt,
     };
 }
 

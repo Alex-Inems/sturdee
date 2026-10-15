@@ -18,7 +18,8 @@ export type TutorialBlock =
     | { type: "tip"; text: string }
     | { type: "list"; items: string[] }
     | { type: "steps"; items: string[] }
-    | { type: "faq"; items: { question: string; answer: string }[] };
+    | { type: "faq"; items: { question: string; answer: string }[] }
+    | { type: "figure"; src: string; alt: string; caption?: string };
 
 export interface TutorialVideo {
     id: string;

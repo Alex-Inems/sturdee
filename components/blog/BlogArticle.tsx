@@ -6,6 +6,7 @@ import { getCategorySlug } from "@/lib/blog";
 import { blogPostJsonLd, breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 import type { BlogPost } from "@/lib/blog/types";
 import type { TutorialBlock } from "@/lib/tutorials/types";
+import type { Locale } from "@/i18n/routing";
 
 function extractFaq(sections: TutorialBlock[]) {
     const block = sections.find((s) => s.type === "faq");
@@ -13,15 +14,45 @@ function extractFaq(sections: TutorialBlock[]) {
     return block.items;
 }
 
+const UI: Record<Locale, { home: string; blog: string; related: string; continueLearning: string }> = {
+    en: {
+        home: "Home",
+        blog: "Blog",
+        related: "Related articles",
+        continueLearning: "Continue learning interactively",
+    },
+    fr: {
+        home: "Accueil",
+        blog: "Blog",
+        related: "Articles connexes",
+        continueLearning: "Continuer à apprendre en interactif",
+    },
+    es: {
+        home: "Inicio",
+        blog: "Blog",
+        related: "Artículos relacionados",
+        continueLearning: "Seguir aprendiendo de forma interactiva",
+    },
+    zh: {
+        home: "首页",
+        blog: "博客",
+        related: "相关文章",
+        continueLearning: "继续互动学习",
+    },
+};
+
 interface BlogArticleProps {
     post: BlogPost;
     related?: BlogPost[];
+    locale?: Locale;
 }
 
-export default function BlogArticle({ post, related = [] }: BlogArticleProps) {
+export default function BlogArticle({ post, related = [], locale = "en" }: BlogArticleProps) {
     const path = `/blog/${post.slug}`;
     const faqItems = extractFaq(post.sections);
-    const published = new Date(post.publishedAt).toLocaleDateString("en-US", {
+    const labels = UI[locale] ?? UI.en;
+    const dateLocale = locale === "zh" ? "zh-CN" : locale === "fr" ? "fr-FR" : locale === "es" ? "es-ES" : "en-US";
+    const published = new Date(post.publishedAt).toLocaleDateString(dateLocale, {
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -32,8 +63,8 @@ export default function BlogArticle({ post, related = [] }: BlogArticleProps) {
             <JsonLd
                 data={[
                     breadcrumbJsonLd([
-                        { name: "Home", path: "/" },
-                        { name: "Blog", path: "/blog" },
+                        { name: labels.home, path: "/" },
+                        { name: labels.blog, path: "/blog" },
                         { name: post.title, path },
                     ]),
                     blogPostJsonLd(post),
@@ -43,12 +74,12 @@ export default function BlogArticle({ post, related = [] }: BlogArticleProps) {
             <div className="max-w-3xl mx-auto px-6 md:px-12">
                 <Breadcrumbs
                     items={[
-                        { label: "Home", href: "/" },
-                        { label: "Blog", href: "/blog" },
+                        { label: labels.home, href: "/" },
+                        { label: labels.blog, href: "/blog" },
                         { label: post.title },
                     ]}
                 />
-                <article className="rounded-2xl border border-gray-200 bg-white shadow-xl p-6 md:p-10 mt-4">
+                <article className="rounded-2xl border border-gray-200 bg-white shadow-xl p-6 md:p-10 mt-4 overflow-hidden">
                     <div className="flex flex-wrap items-center gap-2 mb-3">
                         <Link
                             href={`/blog/category/${getCategorySlug(post.category)}`}
@@ -80,15 +111,15 @@ export default function BlogArticle({ post, related = [] }: BlogArticleProps) {
                     <TutorialPageContent sections={post.sections} />
                     {post.tutorialPath && (
                         <div className="mt-10 p-5 rounded-xl bg-emerald-50 border border-emerald-100">
-                            <p className="text-sm font-bold text-gray-900 mb-2">Continue learning interactively</p>
+                            <p className="text-sm font-bold text-gray-900 mb-2">{labels.continueLearning}</p>
                             <Link href={post.tutorialPath} className="text-emerald-700 font-semibold text-sm hover:underline">
-                                Free tutorial: {post.tutorialPath} →
+                                {post.tutorialPath} →
                             </Link>
                         </div>
                     )}
                     {related.length > 0 && (
                         <div className="mt-10 pt-8 border-t border-gray-100">
-                            <h2 className="text-lg font-bold text-gray-900 mb-4">Related articles</h2>
+                            <h2 className="text-lg font-bold text-gray-900 mb-4">{labels.related}</h2>
                             <ul className="space-y-2">
                                 {related.map((r) => (
                                     <li key={r.slug}>

@@ -1,5 +1,7 @@
+import type { Locale } from "@/i18n/routing";
 import { buildBlogPost, categorySlug, scoreRelatedPosts } from "./factory";
 import { validateBlogPosts } from "./validate";
+import { localizeBlogTopic } from "./localize";
 import { AI_TOPICS } from "./topics/ai-learning";
 import { HTML_TOPICS, CSS_TOPICS } from "./topics/html-css";
 import { JAVASCRIPT_TOPICS } from "./topics/javascript";
@@ -9,7 +11,7 @@ import type { BlogCategory, BlogPost, BlogTopic } from "./types";
 
 export type { BlogCategory, BlogPost };
 
-const ALL_TOPICS: BlogTopic[] = [
+export const ALL_BLOG_TOPICS: BlogTopic[] = [
     ...AI_TOPICS,
     ...HTML_TOPICS,
     ...CSS_TOPICS,
@@ -25,10 +27,9 @@ function relatedSlugs(topic: BlogTopic, all: BlogTopic[]): string[] {
     return scoreRelatedPosts(topic, all);
 }
 
-const ALL_TOPICS_ENRICHED = ALL_TOPICS;
-
-export const BLOG_POSTS: BlogPost[] = ALL_TOPICS_ENRICHED.map((topic) =>
-    buildBlogPost(topic, relatedSlugs(topic, ALL_TOPICS_ENRICHED))
+/** English posts (sitemap, static params, validation). */
+export const BLOG_POSTS: BlogPost[] = ALL_BLOG_TOPICS.map((topic) =>
+    buildBlogPost(topic, relatedSlugs(topic, ALL_BLOG_TOPICS))
 );
 
 validateBlogPosts(BLOG_POSTS);
@@ -45,12 +46,23 @@ export const BLOG_CATEGORIES: BlogCategory[] = [
     "Tools",
 ];
 
-export function getBlogPost(slug: string): BlogPost | undefined {
-    return BLOG_POSTS.find((p) => p.slug === slug);
+const localeCache = new Map<string, BlogPost[]>();
+
+export function getBlogPosts(locale: Locale = "en"): BlogPost[] {
+    if (locale === "en") return BLOG_POSTS;
+    const cached = localeCache.get(locale);
+    if (cached) return cached;
+    const posts = ALL_BLOG_TOPICS.map((topic) => localizeBlogTopic(topic, locale, ALL_BLOG_TOPICS));
+    localeCache.set(locale, posts);
+    return posts;
 }
 
-export function getPostsByCategory(category: BlogCategory): BlogPost[] {
-    return BLOG_POSTS.filter((p) => p.category === category);
+export function getBlogPost(slug: string, locale: Locale = "en"): BlogPost | undefined {
+    return getBlogPosts(locale).find((p) => p.slug === slug);
+}
+
+export function getPostsByCategory(category: BlogCategory, locale: Locale = "en"): BlogPost[] {
+    return getBlogPosts(locale).filter((p) => p.category === category);
 }
 
 export function getCategorySlug(category: BlogCategory): string {

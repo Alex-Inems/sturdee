@@ -62,6 +62,25 @@ export default function TutorialPageContent({ sections }: { sections: TutorialBl
                                 {block.text}
                             </div>
                         );
+                    case "figure":
+                        return (
+                            <figure key={i} className="my-10 -mx-1 sm:mx-0">
+                                <div className="overflow-hidden rounded-2xl border border-gray-200/80 bg-gradient-to-br from-emerald-50/40 to-amber-50/30 shadow-sm">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img
+                                        src={block.src}
+                                        alt={block.alt}
+                                        className="w-full h-auto object-cover"
+                                        loading="lazy"
+                                    />
+                                </div>
+                                {block.caption ? (
+                                    <figcaption className="mt-3 text-center text-sm font-medium text-gray-500 leading-relaxed">
+                                        {block.caption}
+                                    </figcaption>
+                                ) : null}
+                            </figure>
+                        );
                     case "faq":
                         return (
                             <div key={i} className="my-8 space-y-4">
