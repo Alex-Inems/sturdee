@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import NextLink from "next/link";
 
 export default function LandingConsult() {
     const t = useTranslations("Landing");
@@ -39,12 +39,12 @@ export default function LandingConsult() {
                             {t("consultBody")}
                         </p>
                         <div className="mt-9">
-                            <Link
+                            <NextLink
                                 href="/book?consult=1"
                                 className="inline-flex items-center justify-center px-8 py-3.5 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold text-[15px] rounded-full shadow-md hover:shadow-lg transition-all duration-200"
                             >
                                 {t("consultCta")}
-                            </Link>
+                            </NextLink>
                         </div>
                     </div>
                 </div>
