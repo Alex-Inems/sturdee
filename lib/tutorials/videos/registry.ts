@@ -6,6 +6,7 @@ import { PYTHON_VIDEOS } from "./python";
 import { LANGUAGE_VIDEOS } from "./languages";
 import { MISC_VIDEOS } from "./misc";
 import { LIQUID_VIDEOS } from "./liquid";
+import { ADVANCED_VIDEOS } from "./advanced";
 
 export const TUTORIAL_VIDEOS: Record<string, TutorialVideo> = {
     ...HTML_VIDEOS,
@@ -15,6 +16,7 @@ export const TUTORIAL_VIDEOS: Record<string, TutorialVideo> = {
     ...LANGUAGE_VIDEOS,
     ...MISC_VIDEOS,
     ...LIQUID_VIDEOS,
+    ...ADVANCED_VIDEOS,
 };
 
 export function getTutorialVideo(langId: string, slug: string): TutorialVideo | undefined {

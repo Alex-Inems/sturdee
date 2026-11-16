@@ -2,12 +2,14 @@ import type { BlogTopicPatch } from "./types";
 
 export const AI_TOPIC_PATCHES_ES: Record<string, BlogTopicPatch> = {
     "learn-artificial-intelligence-free-beginners-guide": {
-        title: "Aprender inteligencia artificial gratis — guía para principiantes (2026)",
-        seoTitle: "Aprender IA gratis — guía completa para principiantes",
+        title: "Aprender IA — guía para principiantes (gratis)",
+        seoTitle: "Aprender IA gratis — inteligencia artificial para principiantes",
         description:
-            "Aprende inteligencia artificial gratis con un plan claro: conceptos, prompts, cursos free y práctica. Empieza IA sin título ni bootcamp de pago.",
-        focusKeyword: "aprender IA gratis",
+            "Aprender IA (inteligencia artificial) gratis: conceptos, prompts, cursos y práctica. Empieza sin título ni bootcamp de pago.",
+        focusKeyword: "aprender ia",
         keywords: [
+            "aprender ia",
+            "aprender IA",
             "aprender IA gratis",
             "aprender inteligencia artificial gratis",
             "IA para principiantes",
@@ -303,16 +305,16 @@ export const AI_TOPIC_PATCHES_ES: Record<string, BlogTopicPatch> = {
         ],
     },
     "ai-agents-explained-for-beginners-practical-guide": {
-        title: "Agentes IA explicados para principiantes — guía práctica",
-        seoTitle: "Agentes IA explicados — guía práctica",
+        title: "Agentes IA para principiantes — guía práctica",
+        seoTitle: "AI agents for beginners — agentes IA para principiantes",
         description:
-            "Agentes IA explicados: herramientas, planificación, memoria y bucles. Aprende cuándo un agente ayuda — y cuándo basta un solo prompt.",
-        focusKeyword: "agentes IA explicados",
+            "AI agents for beginners: planificar, llamar herramientas, observar, repetir. Aprende sobre agentes IA frente a un solo prompt.",
+        focusKeyword: "agentes IA para principiantes",
         keywords: [
+            "ai agents for beginners",
+            "agentes IA para principiantes",
             "agentes IA explicados",
             "qué son agentes IA",
-            "agentes IA principiantes",
-            "agentes IA autónomos",
             "aprender agentes IA",
         ],
         readTime: "12 min de lectura",

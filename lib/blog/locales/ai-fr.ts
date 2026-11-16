@@ -494,17 +494,18 @@ export const AI_TOPIC_PATCHES_FR: Record<string, BlogTopicPatch> = {
         ],
     },
     "what-is-an-ai-tutor-and-how-it-helps-learning": {
-        title: "Qu'est-ce qu'un tuteur IA ? Apprendre plus vite",
-        seoTitle: "Qu'est-ce qu'un tuteur IA ? Bénéfices et usage",
+        title: "Tutor IA : qu'est-ce qu'un tuteur IA ?",
+        seoTitle: "Tutor IA — Qu'est-ce qu'un tuteur IA ?",
         description:
-            "Qu'est-ce qu'un tuteur IA ? Fonctionnement, quand il bat les vidéos, et comment combiner tuteur IA, tutoriels gratuits et cohortes humaines.",
-        focusKeyword: "qu'est-ce qu'un tuteur IA",
+            "Tutor IA / tuteur IA : un professeur chat 24h/24. Qu'est-ce qu'un tuteur IA, quand il bat les vidéos, et comment le combiner avec tutoriels gratuits et cohortes.",
+        focusKeyword: "tutor ia",
         keywords: [
-            "qu'est-ce qu'un tuteur IA",
+            "tutor ia",
             "tuteur IA",
+            "qu'est-ce qu'un tuteur IA",
             "tutorat IA étudiants",
             "apprendre avec tuteur IA",
-            "tuteur apprentissage IA",
+            "what is ai tutor",
         ],
         readTime: "9 min de lecture",
         headings: {
@@ -621,6 +622,8 @@ export const AI_TOPIC_PATCHES_FR: Record<string, BlogTopicPatch> = {
             "IA pour développeurs web",
             "créer sites avec l'IA",
             "HTML CSS JavaScript IA",
+            "javascript tutoriel",
+            "tutoriel javascript",
         ],
         readTime: "11 min de lecture",
         headings: {
@@ -666,15 +669,16 @@ export const AI_TOPIC_PATCHES_FR: Record<string, BlogTopicPatch> = {
         ],
     },
     "rag-explained-for-beginners-simple-guide": {
-        title: "RAG expliqué pour débutants — guide simple",
-        seoTitle: "RAG expliqué — génération augmentée par récupération",
+        title: "Guide débutant : retrieval augmented generation (RAG)",
+        seoTitle: "Guide débutant à la retrieval augmented generation (RAG)",
         description:
-            "RAG expliqué simplement : la génération augmentée par récupération permet à l'IA de répondre avec vos docs. Pipeline, cas d'usage et pièges débutants.",
-        focusKeyword: "RAG expliqué débutant",
+            "Beginner guide to retrieval augmented generation : chunking, récupération, puis génération. Pipeline RAG, recall@k et pièges — lecture gratuite.",
+        focusKeyword: "retrieval augmented generation",
         keywords: [
+            "beginner guide to retrieval augmented generation",
+            "retrieval augmented generation",
             "RAG expliqué débutant",
             "qu'est-ce que RAG IA",
-            "retrieval augmented generation",
             "tutoriel RAG débutant",
             "IA avec vos documents",
         ],
@@ -846,17 +850,18 @@ export const AI_TOPIC_PATCHES_FR: Record<string, BlogTopicPatch> = {
         ],
     },
     "javascript-tutorial-for-beginners-free-interactive": {
-        title: "Tutoriel JavaScript débutant — gratuit et interactif",
-        seoTitle: "Tutoriel JavaScript débutant — parcours interactif free",
+        title: "JavaScript tutoriel — gratuit et interactif",
+        seoTitle: "JavaScript tutoriel — tutoriel JavaScript débutant gratuit",
         description:
-            "Tutoriel JavaScript débutant : leçons interactives gratuites sur variables, fonctions, DOM et habitudes de pratique qui restent — parcours 2026 Sturdee.",
-        focusKeyword: "tutoriel JavaScript débutant",
+            "JavaScript tutoriel (tutoriel JavaScript) : leçons interactives gratuites — variables, fonctions, DOM — plus modules avancés. Aucun compte requis.",
+        focusKeyword: "javascript tutoriel",
         keywords: [
+            "javascript tutoriel",
+            "tutoriel javascript",
             "tutoriel JavaScript débutant",
             "apprendre JavaScript gratuit",
             "JavaScript débutant gratuit",
             "tutoriel JavaScript interactif",
-            "bases JavaScript tutoriel",
         ],
         readTime: "12 min de lecture",
         headings: {

@@ -4,12 +4,12 @@ import JsonLd from "@/components/seo/JsonLd";
 import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
 import { getLocalizedHubMeta } from "@/lib/i18n/metadata";
-import { BLOG_POST_COUNT, getBlogPosts, getCategorySlug } from "@/lib/blog";
+import { BLOG_INDEX_PAGE_SIZE, BLOG_POST_COUNT, getBlogPosts, getCategorySlug } from "@/lib/blog";
 import { assertFeatureEnabled } from "@/lib/features";
 import { getLocaleSeoKeywords } from "@/lib/i18n/seo-locale";
 import { blogListJsonLd, pageMetadata } from "@/lib/seo";
 
-type Props = { params: Promise<{ locale: string }> };
+type Props = { params: Promise<{ locale: string }>; searchParams: Promise<{ page?: string }> };
 
 export function generateStaticParams() {
     return routing.locales.map((locale) => ({ locale }));
@@ -31,15 +31,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     });
 }
 
-export default async function BlogIndexPage({ params }: Props) {
+export default async function BlogIndexPage({ params, searchParams }: Props) {
     assertFeatureEnabled("blog");
     const { locale } = await params;
+    const { page: pageRaw } = await searchParams;
     const posts = getBlogPosts(locale as Locale);
     const CATEGORIES = [...new Set(posts.map((p) => p.category))];
 
     const sorted = [...posts].sort(
         (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
     );
+    const pageCount = Math.max(1, Math.ceil(sorted.length / BLOG_INDEX_PAGE_SIZE));
+    const page = Math.min(pageCount, Math.max(1, Number(pageRaw) || 1));
+    const slice = sorted.slice((page - 1) * BLOG_INDEX_PAGE_SIZE, page * BLOG_INDEX_PAGE_SIZE);
 
     const heading =
         locale === "fr"
@@ -99,7 +103,7 @@ export default async function BlogIndexPage({ params }: Props) {
                 </div>
 
                 <div className="space-y-4">
-                    {sorted.map((post) => (
+                    {slice.map((post) => (
                         <Link
                             key={post.slug}
                             href={`/blog/${post.slug}`}
@@ -136,6 +140,27 @@ export default async function BlogIndexPage({ params }: Props) {
                         </Link>
                     ))}
                 </div>
+                {pageCount > 1 ? (
+                    <nav className="mt-10 flex items-center justify-between text-sm font-semibold" aria-label="Blog pages">
+                        {page > 1 ? (
+                            <Link href={page === 2 ? "/blog" : `/blog?page=${page - 1}`} className="text-emerald-700 hover:underline">
+                                ← Previous
+                            </Link>
+                        ) : (
+                            <span />
+                        )}
+                        <span className="text-gray-400">
+                            {page} / {pageCount}
+                        </span>
+                        {page < pageCount ? (
+                            <Link href={`/blog?page=${page + 1}`} className="text-emerald-700 hover:underline">
+                                Next →
+                            </Link>
+                        ) : (
+                            <span />
+                        )}
+                    </nav>
+                ) : null}
             </div>
         </div>
     );

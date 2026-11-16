@@ -35,22 +35,34 @@ export default function TutorialsPage() {
     return (
         <div className="font-jakarta bg-page min-h-screen pt-28 pb-20">
             <JsonLd
-                data={breadcrumbJsonLd([
-                    { name: "Home", path: "/" },
-                    { name: "Tutorials", path: "/tutorials" },
-                ])}
+                data={[
+                    breadcrumbJsonLd([
+                        { name: "Home", path: "/" },
+                        { name: "Tutorials", path: "/tutorials" },
+                    ]),
+                    {
+                        "@context": "https://schema.org",
+                        "@type": "CollectionPage",
+                        name: "Free coding tutorials",
+                        description:
+                            "Public interactive tutorials with lecture videos and graduate modules. No account required.",
+                        url: `${SITE_NAME}`,
+                        isAccessibleForFree: true,
+                    },
+                ]}
             />
             <div className="max-w-7xl mx-auto px-6 md:px-12">
                 <div className="text-center max-w-3xl mx-auto mb-14">
                     <span className="inline-flex mb-6 px-5 py-2.5 bg-[#FFE55E] rounded-full font-bold text-black text-xs sm:text-sm tracking-wide shadow-md">
-                        Free Tutorials
+                        Free · Public · No account required
                     </span>
                     <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 leading-tight">
                         Learn to Code
                     </h1>
                     <p className="text-lg text-gray-500 font-medium mt-4 leading-relaxed">
-                        Example-driven tutorials for every major programming language. Read, edit, and run code —
-                        the {SITE_NAME} way.
+                        Example-driven tutorials for every major programming language — beginner lessons through
+                        graduate / PhD-standard modules, each with a lecture video. Read, edit, and run code in the
+                        browser. Open to anyone on {SITE_NAME}.
                     </p>
                 </div>
 

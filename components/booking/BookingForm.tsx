@@ -25,6 +25,7 @@ export default function BookingForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const skillSlug = searchParams.get("skill");
+    const isConsult = searchParams.get("consult") === "1";
     const preselectedSkill = skillSlug ? getSkill(skillSlug) : undefined;
     const aiOn = isFeatureEnabled("ai");
 
@@ -56,6 +57,13 @@ export default function BookingForm() {
             prev || `I want to learn ${preselectedSkill.title}. My goals: `
         );
     }, [preselectedSkill]);
+
+    useEffect(() => {
+        if (!isConsult) return;
+        setNotes((prev) =>
+            prev || "I'd like a free live consultation / class. I'm stuck on: "
+        );
+    }, [isConsult]);
 
     const activeSkill = skill ? getSkill(skill) : undefined;
     const assigned = result?.status === "confirmed" && result.batchId;
@@ -231,10 +239,13 @@ export default function BookingForm() {
     return (
         <div className="rounded-2xl border border-gray-100 bg-white shadow-xl overflow-hidden">
             <div className="border-b border-gray-100 bg-emerald-50/40 px-8 py-5">
-                <h2 className="text-lg font-bold text-gray-900">Student registration</h2>
+                <h2 className="text-lg font-bold text-gray-900">
+                    {isConsult ? "Book a free live class" : "Student registration"}
+                </h2>
                 <p className="mt-1 text-sm text-gray-600">
-                    Enter your details and goals. {aiOn ? "We can recommend the best AI skill path, then " : "We'll "}
-                    place you in an available batch with a tutor.
+                    {isConsult
+                        ? "Tell me what you’re stuck on and which skill you want. I’ll place you in a live consultation — no charge to register."
+                        : `Enter your details and goals. ${aiOn ? "We can recommend the best AI skill path, then " : "We'll "}place you in an available batch with a tutor.`}
                 </p>
             </div>
 

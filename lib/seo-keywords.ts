@@ -23,6 +23,10 @@ export const PRIMARY_KEYWORDS = [
     "free generative AI courses",
     "learn to code with AI",
     "free online courses",
+    "beginner guide to retrieval augmented generation",
+    "what is an AI tutor",
+    "AI agents for beginners",
+    "Shopify Liquid tutorial",
 ] as const;
 
 export const SECONDARY_KEYWORDS = [
@@ -67,6 +71,9 @@ export const LEARN_HUBS: LearnHub[] = [
             "AI tutorials",
             "free generative AI courses",
             "learn AI free",
+            "what is an AI tutor",
+            "AI agents for beginners",
+            "beginner guide to retrieval augmented generation",
         ],
         bullets: [
             "Free AI skill paths: automation, prompts, and agents",

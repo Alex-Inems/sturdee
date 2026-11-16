@@ -1,10 +1,10 @@
 import type { MetadataRoute } from "next";
 import type { Locale } from "@/i18n/routing";
-import { BLOG_POSTS, getCategorySlug, BLOG_CATEGORIES } from "@/lib/blog";
+import { getCategorySlug, BLOG_CATEGORIES, listAllBlogSlugs } from "@/lib/blog";
 import { LOCALES, localizedUrl } from "@/lib/site";
 import { SITE_URL } from "@/lib/site-core";
 import { SKILLS } from "@/lib/skills";
-import { TUTORIAL_LANGUAGES } from "@/lib/tutorials";
+import { TUTORIAL_LANGUAGES, TUTORIAL_TRACKS } from "@/lib/tutorials";
 import { LEARN_HUBS } from "@/lib/seo-keywords";
 import { FEATURES } from "@/lib/feature-flags";
 
@@ -37,7 +37,14 @@ export default async function sitemap(): Promise<Sitemap> {
     );
 
     const tutorialRoutes = localeEntries("/tutorials", 0.98, "weekly").concat(
-        ...TUTORIAL_LANGUAGES.map((lang) => localeEntries(`/tutorials/${lang.id}`, 0.9, "weekly"))
+        ...TUTORIAL_LANGUAGES.map((lang) => localeEntries(`/tutorials/${lang.id}`, 0.9, "weekly")),
+        ...TUTORIAL_TRACKS.flatMap((track) =>
+            track.sections.flatMap((section) =>
+                section.pages.flatMap((page) =>
+                    localeEntries(`/tutorials/${track.language.id}/${page.slug}`, 0.8, "monthly")
+                )
+            )
+        )
     );
 
     const learnRoutes = localeEntries("/learn", 0.97, "weekly").concat(
@@ -49,8 +56,8 @@ export default async function sitemap(): Promise<Sitemap> {
               ...BLOG_CATEGORIES.map((cat) =>
                   localeEntries(`/blog/category/${getCategorySlug(cat)}`, 0.85, "weekly")
               ),
-              ...BLOG_POSTS.map((post) =>
-                  localeEntries(`/blog/${post.slug}`, 0.88, "monthly", undefined, post.updatedAt)
+              ...listAllBlogSlugs().map((slug) =>
+                  localeEntries(`/blog/${slug}`, 0.86, "monthly")
               )
           )
         : [];

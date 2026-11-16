@@ -20,6 +20,7 @@ import {
     variablesPage,
 } from "./topics";
 import { referenceSection } from "./extra-pages";
+import { graduateSection } from "./graduate-pages";
 import type { TutorialLanguage, TutorialTrack } from "./types";
 import { liquidTrack } from "./liquid";
 import { attachVideoToPage } from "./videos";
@@ -147,6 +148,7 @@ function htmlTrack(): TutorialTrack {
                     steps(["Unique title per page (50–60 chars)", "Meta description (150–155 chars)", "Canonical URL", "One H1 with primary keyword", "Internal links to related tutorials"]),
                 ]),
             ]),
+            graduateSection(id, name, ext),
         ],
     };
 }
@@ -213,6 +215,7 @@ function cssTrack(): TutorialTrack {
                     code("css", `.card {\n  transition: transform 0.2s ease, box-shadow 0.2s ease;\n}\n.card:hover {\n  transform: translateY(-4px);\n}`),
                 ]),
             ]),
+            graduateSection(id, "CSS", "css"),
         ],
     };
 }
@@ -294,6 +297,7 @@ function jsTrack(): TutorialTrack {
                     sandboxTryit("weather", WEATHER_ERRORS_TRYIT, "Weather API with retry backoff"),
                 ]),
             ]),
+            graduateSection(id, "JavaScript", ext),
         ],
     };
 }
@@ -335,6 +339,7 @@ function pythonTrack(): TutorialTrack {
                     code(ext, `with open("notes.txt", "w") as f:\n    f.write("Hello")\n\nwith open("notes.txt") as f:\n    print(f.read())`),
                 ]),
             ]),
+            graduateSection(id, "Python", ext),
         ],
     };
 }
@@ -366,7 +371,11 @@ function genericTrack(
     if (classExample) basics.push(classesPage(id, name, ext, classExample));
     return {
         language: lang,
-        sections: [section(`${name} Tutorial`, basics), referenceSection(id, name, ext)],
+        sections: [
+            section(`${name} Tutorial`, basics),
+            referenceSection(id, name, ext),
+            graduateSection(id, name, ext),
+        ],
     };
 }
 

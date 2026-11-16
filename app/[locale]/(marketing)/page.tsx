@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import JsonLd from "@/components/seo/JsonLd";
 import LandingHero from "@/components/landing/LandingHero";
+import LandingConsult from "@/components/landing/LandingConsult";
 import LandingLanguages from "@/components/landing/LandingLanguages";
 import LandingMethod from "@/components/landing/LandingMethod";
 import LandingCTA from "@/components/landing/LandingCTA";
+import { FEATURES } from "@/lib/feature-flags";
 import { breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 import { getLocalizedHomeMeta } from "@/lib/i18n/metadata";
 import { getLocaleSeoKeywords } from "@/lib/i18n/seo-locale";
@@ -36,6 +38,7 @@ export default async function HomePage({ params }: Props) {
         <div className="font-jakarta bg-page">
             <JsonLd data={breadcrumbJsonLd([{ name: meta.breadcrumb, path: "/" }])} />
             <LandingHero />
+            {FEATURES.booking ? <LandingConsult /> : null}
             <LandingLanguages />
             <LandingMethod />
             <LandingCTA />

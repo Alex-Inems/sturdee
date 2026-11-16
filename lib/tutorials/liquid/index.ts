@@ -6,6 +6,7 @@ import { liquidObjectsSection } from "./objects";
 import { liquidArchitectureSection } from "./architecture";
 import { liquidCliSection } from "./cli";
 import { liquidAdvancedSection } from "./advanced";
+import { graduateSection } from "../graduate-pages";
 
 const LANG = {
     id: "liquid",
@@ -25,5 +26,6 @@ export const liquidTrack: TutorialTrack = {
         liquidArchitectureSection,
         liquidCliSection,
         liquidAdvancedSection,
+        graduateSection("liquid", "Liquid", "liquid"),
     ],
 };

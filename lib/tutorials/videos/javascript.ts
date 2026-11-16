@@ -18,4 +18,8 @@ export const JAVASCRIPT_VIDEOS: Record<string, ReturnType<typeof v>> = {
     "javascript/javascript_arrays": v(MOSH_JS, 2100, "Programming with Mosh"),
     "javascript/javascript_async": v("PoRJizFvM7o", 0, "Traversy Media"),
     "javascript/javascript_dom": v("0ik6f4TqGOE", 0, "Traversy Media"),
+    "javascript/javascript_objects": v("W6NZfCO5SIk", 2700, "Programming with Mosh"),
+    "javascript/javascript_events": v("0ik6f4TqGOE", 600, "Traversy Media"),
+    "javascript/javascript_fetch": v("PoRJizFvM7o", 180, "Traversy Media"),
+    "javascript/javascript_interview": v("jS4aFq5-91M", 0, "freeCodeCamp.org"),
 };

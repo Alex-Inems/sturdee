@@ -70,6 +70,7 @@ export default async function TutorialLanguagePage({ params }: Props) {
                         description: track.language.tagline,
                         url: `${SITE_URL}/tutorials/${lang}`,
                         provider: { "@type": "Organization", name: "Sturdee" },
+                        isAccessibleForFree: true,
                         hasCourseInstance: {
                             "@type": "CourseInstance",
                             courseMode: "online",
@@ -95,7 +96,14 @@ export default async function TutorialLanguagePage({ params }: Props) {
                                 {track.language.name} Tutorial
                             </h1>
                             <p className="text-gray-500 font-medium mt-3 leading-relaxed">{track.language.tagline}</p>
-                            <p className="text-sm text-gray-400 font-medium mt-2">{pages.length} free lessons</p>
+                            <p className="text-sm text-gray-400 font-medium mt-2">
+                                {pages.length} free lessons · videos on every page · no account required
+                            </p>
+                            <p className="text-sm text-gray-500 font-medium mt-3 leading-relaxed">
+                                Includes a Graduate &amp; Research section (algorithms, semantics, systems, ML/RAG,
+                                lecture list) so you can go from beginner syntax to PhD-standard reading — still
+                                public and free.
+                            </p>
                         </div>
                     </div>
 

@@ -8,8 +8,15 @@ import { JAVASCRIPT_TOPICS } from "./topics/javascript";
 import { PYTHON_TOPICS, SHOPIFY_TOPICS } from "./topics/python-shopify";
 import { CAREER_TOPICS, BACKEND_TOPICS, TOOLS_TOPICS } from "./topics/career-backend-tools";
 import type { BlogCategory, BlogPost, BlogTopic } from "./types";
+import {
+    getMatrixPost,
+    initMatrixSeeds,
+    listMatrixItems,
+    listMatrixSlugs,
+    type BlogListItem,
+} from "./matrix";
 
-export type { BlogCategory, BlogPost };
+export type { BlogCategory, BlogPost, BlogListItem };
 
 export const ALL_BLOG_TOPICS: BlogTopic[] = [
     ...AI_TOPICS,
@@ -23,11 +30,13 @@ export const ALL_BLOG_TOPICS: BlogTopic[] = [
     ...TOOLS_TOPICS,
 ];
 
+initMatrixSeeds(new Set(ALL_BLOG_TOPICS.map((t) => t.slug)));
+
 function relatedSlugs(topic: BlogTopic, all: BlogTopic[]): string[] {
     return scoreRelatedPosts(topic, all);
 }
 
-/** English posts (sitemap, static params, validation). */
+/** Pillar posts only — prerendered. Matrix posts render on demand. */
 export const BLOG_POSTS: BlogPost[] = ALL_BLOG_TOPICS.map((topic) =>
     buildBlogPost(topic, relatedSlugs(topic, ALL_BLOG_TOPICS))
 );
@@ -46,19 +55,47 @@ export const BLOG_CATEGORIES: BlogCategory[] = [
     "Tools",
 ];
 
-const localeCache = new Map<string, BlogPost[]>();
+const localePillars = new Map<string, BlogPost[]>();
 
-export function getBlogPosts(locale: Locale = "en"): BlogPost[] {
+function pillarPosts(locale: Locale): BlogPost[] {
     if (locale === "en") return BLOG_POSTS;
-    const cached = localeCache.get(locale);
+    const cached = localePillars.get(locale);
     if (cached) return cached;
     const posts = ALL_BLOG_TOPICS.map((topic) => localizeBlogTopic(topic, locale, ALL_BLOG_TOPICS));
-    localeCache.set(locale, posts);
+    localePillars.set(locale, posts);
     return posts;
 }
 
+function itemToListPost(item: BlogListItem): BlogPost {
+    return {
+        slug: item.slug,
+        title: item.title,
+        seoTitle: item.seoTitle,
+        description: item.description,
+        focusKeyword: item.keywords[0] ?? item.title,
+        keywords: item.keywords,
+        category: item.category,
+        readTime: item.readTime,
+        publishedAt: item.publishedAt,
+        updatedAt: item.updatedAt,
+        tutorialPath: item.tutorialPath,
+        canonicalPath: `/blog/${item.slug}`,
+        relatedSlugs: item.relatedSlugs,
+        sections: [],
+        coverImage: item.coverImage,
+        coverAlt: item.coverAlt,
+    };
+}
+
+/** Lightweight cards for index, categories, sitemap — no article bodies. */
+export function getBlogPosts(locale: Locale = "en"): BlogPost[] {
+    return [...pillarPosts(locale), ...listMatrixItems().map(itemToListPost)];
+}
+
 export function getBlogPost(slug: string, locale: Locale = "en"): BlogPost | undefined {
-    return getBlogPosts(locale).find((p) => p.slug === slug);
+    const pillar = pillarPosts(locale).find((p) => p.slug === slug);
+    if (pillar) return pillar;
+    return getMatrixPost(slug, locale);
 }
 
 export function getPostsByCategory(category: BlogCategory, locale: Locale = "en"): BlogPost[] {
@@ -70,8 +107,13 @@ export function getCategorySlug(category: BlogCategory): string {
 }
 
 export function getAllCategorySlugs(): { category: string }[] {
-    const cats = [...new Set(BLOG_POSTS.map((p) => p.category))];
-    return cats.map((c) => ({ category: categorySlug(c) }));
+    return BLOG_CATEGORIES.map((c) => ({ category: categorySlug(c) }));
 }
 
-export const BLOG_POST_COUNT = BLOG_POSTS.length;
+export function listAllBlogSlugs(): string[] {
+    return [...BLOG_POSTS.map((p) => p.slug), ...listMatrixSlugs()];
+}
+
+export const BLOG_POST_COUNT = BLOG_POSTS.length + listMatrixSlugs().length;
+export const BLOG_PILLAR_COUNT = BLOG_POSTS.length;
+export const BLOG_INDEX_PAGE_SIZE = 24;

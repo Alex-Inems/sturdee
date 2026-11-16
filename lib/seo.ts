@@ -141,6 +141,7 @@ export function tutorialLessonMetadata(
         page.title.toLowerCase(),
         "free tutorial",
         "learn programming",
+        "no account required",
     ];
 
     return pageMetadata({
@@ -152,11 +153,40 @@ export function tutorialLessonMetadata(
     });
 }
 
+const LANGUAGE_SEO: Record<string, { title: string; description: string; keywords: string[] }> = {
+    javascript: {
+        title: "JavaScript Tutorial (Tutoriel JavaScript) — Free Interactive",
+        description:
+            "JavaScript tutorial for beginners — tutoriel JavaScript gratuit. Variables, functions, DOM, and graduate modules. Watch a video, then run code. No account required.",
+        keywords: [
+            "javascript tutorial",
+            "javascript tutoriel",
+            "tutoriel javascript",
+            "javascript tutorial for beginners",
+            "learn javascript free",
+        ],
+    },
+    liquid: {
+        title: "Shopify Liquid Tutorial — Liquid Shopify (Free)",
+        description:
+            "Shopify Liquid tutorial (Liquid Shopify): objects, tags, filters, theme JS integration, plus graduate reading. Free — no account required.",
+        keywords: [
+            "shopify liquid tutorial",
+            "liquid shopify",
+            "shopify liquid tutorial for beginners",
+            "liquid js integration",
+        ],
+    },
+};
+
 export function tutorialLanguageMetadata(track: TutorialTrack): Metadata {
     const pageCount = track.sections.reduce((total, section) => total + section.pages.length, 0);
     const name = track.language.name;
-    const title = `Learn ${name} Free — Interactive Tutorial`;
-    const description = `${track.language.tagline} Free ${name} tutorial with ${pageCount} interactive lessons, code examples, and try-it-yourself editors. Learn ${name} for free on ${SITE_NAME}.`;
+    const override = LANGUAGE_SEO[track.language.id];
+    const title = override?.title ?? `Learn ${name} Free — Interactive Tutorial`;
+    const description =
+        override?.description ??
+        `${track.language.tagline} Free ${name} tutorial with ${pageCount} interactive lessons, code examples, video walkthroughs, and graduate/PhD-standard modules. No account required.`;
 
     return pageMetadata({
         title,
@@ -170,6 +200,8 @@ export function tutorialLanguageMetadata(track: TutorialTrack): Metadata {
             `${name.toLowerCase()} tutorial free`,
             "free coding tutorials",
             "learn to code for free",
+            "no account required",
+            ...(override?.keywords ?? []),
         ],
     });
 }
@@ -256,6 +288,19 @@ export function tutorialLessonJsonLd(
     slug: string
 ) {
     const path = `/tutorials/${lang}/${slug}`;
+    const graduate = /_(complexity|semantics|systems|ml|research)$/.test(slug);
+    const video = page.video
+        ? {
+              "@type": "VideoObject",
+              name: `${page.title} — lecture video`,
+              description: getTutorialPageDescription(page, track.language.name),
+              embedUrl: `https://www.youtube-nocookie.com/embed/${page.video.id}`,
+              contentUrl: `https://www.youtube.com/watch?v=${page.video.id}`,
+              thumbnailUrl: `https://i.ytimg.com/vi/${page.video.id}/hqdefault.jpg`,
+              uploadDate: "2020-01-01",
+          }
+        : undefined;
+
     return {
         "@context": "https://schema.org",
         "@type": "LearningResource",
@@ -263,7 +308,7 @@ export function tutorialLessonJsonLd(
         description: getTutorialPageDescription(page, track.language.name),
         url: `${SITE_URL}${path}`,
         learningResourceType: "tutorial",
-        educationalLevel: "Beginner",
+        educationalLevel: graduate ? "Graduate" : "Beginner",
         inLanguage: "en",
         isAccessibleForFree: true,
         provider: {
@@ -275,6 +320,7 @@ export function tutorialLessonJsonLd(
             "@type": "Thing",
             name: track.language.name,
         },
+        ...(video ? { video } : {}),
     };
 }
 

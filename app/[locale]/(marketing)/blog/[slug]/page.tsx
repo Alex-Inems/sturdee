@@ -10,6 +10,8 @@ interface Props {
     params: Promise<{ locale: string; slug: string }>;
 }
 
+export const dynamicParams = true;
+
 export function generateStaticParams() {
     return staticParamsFor("blog", () =>
         routing.locales.flatMap((locale) => BLOG_POSTS.map((p) => ({ locale, slug: p.slug })))

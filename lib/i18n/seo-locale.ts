@@ -13,6 +13,9 @@ export const LOCALE_PRIMARY_KEYWORDS: Record<Locale, string[]> = {
         "cours d'IA gratuits",
         "apprendre le développement web gratuitement",
         "tutoriel JavaScript débutant",
+        "javascript tutoriel",
+        "tutor ia",
+        "tuteur IA",
         "ingénierie de prompts",
     ],
     es: [
@@ -23,6 +26,9 @@ export const LOCALE_PRIMARY_KEYWORDS: Record<Locale, string[]> = {
         "cursos de IA gratis",
         "aprender desarrollo web gratis",
         "tutorial JavaScript para principiantes",
+        "aprender ia",
+        "aprender IA",
+        "tutor IA",
         "prompt engineering curso gratis",
     ],
     zh: [
@@ -41,16 +47,18 @@ export const LOCALE_PRIMARY_KEYWORDS: Record<Locale, string[]> = {
 const FR_HUBS: LearnHub[] = [
     {
         slug: "ai",
-        title: "Apprendre l'intelligence artificielle gratuitement — Tutoriels & cohortes",
+        title: "Apprendre l'intelligence artificielle gratuitement — Tutor IA",
         h1: "Apprendre l'intelligence artificielle gratuitement",
         description:
-            "Commencez l'IA gratuitement : tutoriels interactifs, ingénierie de prompts et cohortes en direct. Pratiquez avec le tuteur IA Sturdee (Pro).",
+            "Commencez l'IA gratuitement : tutoriels interactifs, ingénierie de prompts, tutor IA et cohortes. Pratiquez avec le tuteur IA Sturdee (Pro).",
         keywords: [
             "apprendre l'intelligence artificielle",
             "cours d'intelligence artificielle",
             "tutoriels IA",
             "cours d'IA générative gratuits",
             "apprendre l'IA gratuitement",
+            "tutor ia",
+            "tuteur IA",
         ],
         bullets: [
             "Parcours IA gratuits : automatisation, prompts et agents",
@@ -203,11 +211,13 @@ const FR_HUBS: LearnHub[] = [
 const ES_HUBS: LearnHub[] = [
     {
         slug: "ai",
-        title: "Aprender inteligencia artificial gratis — Tutoriales y cohortes",
-        h1: "Aprender inteligencia artificial gratis",
+        title: "Aprender IA gratis — Tutoriales, tutor IA y cohortes",
+        h1: "Aprender IA gratis",
         description:
-            "Empieza a aprender IA gratis con tutoriales interactivos, ingeniería de prompts y cohortes en vivo. Practica con el tutor IA de Sturdee (Pro).",
+            "Aprender IA (inteligencia artificial) gratis: tutoriales interactivos, ingeniería de prompts, tutor IA y cohortes en vivo. Practica con el tutor IA de Sturdee (Pro).",
         keywords: [
+            "aprender ia",
+            "aprender IA",
             "aprender inteligencia artificial",
             "cursos de inteligencia artificial",
             "tutoriales de IA",

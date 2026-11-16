@@ -2,6 +2,7 @@ import Link from "next/link";
 import TutorialPageContent from "@/components/tutorials/TutorialPageContent";
 import Breadcrumbs from "@/components/seo/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
+import BlogConsultCta from "@/components/blog/BlogConsultCta";
 import { getCategorySlug } from "@/lib/blog";
 import { blogPostJsonLd, breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 import type { BlogPost } from "@/lib/blog/types";
@@ -109,6 +110,7 @@ export default function BlogArticle({ post, related = [], locale = "en" }: BlogA
                         ))}
                     </div>
                     <TutorialPageContent sections={post.sections} />
+                    <BlogConsultCta locale={locale} />
                     {post.tutorialPath && (
                         <div className="mt-10 p-5 rounded-xl bg-emerald-50 border border-emerald-100">
                             <p className="text-sm font-bold text-gray-900 mb-2">{labels.continueLearning}</p>
