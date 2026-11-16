@@ -1540,9 +1540,9 @@ export const AI_TOPICS: BlogTopic[] = [
                     "Prompt with passages + citation rules",
                     "Evaluate with real user questions",
                     "Iterate chunk size and retrieval before scaling infra",
-                ],
-            },
-            {
+        ],
+    },
+    {
                 title: "Hands-on learning without overengineering",
                 paragraphs: [
                     "Collect ten FAQs your team actually asks. Split source docs into sections manually if needed. For each question, pick the three best sections by hand first — you are learning relevance intuition.",

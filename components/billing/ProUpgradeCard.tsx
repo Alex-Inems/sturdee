@@ -33,12 +33,12 @@ export default function ProUpgradeCard({
     const startCheckout = async () => {
         setError("");
         setUnavailable(false);
-        if (!PRO_CHECKOUT_ENABLED) {
-            setUnavailable(true);
-            return;
-        }
         if (!isAuthenticated) {
             router.push(`/?auth=login&role=student&next=${encodeURIComponent("/pricing")}`);
+            return;
+        }
+        if (!PRO_CHECKOUT_ENABLED) {
+            router.push("/pricing");
             return;
         }
         setLoading(true);
@@ -61,7 +61,7 @@ export default function ProUpgradeCard({
         return (
             <div className="rounded-xl border border-amber-200 bg-amber-50/80 px-4 py-3">
                 <p className="text-sm font-semibold text-amber-950">
-                    {featureLabel} are on {PRO_PLAN_NAME} ({PRO_PRICE_LABEL})
+                    Subscribe to AI to use {featureLabel} — {PRO_PLAN_NAME} ({PRO_PRICE_LABEL})
                 </p>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                     <button
@@ -71,7 +71,7 @@ export default function ProUpgradeCard({
                         className="inline-flex items-center gap-1.5 rounded-full bg-gray-900 px-4 py-1.5 text-xs font-semibold text-white hover:bg-black disabled:opacity-60"
                     >
                         {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
-                        Upgrade to Pro
+                        Subscribe to AI
                     </button>
                     <Link href="/pricing" className="text-xs font-semibold text-amber-900 underline-offset-2 hover:underline">
                         See plans
@@ -102,7 +102,7 @@ export default function ProUpgradeCard({
                 className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#10B981] hover:bg-[#0F9F72] disabled:opacity-60 px-6 py-3 text-sm font-semibold text-white"
             >
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                {isAuthenticated ? `Upgrade — ${PRO_PRICE_LABEL}` : "Sign in to upgrade"}
+                {isAuthenticated ? `Subscribe to AI — ${PRO_PRICE_LABEL}` : "Sign in to subscribe"}
             </button>
             {unavailable && (
                 <p className="mt-3 text-sm font-medium text-amber-900">{PRO_CHECKOUT_UNAVAILABLE_MESSAGE}</p>

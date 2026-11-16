@@ -7,6 +7,7 @@ import { blogPostJsonLd, breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 import type { BlogPost } from "@/lib/blog/types";
 import type { TutorialBlock } from "@/lib/tutorials/types";
 import type { Locale } from "@/i18n/routing";
+import BlogConsultCta from "@/components/blog/BlogConsultCta";
 
 function extractFaq(sections: TutorialBlock[]) {
     const block = sections.find((s) => s.type === "faq");
@@ -109,6 +110,7 @@ export default function BlogArticle({ post, related = [], locale = "en" }: BlogA
                         ))}
                     </div>
                     <TutorialPageContent sections={post.sections} />
+                    <BlogConsultCta locale={locale} />
                     {post.tutorialPath && (
                         <div className="mt-10 p-5 rounded-xl bg-emerald-50 border border-emerald-100">
                             <p className="text-sm font-bold text-gray-900 mb-2">{labels.continueLearning}</p>

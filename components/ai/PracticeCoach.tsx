@@ -25,18 +25,16 @@ export default function PracticeCoach({ context }: Props) {
     const [answer, setAnswer] = useState("");
     const [feedback, setFeedback] = useState("");
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
     const [needsPro, setNeedsPro] = useState(false);
 
-    if (!isPro) {
-        return <ProUpgradeCard compact featureLabel="Practice Coach" />;
-    }
-
     const generate = async () => {
-        setLoading(true);
-        setError("");
         setFeedback("");
         setAnswer("");
+        if (!isPro) {
+            setNeedsPro(true);
+            return;
+        }
+        setLoading(true);
         setNeedsPro(false);
         try {
             const res = await fetch("/api/ai/practice", {
@@ -45,14 +43,17 @@ export default function PracticeCoach({ context }: Props) {
                 body: JSON.stringify({ action: "generate", context }),
             });
             const data = await res.json();
-            if (data.code === "PRO_REQUIRED" || res.status === 402) {
+            if (data.code === "PRO_REQUIRED" || data.code === "AUTH_REQUIRED" || res.status === 402 || res.status === 401) {
                 setNeedsPro(true);
                 return;
             }
-            if (!res.ok) throw new Error(data.error || "Could not generate exercise");
+            if (!res.ok) {
+                setNeedsPro(true);
+                return;
+            }
             setExercise(data.exercise as Exercise);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : "Could not generate exercise");
+        } catch {
+            setNeedsPro(true);
         } finally {
             setLoading(false);
         }
@@ -61,7 +62,6 @@ export default function PracticeCoach({ context }: Props) {
     const grade = async () => {
         if (!exercise || !answer.trim()) return;
         setLoading(true);
-        setError("");
         try {
             const res = await fetch("/api/ai/practice", {
                 method: "POST",
@@ -74,22 +74,21 @@ export default function PracticeCoach({ context }: Props) {
                 }),
             });
             const data = await res.json();
-            if (data.code === "PRO_REQUIRED" || res.status === 402) {
+            if (data.code === "PRO_REQUIRED" || data.code === "AUTH_REQUIRED" || res.status === 402 || res.status === 401) {
                 setNeedsPro(true);
                 return;
             }
-            if (!res.ok) throw new Error(data.error || "Could not grade answer");
+            if (!res.ok) {
+                setNeedsPro(true);
+                return;
+            }
             setFeedback(data.feedback as string);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : "Could not grade answer");
+        } catch {
+            setNeedsPro(true);
         } finally {
             setLoading(false);
         }
     };
-
-    if (needsPro) {
-        return <ProUpgradeCard compact featureLabel="Practice Coach" />;
-    }
 
     return (
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50/40 p-5 sm:p-6">
@@ -118,10 +117,10 @@ export default function PracticeCoach({ context }: Props) {
                 </button>
             </div>
 
-            {error && (
-                <p className="mt-4 text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
-                    {error}
-                </p>
+            {needsPro && (
+                <div className="mt-4">
+                    <ProUpgradeCard compact featureLabel="AI Practice Coach" />
+                </div>
             )}
 
             {exercise && (

@@ -113,29 +113,29 @@ function NavigationInner() {
                                 </button>
                             </>
                         ) : (
-                            <button
+                                <button
                                 onClick={openAuth}
                                 className="px-5 py-2 bg-[#10B981] hover:bg-[#0F9F72] text-white font-semibold text-[13px] rounded-full transition-colors"
                             >
                                 {t("login")}
-                            </button>
+                                </button>
                         )}
                     </div>
 
                     <div className="flex md:hidden items-center gap-2 shrink-0">
-                        <button
-                            onClick={() => setMobileMenu(!mobileMenu)}
+                    <button
+                        onClick={() => setMobileMenu(!mobileMenu)}
                             className="p-2 rounded-full hover:bg-gray-50"
-                            aria-label="Toggle menu"
-                        >
-                            <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                {mobileMenu ? (
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M6 18L18 6M6 6l12 12" />
-                                ) : (
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M4 6h16M4 12h16M4 18h16" />
-                                )}
-                            </svg>
-                        </button>
+                        aria-label="Toggle menu"
+                    >
+                        <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            {mobileMenu ? (
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M6 18L18 6M6 6l12 12" />
+                            ) : (
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M4 6h16M4 12h16M4 18h16" />
+                            )}
+                        </svg>
+                    </button>
                     </div>
                 </div>
 
@@ -179,7 +179,7 @@ function NavigationInner() {
                                 className="w-full mt-2 py-2.5 bg-[#10B981] text-white rounded-xl font-semibold text-sm"
                             >
                                 {t("login")}
-                            </button>
+                                </button>
                         )}
                     </div>
                 )}
